@@ -44,7 +44,7 @@ class User(AbstractUser):
         return bool(self.first_name and self.last_name and self.email)
 
     def get_absolute_url(self):
-        return reverse("account_profile")
+        return reverse("users:account_profile")
 
 
 # Compatibility shim: legacy code imports SavedFlight from users.models,
@@ -53,4 +53,3 @@ try:
     from flights.models import SavedFlight  # noqa: F401
 except Exception:
     pass
-

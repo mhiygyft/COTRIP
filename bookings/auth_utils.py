@@ -92,7 +92,7 @@ def require_complete_profile(view_func):
             )
             # Redirect to profile completion with next parameter
             next_url = request.get_full_path()
-            profile_url = f"{reverse('account_profile')}?next={next_url}"
+            profile_url = f"{reverse('users:account_profile')}?next={next_url}"
             return redirect(profile_url)
         
         return view_func(request, *args, **kwargs)

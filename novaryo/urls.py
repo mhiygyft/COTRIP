@@ -18,6 +18,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from hotels.views import HomeView
+from users import views as user_views
 from .swagger_settings import schema_view
 
 urlpatterns = [
@@ -42,6 +43,7 @@ urlpatterns = [
     
     # Home page
     path('', HomeView.as_view(), name='home'),
+    path('profile/', user_views.profile, name='account_profile'),
     
     # Web app URLs
     path('hotels/', include('hotels.urls')),

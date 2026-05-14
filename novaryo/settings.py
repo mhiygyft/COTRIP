@@ -18,9 +18,56 @@ Unauthorized use, reproduction, or distribution is strictly prohibited.
 import os
 from pathlib import Path
 from decouple import config
+from decouple import UndefinedValueError
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def dotenv_value(name):
+    env_file = BASE_DIR / ".env"
+    if not env_file.exists():
+        return None
+
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        if key.strip() == name:
+            return value.strip().strip('"').strip("'")
+    return None
+
+
+def bool_from_string(value):
+    normalized = str(value).strip().lower()
+    if normalized in {"1", "true", "yes", "on", "debug", "development", "dev"}:
+        return True
+    if normalized in {"0", "false", "no", "off", "release", "production", "prod"}:
+        return False
+    return None
+
+
+def config_bool(name, default=False):
+    """Read booleans and fall back to .env when shell env uses app labels."""
+    try:
+        value = config(name)
+    except UndefinedValueError:
+        return default
+
+    if isinstance(value, bool):
+        return value
+
+    parsed = bool_from_string(value)
+    if parsed is not None and str(value).strip().lower() not in {"release", "production", "prod"}:
+        return parsed
+
+    file_value = dotenv_value(name)
+    file_parsed = bool_from_string(file_value) if file_value is not None else None
+    if file_parsed is not None:
+        return file_parsed
+
+    return parsed if parsed is not None else default
 
 
 # Quick-start development settings - unsuitable for production
@@ -30,7 +77,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config_bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
@@ -120,7 +167,7 @@ DATABASES = {
 }
 
 # Fallback to SQLite for development if PostgreSQL is not available
-if config("USE_SQLITE", default=False, cast=bool):
+if config_bool("USE_SQLITE", default=False):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -306,7 +353,7 @@ SITE_ID = 1
 EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 EMAIL_HOST = config("EMAIL_HOST", default="localhost")
 EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_USE_TLS = config_bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = "Novaryo <noreply@novaryo.com>"

@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Min, Max
 from django.http import JsonResponse
 from django.urls import reverse
+from urllib.parse import urlencode
 from django.utils import timezone
 from datetime import datetime, time, timedelta
 from decimal import Decimal
@@ -38,7 +39,7 @@ def flight_search(request):
         if form.cleaned_data.get('return_date'):
             params['return_date'] = form.cleaned_data['return_date'].strftime('%Y-%m-%d')
         
-        return redirect('flights:search_results', **params)
+        return redirect(f"{reverse('flights:search_results')}?{urlencode(params)}")
     
     return render(request, 'flights/search.html', context)
 
@@ -352,13 +353,15 @@ def quick_search_redirect(request):
     form = QuickFlightSearchForm(request.GET)
     
     if form.is_valid():
-        return redirect('flights:search_results', 
-                       origin=form.cleaned_data['origin'].id,
-                       destination=form.cleaned_data['destination'].id,
-                       departure_date=form.cleaned_data['departure_date'].strftime('%Y-%m-%d'),
-                       trip_type='one_way',
-                       passengers=1,
-                       cabin_class='economy')
+        params = {
+            'origin': form.cleaned_data['origin'].id,
+            'destination': form.cleaned_data['destination'].id,
+            'departure_date': form.cleaned_data['departure_date'].strftime('%Y-%m-%d'),
+            'trip_type': 'one_way',
+            'passengers': 1,
+            'cabin_class': 'economy',
+        }
+        return redirect(f"{reverse('flights:search_results')}?{urlencode(params)}")
     
     # If form is invalid, redirect to main search with error
     messages.error(request, 'Please correct the search parameters and try again.')

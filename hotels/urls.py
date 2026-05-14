@@ -5,6 +5,7 @@ app_name = 'hotels'
 
 urlpatterns = [
     # Hotel search and listing (home page moved to main urls.py)
+    path('', views.HotelListView.as_view(), name='hotel_list_root'),
     path('search/', views.HotelSearchView.as_view(), name='search'),
     path('hotels/', views.HotelListView.as_view(), name='hotel_list'),
     path('hotel/<slug:slug>/', views.HotelDetailView.as_view(), name='hotel_detail'),

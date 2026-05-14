@@ -18,7 +18,7 @@ def profile(request):
             next_url = request.GET.get("next")
             if next_url and next_url.startswith("/"):
                 return redirect(next_url)
-            return redirect("account_profile")
+            return redirect("users:account_profile")
     else:
         form = UserProfileForm(instance=request.user)
 
@@ -52,4 +52,3 @@ def saved_flights(request):
         "page_title": "Saved Flights",
     }
     return render(request, "users/saved_flights.html", context)
-
