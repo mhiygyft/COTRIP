@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .bookings-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+    }
+    
+    .booking-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .booking-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .booking-header {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .booking-reference {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .no-bookings {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bookings-header">
+    <div class="container">
+        <h1 class="h3 mb-1">My Bookings</h1>
+        <p class="mb-0">Manage your flight reservations</p>
+    </div>
+</div>
+
+<div class="container mt-4">
+    {% if bookings %}
+        {% for booking in bookings %}
+        <div class="booking-card">
+            <div class="booking-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="booking-reference">{{ booking.booking_reference }}</div>
+                        <div class="text-muted">Booked on {{ booking.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="status-badge status-{{ booking.status }}">
+                            <i class="fas {% if booking.status == 'confirmed' %}fa-check-circle{% elif booking.status == 'cancelled' %}fa-times-circle{% else %}fa-clock{% endif %} me-1"></i>
+                            {{ booking.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Flight Info -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="airline-logo me-3" style="width: 40px; height: 40px; background: #667eea; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
+                                {{ booking.flight.airline.iata_code }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ booking.flight.airline.name }}</h6>
+                                <small class="text-muted">Flight {{ booking.flight.flight_number }}</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Route -->
+                        <div class="row text-center mb-3">
+                            <div class="col">
+                                <div class="fw-bold">{{ booking.flight.departure_time|date:"H:i" }}</div>
+                                <div class="text-muted">{{ booking.flight.origin.iata_code }}</div>
+                                <div class="small text-muted">{{ booking.flight.origin.city }}</div>
+                            </div>
+                            <div class="col-2">
+                                <i class="fas fa-arrow-right text-primary"></i>
+                                <div class="small text-muted">{{ booking.flight.duration_minutes|floatformat:0 }}m</div>
+                            </div>
+                            <div class="col">
+                                <div class="fw-bold">{{ booking.flight.arrival_time|date:"H:i" }}</div>
+                                <div class="text-muted">{{ booking.flight.destination.iata_code }}</div>
+                                <div class="small text-muted">{{ booking.flight.destination.city }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Travel Date -->
+                        <div class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ booking.flight.departure_time|date:"l, F d, Y" }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <!-- Price -->
+                        <div class="text-end mb-3">
+                            <div class="h5 text-success mb-0">${{ booking.total_price }}</div>
+                            <small class="text-muted">{{ booking.get_cabin_class_display }}</small>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'bookings:booking_detail' booking.booking_reference %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            {% if booking.is_cancellable %}
+                            <a href="{% url 'bookings:cancel_booking' booking.booking_reference %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-bookings">
+            <i class="fas fa-ticket-alt fa-4x mb-3"></i>
+            <h4>No bookings yet</h4>
+            <p class="text-muted mb-4">You haven't made any flight bookings yet. Start exploring flights to book your next adventure!</p>
+            <a href="{% url 'flights:search' %}" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i>Search Flights
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

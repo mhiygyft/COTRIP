@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .search-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+    }
+    
+    .search-summary {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: -1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filters-sidebar {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .flight-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .flight-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        border-color: #667eea;
+    }
+    
+    .airline-logo {
+        width: 40px;
+        height: 40px;
+        background: #667eea;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    
+    .flight-route {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .flight-time {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .flight-duration {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .flight-duration::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #dee2e6;
+        z-index: 1;
+    }
+    
+    .flight-duration span {
+        background: white;
+        padding: 0 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .price-section {
+        text-align: right;
+    }
+    
+    .flight-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+    
+    .price-per-person {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .select-flight-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 0.5rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+    
+    .select-flight-btn:hover {
+        transform: translateY(-1px);
+        color: white;
+    }
+    
+    .stops-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .filter-section {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .no-flights {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .save-search-btn {
+        border: 1px solid #667eea;
+        color: #667eea;
+        border-radius: 20px;
+        padding: 0.25rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .save-search-btn:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .airline-rating {
+        font-size: 0.8rem;
+        color: #ffc107;
+    }
+    
+    .aircraft-info {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="h3 mb-1">{{ page_title }}</h1>
+                <p class="mb-0">
+                    {{ departure_date|date:"M d, Y" }}
+                    {% if return_date %} - {{ return_date|date:"M d, Y" }}{% endif %}
+                    • {{ passengers }} passenger{{ passengers|pluralize }}
+                    • {{ cabin_class|capfirst }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'flights:search' %}" class="btn btn-light">
+                    <i class="fas fa-edit me-1"></i> Modify Search
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3">
+            <div class="filters-sidebar">
+                <form method="get" class="filter-form">
+                    <!-- Hidden fields to preserve search parameters -->
+                    <input type="hidden" name="origin" value="{{ origin.id }}">
+                    <input type="hidden" name="destination" value="{{ destination.id }}">
+                    <input type="hidden" name="departure_date" value="{{ departure_date|date:'Y-m-d' }}">
+                    {% if return_date %}<input type="hidden" name="return_date" value="{{ return_date|date:'Y-m-d' }}">{% endif %}
+                    <input type="hidden" name="trip_type" value="{{ trip_type }}">
+                    <input type="hidden" name="passengers" value="{{ passengers }}">
+                    <input type="hidden" name="cabin_class" value="{{ cabin_class }}">
+                    
+                    <h5 class="mb-3">
+                        <i class="fas fa-filter me-2"></i>Filters
+                    </h5>
+                    
+                    <!-- Sort By -->
+                    <div class="filter-section">
+                        <h6>Sort By</h6>
+                        {{ filter_form.sort_by }}
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="filter-section">
+                        <h6>Price Range</h6>
+                        {% if price_range.min_price and price_range.max_price %}
+                        <small class="text-muted d-block mb-2">
+                            ${{ price_range.min_price }} - ${{ price_range.max_price }}
+                        </small>
+                        {% endif %}
+                        <div class="row g-2">
+                            <div class="col-6">
+                                {{ filter_form.min_price }}
+                            </div>
+                            <div class="col-6">
+                                {{ filter_form.max_price }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stops -->
+                    <div class="filter-section">
+                        <h6>Stops</h6>
+                        {{ filter_form.stops }}
+                    </div>
+                    
+                    <!-- Departure Time -->
+                    <div class="filter-section">
+                        <h6>Departure Time</h6>
+                        {{ filter_form.departure_time }}
+                    </div>
+                    
+                    <!-- Arrival Time -->
+                    <div class="filter-section">
+                        <h6>Arrival Time</h6>
+                        {{ filter_form.arrival_time }}
+                    </div>
+                    
+                    <!-- Airlines -->
+                    {% if filter_form.airlines.field.queryset %}
+                    <div class="filter-section">
+                        <h6>Airlines</h6>
+                        {% for airline in filter_form.airlines.field.queryset %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   name="airlines" value="{{ airline.id }}" 
+                                   id="airline_{{ airline.id }}"
+                                   {% if airline.id in request.GET.airlines %}checked{% endif %}>
+                            <label class="form-check-label small" for="airline_{{ airline.id }}">
+                                {{ airline.name }}
+                                <span class="airline-rating">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= airline.average_rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        Apply Filters
+                    </button>
+                </form>
+                
+                <!-- Save Search for logged-in users -->
+                {% if user.is_authenticated and save_form %}
+                <div class="mt-4 pt-3 border-top">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="save_search" value="1">
+                        <h6>Save This Search</h6>
+                        {{ save_form.search_name }}
+                        <button type="submit" class="btn save-search-btn btn-sm w-100 mt-2">
+                            <i class="fas fa-bookmark me-1"></i> Save Search
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Flight Results -->
+        <div class="col-lg-9">
+            {% if outbound_flights %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p class="text-muted mb-0">
+                        Showing {{ outbound_flights.start_index }}-{{ outbound_flights.end_index }} 
+                        of {{ outbound_flights.paginator.count }} flights
+                    </p>
+                    <div class="btn-group btn-group-sm">
+                        <input type="radio" class="btn-check" name="sort" id="sort-price" checked>
+                        <label class="btn btn-outline-secondary" for="sort-price">Price</label>
+                        
+                        <input type="radio" class="btn-check" name="sort" id="sort-duration">
+                        <label class="btn btn-outline-secondary" for="sort-duration">Duration</label>
+                        
+                        <input type="radio" class="btn-check" name="sort" id="sort-departure">
+                        <label class="btn btn-outline-secondary" for="sort-departure">Departure</label>
+                    </div>
+                </div>
+                
+                <!-- Outbound Flights -->
+                {% for flight in outbound_flights %}
+                <div class="flight-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="airline-logo me-3">
+                                    {{ flight.airline.iata_code }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ flight.airline.name }}</h6>
+                                    <small class="aircraft-info">
+                                        {{ flight.aircraft.manufacturer }} {{ flight.aircraft.model }}
+                                        {% if flight.aircraft.variant %} {{ flight.aircraft.variant }}{% endif %}
+                                    </small>
+                                    <div class="airline-rating">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= flight.airline.average_rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <small class="text-muted">({{ flight.airline.total_reviews }} reviews)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flight-route">
+                                <div class="text-center">
+                                    <div class="flight-time">{{ flight.departure_time|date:"H:i" }}</div>
+                                    <small class="text-muted">{{ flight.origin.iata_code }}</small>
+                                </div>
+                                
+                                <div class="flex-grow-1 flight-duration">
+                                    <span>{{ flight.duration_minutes|floatformat:0 }}m</span>
+                                    <div class="stops-info text-center">
+                                        {% if flight.stops == 0 %}
+                                            Direct
+                                        {% elif flight.stops == 1 %}
+                                            1 stop
+                                        {% else %}
+                                            {{ flight.stops }} stops
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="flight-time">{{ flight.arrival_time|date:"H:i" }}</div>
+                                    <small class="text-muted">{{ flight.destination.iata_code }}</small>
+                                    {% if flight.arrival_time.date != flight.departure_time.date %}
+                                        <small class="text-danger">+{{ flight.arrival_time.date|timeuntil:flight.departure_time.date }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="price-section">
+                                <div class="flight-price">
+                                    ${% if cabin_class == 'economy' %}{{ flight.economy_price }}{% elif cabin_class == 'premium_economy' %}{{ flight.premium_economy_price }}{% elif cabin_class == 'business' %}{{ flight.business_price }}{% else %}{{ flight.first_class_price }}{% endif %}
+                                </div>
+                                <div class="price-per-person">per person</div>
+                                <div class="mt-2">
+                                    {% if cabin_class == 'economy' %}{{ flight.economy_available }}{% elif cabin_class == 'premium_economy' %}{{ flight.premium_economy_available }}{% elif cabin_class == 'business' %}{{ flight.business_available }}{% else %}{{ flight.first_class_available }}{% endif %}
+                                    seats left
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{% url 'flights:detail' flight.id %}" class="select-flight-btn btn">
+                                        Select Flight
+                                    </a>
+                                </div>
+                                {% if user.is_authenticated %}
+                                <div class="mt-2">
+                                    <button class="btn btn-link btn-sm p-0 save-flight-btn" 
+                                            data-flight-id="{{ flight.id }}">
+                                        <i class="far fa-heart"></i> Save
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <!-- Pagination -->
+                {% if outbound_flights.has_other_pages %}
+                <nav aria-label="Flight search results pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if outbound_flights.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ outbound_flights.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in outbound_flights.paginator.page_range %}
+                            {% if outbound_flights.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > outbound_flights.number|add:'-3' and num < outbound_flights.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if outbound_flights.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ outbound_flights.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="no-flights">
+                    <i class="fas fa-plane-slash fa-3x mb-3 text-muted"></i>
+                    <h4>No flights found</h4>
+                    <p class="text-muted">
+                        Try adjusting your search criteria or dates to find more flights.
+                    </p>
+                    <a href="{% url 'flights:search' %}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>New Search
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit filter form when sort or filter changes
+    const sortRadios = document.querySelectorAll('input[name="sort"]');
+    const filterForm = document.querySelector('.filter-form');
+    
+    sortRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const sortBy = this.id.replace('sort-', '').replace('-', '_');
+            
+            // Add sort parameter to form
+            let sortInput = filterForm.querySelector('input[name="sort_by"]');
+            if (!sortInput) {
+                sortInput = document.createElement('input');
+                sortInput.type = 'hidden';
+                sortInput.name = 'sort_by';
+                filterForm.appendChild(sortInput);
+            }
+            sortInput.value = sortBy === 'price' ? 'price_low_high' : sortBy + '_time';
+            
+            filterForm.submit();
+        });
+    });
+    
+    // Save flight functionality
+    document.querySelectorAll('.save-flight-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const flightId = this.dataset.flightId;
+            const icon = this.querySelector('i');
+            
+            fetch(`/flights/save-flight/${flightId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_saved) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.innerHTML = '<i class="fas fa-heart"></i> Saved';
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.innerHTML = '<i class="far fa-heart"></i> Save';
+                }
+                
+                // Show toast notification
+                showToast(data.message);
+            });
+        });
+    });
+});
+
+function showToast(message) {
+    // Create simple toast notification
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed top-0 end-0 p-3';
+    toast.style.zIndex = '1080';
+    toast.innerHTML = `
+        <div class="toast show" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-plane text-primary me-2"></i>
+                <strong class="me-auto">Flight Search</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

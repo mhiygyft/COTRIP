@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .passenger-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+    }
+    
+    .passenger-form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+    }
+    
+    .step.completed {
+        color: #28a745;
+    }
+    
+    .step.active {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .step.completed .step-number {
+        background: #28a745;
+        color: white;
+    }
+    
+    .step.active .step-number {
+        background: #667eea;
+        color: white;
+    }
+    
+    .step-connector {
+        width: 3rem;
+        height: 2px;
+        background: #e9ecef;
+        margin: 0 1rem;
+    }
+    
+    .step.completed + .step .step-connector {
+        background: #28a745;
+    }
+    
+    .continue-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        width: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .continue-btn:hover {
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .flight-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="passenger-header">
+    <div class="container">
+        <h1 class="h3 mb-1">Passenger Details</h1>
+        <p class="mb-0">Please provide passenger information for your flight</p>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-number">
+                <i class="fas fa-check"></i>
+            </div>
+            <span>Flight Selected</span>
+        </div>
+        <div class="step-connector"></div>
+        
+        <div class="step active">
+            <div class="step-number">2</div>
+            <span>Passenger Details</span>
+        </div>
+        <div class="step-connector"></div>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <span>Payment</span>
+        </div>
+        <div class="step-connector"></div>
+        
+        <div class="step">
+            <div class="step-number">4</div>
+            <span>Confirmation</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="passenger-form-card">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-user me-2"></i>Passenger Information
+                        </h5>
+                        
+                        <!-- Personal Information -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ passenger_form.title.id_for_label }}" class="form-label">Title</label>
+                                {{ passenger_form.title }}
+                                {% if passenger_form.title.errors %}
+                                    <div class="text-danger small">{{ passenger_form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label for="{{ passenger_form.first_name.id_for_label }}" class="form-label">First Name *</label>
+                                {{ passenger_form.first_name }}
+                                {% if passenger_form.first_name.errors %}
+                                    <div class="text-danger small">{{ passenger_form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ passenger_form.middle_name.id_for_label }}" class="form-label">Middle Name</label>
+                                {{ passenger_form.middle_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.last_name.id_for_label }}" class="form-label">Last Name *</label>
+                                {{ passenger_form.last_name }}
+                                {% if passenger_form.last_name.errors %}
+                                    <div class="text-danger small">{{ passenger_form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.date_of_birth.id_for_label }}" class="form-label">Date of Birth *</label>
+                                {{ passenger_form.date_of_birth }}
+                                {% if passenger_form.date_of_birth.errors %}
+                                    <div class="text-danger small">{{ passenger_form.date_of_birth.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Travel Documents -->
+                        <h6 class="mt-4 mb-3">Travel Documents</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.passport_number.id_for_label }}" class="form-label">Passport Number</label>
+                                {{ passenger_form.passport_number }}
+                                {% if passenger_form.passport_number.errors %}
+                                    <div class="text-danger small">{{ passenger_form.passport_number.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ passenger_form.passport_country.id_for_label }}" class="form-label">Country</label>
+                                {{ passenger_form.passport_country }}
+                                {% if passenger_form.passport_country.errors %}
+                                    <div class="text-danger small">{{ passenger_form.passport_country.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ passenger_form.passport_expiry.id_for_label }}" class="form-label">Expiry Date</label>
+                                {{ passenger_form.passport_expiry }}
+                                {% if passenger_form.passport_expiry.errors %}
+                                    <div class="text-danger small">{{ passenger_form.passport_expiry.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <h6 class="mt-4 mb-3">Contact Information</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ passenger_form.email }}
+                                {% if passenger_form.email.errors %}
+                                    <div class="text-danger small">{{ passenger_form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.phone.id_for_label }}" class="form-label">Phone</label>
+                                {{ passenger_form.phone }}
+                                {% if passenger_form.phone.errors %}
+                                    <div class="text-danger small">{{ passenger_form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Preferences -->
+                        <h6 class="mt-4 mb-3">Preferences</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.meal_preference.id_for_label }}" class="form-label">Meal Preference</label>
+                                {{ passenger_form.meal_preference }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ passenger_form.seat_preference.id_for_label }}" class="form-label">Seat Preference</label>
+                                {{ passenger_form.seat_preference }}
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="{{ passenger_form.special_assistance.id_for_label }}" class="form-label">Special Assistance</label>
+                                {{ passenger_form.special_assistance }}
+                            </div>
+                        </div>
+                        
+                        <!-- Booking Contact -->
+                        <h5 class="mt-5 mb-4">
+                            <i class="fas fa-envelope me-2"></i>Booking Contact
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ contact_form.contact_email.id_for_label }}" class="form-label">Contact Email *</label>
+                                {{ contact_form.contact_email }}
+                                {% if contact_form.contact_email.errors %}
+                                    <div class="text-danger small">{{ contact_form.contact_email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ contact_form.contact_phone.id_for_label }}" class="form-label">Contact Phone</label>
+                                {{ contact_form.contact_phone }}
+                                {% if contact_form.contact_phone.errors %}
+                                    <div class="text-danger small">{{ contact_form.contact_phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="{{ contact_form.special_requests.id_for_label }}" class="form-label">Special Requests</label>
+                                {{ contact_form.special_requests }}
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="continue-btn mt-4">
+                            <i class="fas fa-arrow-right me-2"></i>Continue to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Flight Summary -->
+        <div class="col-lg-4">
+            <div class="flight-summary">
+                <h6 class="fw-bold mb-3">
+                    <i class="fas fa-plane me-2"></i>Flight Summary
+                </h6>
+                
+                <div class="d-flex align-items-center mb-2">
+                    <div class="airline-logo me-2" style="width: 30px; height: 30px; background: #667eea; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: bold;">
+                        {{ flight.airline.iata_code }}
+                    </div>
+                    <div>
+                        <strong>{{ flight.airline.name }}</strong>
+                        <div class="small text-muted">{{ flight.flight_number }}</div>
+                    </div>
+                </div>
+                
+                <div class="row text-center mb-3">
+                    <div class="col">
+                        <div class="fw-bold">{{ flight.departure_time|date:"H:i" }}</div>
+                        <div class="small text-muted">{{ flight.origin.iata_code }}</div>
+                        <div class="small text-muted">{{ flight.origin.city }}</div>
+                    </div>
+                    <div class="col-2">
+                        <div class="small text-muted">{{ flight.duration_minutes|floatformat:0 }}m</div>
+                        <i class="fas fa-arrow-right text-primary"></i>
+                        {% if flight.stops > 0 %}
+                            <div class="small text-muted">{{ flight.stops }} stop{{ flight.stops|pluralize }}</div>
+                        {% else %}
+                            <div class="small text-success">Direct</div>
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <div class="fw-bold">{{ flight.arrival_time|date:"H:i" }}</div>
+                        <div class="small text-muted">{{ flight.destination.iata_code }}</div>
+                        <div class="small text-muted">{{ flight.destination.city }}</div>
+                    </div>
+                </div>
+                
+                <div class="border-top pt-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Class:</span>
+                        <span class="fw-bold">{{ cabin_class|capfirst }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Price:</span>
+                        <span class="fw-bold text-success">${{ price }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-populate passenger type based on age
+    const dobInput = document.querySelector('input[name="date_of_birth"]');
+    const passengerTypeSelect = document.querySelector('select[name="passenger_type"]');
+    
+    if (dobInput && passengerTypeSelect) {
+        dobInput.addEventListener('change', function() {
+            const dob = new Date(this.value);
+            const today = new Date();
+            const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+            
+            if (age < 2) {
+                passengerTypeSelect.value = 'infant';
+            } else if (age >= 2 && age < 12) {
+                passengerTypeSelect.value = 'child';
+            } else {
+                passengerTypeSelect.value = 'adult';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

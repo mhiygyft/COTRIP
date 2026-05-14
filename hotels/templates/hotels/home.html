@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Novaryo - Book Hotels, Flights & More | Best Deals Guaranteed{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Search -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-4 fw-bold mb-3">Discover Comfort. Discover Novaryo.</h1>
+                <p class="lead mb-5">Find and book the perfect accommodation for your next adventure</p>
+                
+                <!-- Hotel Search Form -->
+                <div class="search-form mx-auto" style="max-width: 700px;">
+                    <form action="{% url 'hotels:search' %}" method="GET" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="location" class="form-label text-dark">Where are you going?</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" class="form-control" id="location" name="location" 
+                                       placeholder="City, hotel, or destination" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="checkin" class="form-label text-dark">Check-in</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                <input type="date" class="form-control" id="checkin" name="checkin" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="checkout" class="form-label text-dark">Check-out</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                <input type="date" class="form-control" id="checkout" name="checkout" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="guests" class="form-label text-dark">Guests</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-people"></i></span>
+                                <select class="form-select" id="guests" name="guests" required>
+                                    <option value="1">1 Guest</option>
+                                    <option value="2" selected>2 Guests</option>
+                                    <option value="3">3 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                    <option value="5">5 Guests</option>
+                                    <option value="6">6+ Guests</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-dark">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100 py-3">
+                                <i class="bi bi-search"></i> Search Hotels
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popular Destinations -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2>Popular Destinations</h2>
+            <p class="text-muted">Explore our most loved destinations around the world</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for city in popular_cities %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 destination-card">
+                <div class="card-body text-center">
+                    <div class="destination-icon mb-3">
+                        <i class="bi bi-geo-alt-fill fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="card-title">{{ city.name }}</h5>
+                    <p class="text-muted">{{ city.country.name }}</p>
+                    <p class="text-muted small">{{ city.hotel_count }} hotels available</p>
+                    <a href="{% url 'hotels:city_hotels' city.country.code city.id %}" 
+                       class="btn btn-outline-primary">
+                        Explore Hotels
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No popular destinations available</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Featured Hotels -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2>Featured Hotels</h2>
+                <p class="text-muted">Handpicked accommodations for an exceptional stay</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for hotel in featured_hotels %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card hotel-card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="hotel-rating">
+                                {% for star in hotel.star_range %}
+                                    <i class="bi bi-star-fill star-rating"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="badge bg-primary">Featured</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ hotel.name }}</h5>
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-geo-alt"></i> {{ hotel.city.name }}, {{ hotel.city.country.name }}
+                        </p>
+                        <p class="card-text text-muted small">{{ hotel.description|truncatewords:15 }}</p>
+                        
+                        <!-- Amenities -->
+                        <div class="amenities mb-3">
+                            {% for amenity in hotel.amenities.all|slice:":4" %}
+                                <span class="badge bg-light text-dark me-1">
+                                    <i class="{{ amenity.icon }}"></i> {{ amenity.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Rating and Reviews -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="fw-bold text-primary">{{ hotel.average_rating }}/10</span>
+                                <span class="text-muted small">({{ hotel.total_reviews }} reviews)</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Price -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small">From</span>
+                                <div class="fw-bold text-primary fs-5">${{ hotel.price_from }}<small>/night</small></div>
+                            </div>
+                            <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No featured hotels available</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Novaryo -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h2>Why Choose Novaryo?</h2>
+            <p class="text-muted">Experience the difference with our exceptional service</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4 text-center">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-shield-check fs-1 text-primary"></i>
+            </div>
+            <h5>Best Price Guarantee</h5>
+            <p class="text-muted">Find a lower price? We'll match it and give you even more savings.</p>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 text-center">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-calendar-x fs-1 text-primary"></i>
+            </div>
+            <h5>Free Cancellation</h5>
+            <p class="text-muted">Plans change? No problem. Cancel or modify your booking for free.</p>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 text-center">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-headset fs-1 text-primary"></i>
+            </div>
+            <h5>24/7 Support</h5>
+            <p class="text-muted">Our customer support team is available around the clock to help you.</p>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4 text-center">
+            <div class="feature-icon mb-3">
+                <i class="bi bi-star-fill fs-1 text-primary"></i>
+            </div>
+            <h5>Verified Reviews</h5>
+            <p class="text-muted">Read genuine reviews from verified guests to make informed choices.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Set default dates (today and tomorrow)
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    document.getElementById('checkin').value = today.toISOString().split('T')[0];
+    document.getElementById('checkout').value = tomorrow.toISOString().split('T')[0];
+});
+
+// Prevent past date selection
+document.getElementById('checkin').addEventListener('change', function() {
+    const checkin = new Date(this.value);
+    const checkout = new Date(document.getElementById('checkout').value);
+    
+    if (checkout <= checkin) {
+        const newCheckout = new Date(checkin);
+        newCheckout.setDate(newCheckout.getDate() + 1);
+        document.getElementById('checkout').value = newCheckout.toISOString().split('T')[0];
+    }
+});
+</script>
+{% endblock %}

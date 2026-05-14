@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .confirmation-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 3rem 0;
+        text-align: center;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2.5rem;
+    }
+    
+    .booking-details-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .booking-reference {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .reference-code {
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        margin: 0.5rem 0;
+    }
+    
+    .flight-info-section {
+        padding: 2rem;
+    }
+    
+    .flight-route {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .airport-info {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .airport-time {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #495057;
+    }
+    
+    .airport-code {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #667eea;
+        margin: 0.5rem 0 0.25rem;
+    }
+    
+    .airport-name {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .flight-arrow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #28a745;
+    }
+    
+    .duration-badge {
+        background: #28a745;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .passenger-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .important-info {
+        background: #e8f4ff;
+        border: 1px solid #b8daff;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .action-btn {
+        padding: 1rem;
+        border-radius: 10px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .btn-primary-action {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-secondary-action {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+    
+    .booking-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+    }
+    
+    .price-breakdown {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .total-paid {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+        border-top: 2px solid #28a745;
+        padding-top: 1rem;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-header">
+    <div class="container">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1 class="display-4 fw-bold mb-2">Booking Confirmed!</h1>
+        <p class="lead">Your flight has been successfully booked</p>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Booking Reference -->
+            <div class="booking-details-card">
+                <div class="booking-reference">
+                    <h4>Your Booking Reference</h4>
+                    <div class="reference-code">{{ booking.booking_reference }}</div>
+                    <p class="mb-0">Please save this reference for your records</p>
+                </div>
+                
+                <div class="flight-info-section">
+                    <!-- Flight Information -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="airline-logo me-3" style="width: 50px; height: 50px; background: #667eea; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1rem;">
+                            {{ booking.flight.airline.iata_code }}
+                        </div>
+                        <div>
+                            <h5 class="mb-0">{{ booking.flight.airline.name }}</h5>
+                            <p class="text-muted mb-0">Flight {{ booking.flight.flight_number }}</p>
+                        </div>
+                        <div class="ms-auto">
+                            <span class="status-badge {% if booking.status == 'confirmed' %}status-confirmed{% else %}status-pending{% endif %}">
+                                <i class="fas {% if booking.status == 'confirmed' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Flight Route -->
+                    <div class="flight-route">
+                        <div class="airport-info">
+                            <div class="airport-time">{{ booking.flight.departure_time|date:"H:i" }}</div>
+                            <div class="airport-code">{{ booking.flight.origin.iata_code }}</div>
+                            <div class="airport-name">{{ booking.flight.origin.name }}</div>
+                            <div class="text-muted">{{ booking.flight.origin.city }}</div>
+                        </div>
+                        
+                        <div class="flight-arrow">
+                            <div class="duration-badge">{{ booking.flight.duration_minutes|floatformat:0 }}m</div>
+                            <i class="fas fa-arrow-right fs-3"></i>
+                            {% if booking.flight.stops > 0 %}
+                                <small class="text-muted">{{ booking.flight.stops }} stop{{ booking.flight.stops|pluralize }}</small>
+                            {% else %}
+                                <small class="text-success">Direct</small>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="airport-info">
+                            <div class="airport-time">{{ booking.flight.arrival_time|date:"H:i" }}</div>
+                            <div class="airport-code">{{ booking.flight.destination.iata_code }}</div>
+                            <div class="airport-name">{{ booking.flight.destination.name }}</div>
+                            <div class="text-muted">{{ booking.flight.destination.city }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Flight Details -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar me-2"></i>Travel Date</h6>
+                            <p>{{ booking.flight.departure_time|date:"l, F d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-chair me-2"></i>Class</h6>
+                            <p>{{ booking.get_cabin_class_display }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Passenger Information -->
+            <div class="booking-details-card">
+                <div class="flight-info-section">
+                    <h5 class="mb-4">
+                        <i class="fas fa-users me-2"></i>Passenger Information
+                    </h5>
+                    
+                    {% for passenger in passengers %}
+                    <div class="passenger-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="mb-1">{{ passenger.display_name }}</h6>
+                                <div class="text-muted">
+                                    {{ passenger.get_passenger_type_display }} • 
+                                    Born {{ passenger.date_of_birth|date:"M d, Y" }}
+                                    {% if passenger.passport_number %} • Passport {{ passenger.passport_number }}{% endif %}
+                                </div>
+                                {% if passenger.meal_preference %}
+                                <div class="mt-1">
+                                    <small class="badge bg-secondary">{{ passenger.get_meal_preference_display }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                {% if passenger.assigned_seat %}
+                                <div class="fw-bold">Seat {{ passenger.assigned_seat }}</div>
+                                {% else %}
+                                <div class="text-muted">Seat: To be assigned</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Important Information -->
+            <div class="important-info">
+                <h6><i class="fas fa-info-circle me-2"></i>Important Information</h6>
+                <ul class="mb-0">
+                    <li>Please arrive at the airport at least 2 hours before domestic flights and 3 hours before international flights</li>
+                    <li>Ensure your travel documents are valid and up to date</li>
+                    <li>Check-in online 24 hours before departure to save time</li>
+                    {% if booking.payment_method == 'skipped' %}
+                    <li><strong>Note:</strong> This booking was created in testing mode. No actual payment was processed.</li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="#" class="action-btn btn-primary-action">
+                    <i class="fas fa-download me-2"></i>Download E-Ticket
+                </a>
+                <a href="#" class="action-btn btn-secondary-action">
+                    <i class="fas fa-envelope me-2"></i>Email Confirmation
+                </a>
+                <a href="{% url 'bookings:my_bookings' %}" class="action-btn btn-secondary-action">
+                    <i class="fas fa-list me-2"></i>View All Bookings
+                </a>
+                <a href="{% url 'flights:search' %}" class="action-btn btn-secondary-action">
+                    <i class="fas fa-search me-2"></i>Book Another Flight
+                </a>
+            </div>
+        </div>
+        
+        <!-- Booking Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="booking-summary">
+                <h6 class="fw-bold mb-3">
+                    <i class="fas fa-receipt me-2"></i>Booking Summary
+                </h6>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Booking Reference:</span>
+                        <span class="fw-bold">{{ booking.booking_reference }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Status:</span>
+                        <span class="fw-bold text-success">{{ booking.get_status_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Booked on:</span>
+                        <span>{{ booking.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% if booking.confirmed_at %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Confirmed:</span>
+                        <span>{{ booking.confirmed_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="border-top pt-3 mb-3">
+                    <h6>Contact Information</h6>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Email:</span>
+                        <span>{{ booking.contact_email }}</span>
+                    </div>
+                    {% if booking.contact_phone %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Phone:</span>
+                        <span>{{ booking.contact_phone }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Price Breakdown -->
+                <div class="price-breakdown">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Base fare ({{ booking.passenger_count }} passenger{{ booking.passenger_count|pluralize }})</span>
+                        <span>${{ booking.base_price }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Taxes & fees</span>
+                        <span>${{ booking.taxes_and_fees }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between total-paid">
+                        <span><strong>Total {% if booking.payment_method == 'skipped' %}(Testing){% else %}Paid{% endif %}</strong></span>
+                        <span><strong>${{ booking.total_price }}</strong></span>
+                    </div>
+                    
+                    {% if booking.payment_method != 'skipped' %}
+                    <div class="text-center mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-credit-card me-1"></i>
+                            {{ booking.get_payment_method_display }}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Your booking is protected
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add confetti effect for successful booking
+    if (typeof confetti !== 'undefined') {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
+});
+</script>
+{% endblock %}

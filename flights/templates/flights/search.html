@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .flight-search-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .search-form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-top: -3rem;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .trip-type-tabs {
+        border-bottom: none;
+        margin-bottom: 2rem;
+    }
+    
+    .trip-type-tabs .form-check {
+        background: #f8f9fa;
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        margin-right: 1rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .trip-type-tabs .form-check:hover {
+        background: #e9ecef;
+        border-color: #6c757d;
+    }
+    
+    .trip-type-tabs .form-check-input:checked + .form-check-label {
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .form-floating .form-select,
+    .form-floating .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-floating .form-select:focus,
+    .form-floating .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .search-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: transform 0.3s ease;
+    }
+    
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .popular-destinations {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .destination-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .destination-card:hover {
+        transform: translateY(-5px);
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .swap-airports-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        background: #fff;
+        border: 2px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        transition: all 0.3s ease;
+    }
+    
+    .swap-airports-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: translate(-50%, -50%) rotate(180deg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flight-search-hero">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">Find Your Perfect Flight</h1>
+        <p class="lead">Search and compare flights from hundreds of airlines worldwide</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="search-form-card">
+                <form method="get" action="{% url 'flights:search' %}" id="flight-search-form">
+                    <!-- Trip Type Selection -->
+                    <div class="trip-type-tabs d-flex flex-wrap mb-4">
+                        {% for value, label in form.trip_type.field.choices %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" 
+                                   name="{{ form.trip_type.name }}" 
+                                   id="trip_type_{{ value }}" 
+                                   value="{{ value }}"
+                                   {% if form.trip_type.value == value or value == 'round_trip' and not form.trip_type.value %}checked{% endif %}>
+                            <label class="form-check-label" for="trip_type_{{ value }}">
+                                {{ label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Origin and Destination -->
+                        <div class="col-md-6">
+                            <div class="position-relative">
+                                <div class="form-floating">
+                                    {{ form.origin }}
+                                    <label for="{{ form.origin.id_for_label }}">From</label>
+                                </div>
+                                <div class="swap-airports-btn" onclick="swapAirports()">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.destination }}
+                                <label for="{{ form.destination.id_for_label }}">To</label>
+                            </div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.departure_date }}
+                                <label for="{{ form.departure_date.id_for_label }}">Departure Date</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6" id="return-date-container">
+                            <div class="form-floating">
+                                {{ form.return_date }}
+                                <label for="{{ form.return_date.id_for_label }}">Return Date</label>
+                            </div>
+                        </div>
+
+                        <!-- Passengers and Class -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.passengers }}
+                                <label for="{{ form.passengers.id_for_label }}">Passengers</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.cabin_class }}
+                                <label for="{{ form.cabin_class.id_for_label }}">Class</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mt-3">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Search Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary search-btn btn-lg">
+                            <i class="fas fa-search me-2"></i>Search Flights
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Destinations -->
+    <div class="popular-destinations">
+        <h3 class="text-center mb-4">Popular Destinations</h3>
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="destination-card d-block text-center">
+                    <i class="fas fa-plane text-primary fs-2 mb-2"></i>
+                    <h6 class="fw-bold">London</h6>
+                    <small class="text-muted">From $299</small>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="destination-card d-block text-center">
+                    <i class="fas fa-torii-gate text-danger fs-2 mb-2"></i>
+                    <h6 class="fw-bold">Tokyo</h6>
+                    <small class="text-muted">From $599</small>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="destination-card d-block text-center">
+                    <i class="fas fa-building text-warning fs-2 mb-2"></i>
+                    <h6 class="fw-bold">Dubai</h6>
+                    <small class="text-muted">From $399</small>
+                </a>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <a href="#" class="destination-card d-block text-center">
+                    <i class="fas fa-opera-house text-info fs-2 mb-2"></i>
+                    <h6 class="fw-bold">Sydney</h6>
+                    <small class="text-muted">From $799</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Airport autocomplete data -->
+<datalist id="airports-list">
+    {% for airport in airports %}
+    <option value="{{ airport.iata_code }}">{{ airport.city }} - {{ airport.name }}</option>
+    {% endfor %}
+</datalist>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tripTypeInputs = document.querySelectorAll('input[name="trip_type"]');
+    const returnDateContainer = document.getElementById('return-date-container');
+    const returnDateInput = document.querySelector('input[name="return_date"]');
+    
+    function updateReturnDateVisibility() {
+        const selectedTripType = document.querySelector('input[name="trip_type"]:checked').value;
+        
+        if (selectedTripType === 'round_trip') {
+            returnDateContainer.style.display = 'block';
+            returnDateInput.required = true;
+        } else {
+            returnDateContainer.style.display = 'none';
+            returnDateInput.required = false;
+            returnDateInput.value = '';
+        }
+    }
+    
+    // Initialize visibility
+    updateReturnDateVisibility();
+    
+    // Update on trip type change
+    tripTypeInputs.forEach(input => {
+        input.addEventListener('change', updateReturnDateVisibility);
+    });
+});
+
+function swapAirports() {
+    const originSelect = document.querySelector('select[name="origin"]');
+    const destinationSelect = document.querySelector('select[name="destination"]');
+    
+    const originValue = originSelect.value;
+    originSelect.value = destinationSelect.value;
+    destinationSelect.value = originValue;
+}
+
+// Set minimum departure date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const departureDateInput = document.querySelector('input[name="departure_date"]');
+    const returnDateInput = document.querySelector('input[name="return_date"]');
+    
+    if (departureDateInput) {
+        departureDateInput.min = today;
+        
+        // Update return date minimum when departure date changes
+        departureDateInput.addEventListener('change', function() {
+            if (returnDateInput) {
+                returnDateInput.min = this.value;
+                
+                // If return date is before departure date, clear it
+                if (returnDateInput.value && returnDateInput.value <= this.value) {
+                    returnDateInput.value = '';
+                }
+            }
+        });
+    }
+    
+    if (returnDateInput) {
+        returnDateInput.min = today;
+    }
+});
+</script>
+{% endblock %}

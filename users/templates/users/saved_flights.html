@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }}</title>
+</head>
+<body>
+    <main>
+        <h1>Saved Flights</h1>
+        <ul>
+            {% for saved in saved_flights %}
+                <li>{{ saved.flight.flight_code }} - {{ saved.flight.origin }} to {{ saved.flight.destination }}</li>
+            {% empty %}
+                <li>No saved flights yet.</li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>
+

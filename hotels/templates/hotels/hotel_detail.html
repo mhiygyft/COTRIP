@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} - {{ hotel.city.name }}, {{ hotel.city.country.name }} | Novaryo{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Hotel Main Info -->
+<div class="bg-primary text-white py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'hotels:city_hotels' hotel.city.country.code hotel.city.id %}" 
+                               class="text-white-50 text-decoration-none">{{ hotel.city.name }}</a>
+                        </li>
+                        <li class="breadcrumb-item active text-white">{{ hotel.name }}</li>
+                    </ol>
+                </nav>
+                
+                <!-- Hotel Header Info -->
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-6 fw-bold mb-2">{{ hotel.name }}</h1>
+                        
+                        <!-- Star Rating -->
+                        <div class="hotel-rating mb-2">
+                            {% for star in hotel.star_range %}
+                                <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
+                            {% endfor %}
+                            <span class="ms-2">{{ hotel.star_rating }}-Star Hotel</span>
+                        </div>
+                        
+                        <!-- Location -->
+                        <p class="mb-2">
+                            <i class="bi bi-geo-alt"></i> 
+                            {{ hotel.address }}
+                        </p>
+                        
+                        <!-- Rating and Reviews -->
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-light text-dark me-2 fs-6">{{ hotel.average_rating }}/10</span>
+                            <span>({{ hotel.total_reviews }} reviews)</span>
+                            {% if hotel.is_verified %}
+                                <span class="badge bg-success ms-2">Verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="price-display mb-3">
+                            <span class="text-white-50">Starting from</span>
+                            <div class="display-5 fw-bold">${{ hotel.price_from }}</div>
+                            <small>per night</small>
+                        </div>
+                        <button class="btn btn-warning btn-lg" onclick="scrollToRooms()">
+                            <i class="bi bi-calendar-check"></i> Check Availability
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hotel Images Section -->
+<div class="container-fluid px-0 mb-4">
+    <div class="row g-1">
+        <div class="col-md-6">
+            <div class="hotel-main-image bg-light d-flex align-items-center justify-content-center">
+                <i class="bi bi-building fs-1 text-muted"></i>
+                <small class="position-absolute bottom-0 end-0 bg-dark text-white p-1 m-2 rounded">Main Image</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row g-1 h-100">
+                <div class="col-6">
+                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                        <i class="bi bi-image fs-3 text-muted"></i>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                        <i class="bi bi-image fs-3 text-muted"></i>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                        <i class="bi bi-image fs-3 text-muted"></i>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center position-relative">
+                        <i class="bi bi-images fs-3 text-muted"></i>
+                        <div class="overlay-badge position-absolute top-50 start-50 translate-middle">
+                            <span class="badge bg-dark">+10 Photos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container my-5">
+    <div class="row">
+        <!-- Main Content Column -->
+        <div class="col-lg-8">
+            <!-- Hotel Description -->
+            <section class="mb-5">
+                <h2 class="mb-3">About {{ hotel.name }}</h2>
+                <p class="lead">{{ hotel.description }}</p>
+            </section>
+            
+            <!-- Hotel Amenities -->
+            <section class="mb-5">
+                <h2 class="mb-3">Hotel Amenities</h2>
+                <div class="row">
+                    {% for amenity in hotel.amenities.all %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="{{ amenity.icon }} text-primary me-2"></i>
+                            <span>{{ amenity.name }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            
+            <!-- Room Types Section -->
+            <section id="rooms" class="mb-5">
+                <h2 class="mb-4">Available Rooms</h2>
+                
+                {% for room_type in room_types %}
+                <div class="card mb-4 border shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <div class="room-image-placeholder bg-light d-flex align-items-center justify-content-center h-100">
+                                <div class="text-center">
+                                    <i class="bi bi-door-open fs-1 text-muted mb-2"></i>
+                                    <div class="small text-muted">{{ room_type.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card-body h-100">
+                                <h5 class="card-title">{{ room_type.name }}</h5>
+                                <p class="card-text">{{ room_type.description|truncatewords:20 }}</p>
+                                
+                                <!-- Room Details -->
+                                <div class="room-details mb-3">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-people"></i> Max {{ room_type.max_occupancy }} guests
+                                    </small>
+                                    {% if room_type.size_sqm %}
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-arrows-fullscreen"></i> {{ room_type.size_sqm }} m²
+                                        </small>
+                                    {% endif %}
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-bed"></i> {{ room_type.get_bed_type_display }}
+                                    </small>
+                                </div>
+                                
+                                <!-- Room Amenities -->
+                                <div class="room-amenities">
+                                    {% for amenity in room_type.amenities.all|slice:":3" %}
+                                        <span class="badge bg-light text-dark me-1 mb-1">
+                                            <i class="{{ amenity.icon }}"></i> {{ amenity.name }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-body h-100 d-flex flex-column justify-content-between text-end">
+                                <!-- Cancellation Policy -->
+                                <div class="mb-2">
+                                    {% if room_type.is_refundable %}
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle"></i> Free Cancellation
+                                        </small>
+                                    {% else %}
+                                        <small class="text-warning">
+                                            <i class="bi bi-x-circle"></i> Non-Refundable
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Price -->
+                                <div class="price-section">
+                                    <div class="price mb-2">
+                                        <div class="fw-bold fs-4 text-primary">${{ room_type.base_price }}</div>
+                                        <small class="text-muted">per night</small>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary">Reserve Now</button>
+                                        <button class="btn btn-outline-primary btn-sm">Check Availability</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="bi bi-door-closed fs-1 text-muted mb-3"></i>
+                    <h5>No rooms available</h5>
+                    <p class="text-muted">Please check back later or contact the hotel directly.</p>
+                </div>
+                {% endfor %}
+            </section>
+            
+            <!-- Hotel Policies -->
+            <section class="mb-5">
+                <h2 class="mb-3">Hotel Policies</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Check-in/Check-out</h6>
+                        <p>
+                            <i class="bi bi-clock"></i> 
+                            Check-in: {{ hotel.check_in_time|time:"H:i" }} | 
+                            Check-out: {{ hotel.check_out_time|time:"H:i" }}
+                        </p>
+                        
+                        {% if hotel.cancellation_policy %}
+                        <h6>Cancellation Policy</h6>
+                        <p>{{ hotel.cancellation_policy|truncatewords:30 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if hotel.child_policy %}
+                        <h6>Children Policy</h6>
+                        <p>{{ hotel.child_policy|truncatewords:20 }}</p>
+                        {% endif %}
+                        
+                        {% if hotel.pet_policy %}
+                        <h6>Pet Policy</h6>
+                        <p>{{ hotel.pet_policy|truncatewords:20 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Contact Information</h5>
+                    
+                    {% if hotel.phone_number %}
+                    <p class="mb-2">
+                        <i class="bi bi-telephone"></i> {{ hotel.phone_number }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if hotel.email %}
+                    <p class="mb-2">
+                        <i class="bi bi-envelope"></i> {{ hotel.email }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if hotel.website %}
+                    <p class="mb-2">
+                        <i class="bi bi-globe"></i> 
+                        <a href="{{ hotel.website }}" target="_blank" class="text-decoration-none">
+                            Visit Website
+                        </a>
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Map Placeholder -->
+                    <div class="map-placeholder bg-light d-flex align-items-center justify-content-center mt-3" style="height: 200px;">
+                        <div class="text-center">
+                            <i class="bi bi-geo-alt fs-1 text-muted mb-2"></i>
+                            <div class="small text-muted">Interactive Map</div>
+                            <div class="small text-muted">{{ hotel.city.name }}, {{ hotel.city.country.name }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nearby Hotels -->
+            {% if nearby_hotels %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Other Hotels in {{ hotel.city.name }}</h5>
+                    
+                    {% for nearby_hotel in nearby_hotels %}
+                    <div class="d-flex mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div class="hotel-thumb bg-light d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-building text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <a href="{% url 'hotels:hotel_detail' nearby_hotel.slug %}" 
+                                   class="text-decoration-none text-dark">
+                                    {{ nearby_hotel.name|truncatewords:4 }}
+                                </a>
+                            </h6>
+                            <div class="small text-muted mb-1">
+                                {% for star in nearby_hotel.star_range %}
+                                    <i class="bi bi-star-fill" style="color: #fbbf24; font-size: 0.8rem;"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="fw-bold text-primary small">From ${{ nearby_hotel.price_from }}/night</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hotel-main-image {
+    height: 400px;
+    position: relative;
+}
+
+.hotel-gallery-image {
+    height: 195px;
+    position: relative;
+}
+
+.room-image-placeholder {
+    height: 200px;
+    min-height: 200px;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255,255,255,0.5);
+}
+
+.overlay-badge {
+    background: rgba(0,0,0,0.7);
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function scrollToRooms() {
+    document.getElementById('rooms').scrollIntoView({
+        behavior: 'smooth'
+    });
+}
+
+// Mock availability check
+document.addEventListener('DOMContentLoaded', function() {
+    const checkButtons = document.querySelectorAll('button:contains("Check Availability")');
+    checkButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            alert('Availability check feature coming soon!');
+        });
+    });
+});
+</script>
+{% endblock %}

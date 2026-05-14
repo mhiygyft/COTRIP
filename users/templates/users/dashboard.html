@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }}</title>
+</head>
+<body>
+    <main>
+        <h1>Account Dashboard</h1>
+        <p>Welcome, {{ request.user.full_name }}.</p>
+
+        <h2>Recent Bookings</h2>
+        <ul>
+            {% for booking in bookings %}
+                <li>{{ booking.booking_reference }} - {{ booking.status }}</li>
+            {% empty %}
+                <li>No bookings yet.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Saved Flights</h2>
+        <ul>
+            {% for saved in saved_flights %}
+                <li>{{ saved.flight.flight_code }} - {{ saved.cabin_class }}</li>
+            {% empty %}
+                <li>No saved flights yet.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Saved Searches</h2>
+        <ul>
+            {% for search in saved_searches %}
+                <li>{{ search.origin }} to {{ search.destination }}</li>
+            {% empty %}
+                <li>No saved searches yet.</li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>
+

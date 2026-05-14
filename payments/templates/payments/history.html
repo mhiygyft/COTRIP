@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }}</title>
+</head>
+<body>
+    <main>
+        <h1>Payment History</h1>
+        <ul>
+            {% for transaction in transactions %}
+                <li>{{ transaction.amount }} {{ transaction.currency }} - {{ transaction.status }}</li>
+            {% empty %}
+                <li>No payment transactions yet.</li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>
+

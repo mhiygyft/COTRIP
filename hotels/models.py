@@ -1,0 +1,392 @@
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.text import slugify
+from django.urls import reverse
+from phonenumber_field.modelfields import PhoneNumberField
+from decimal import Decimal
+
+User = get_user_model()
+
+
+class Country(models.Model):
+    """Country model for location hierarchy"""
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=3, unique=True)  # ISO country code
+    flag_url = models.URLField(blank=True)
+    is_popular = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Countries"
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    """City model for location hierarchy"""
+    name = models.CharField(max_length=100)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='cities')
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    is_popular = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='cities/', blank=True, null=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Cities"
+        unique_together = ['name', 'country']
+        ordering = ['name']
+    
+    def __str__(self):
+        return f"{self.name}, {self.country.name}"
+
+
+class HotelChain(models.Model):
+    """Hotel chain/brand model"""
+    name = models.CharField(max_length=100, unique=True)
+    logo = models.ImageField(upload_to='hotel_chains/', blank=True, null=True)
+    website = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
+
+
+class Amenity(models.Model):
+    """Hotel amenities model"""
+    name = models.CharField(max_length=100, unique=True)
+    icon = models.CharField(max_length=50, blank=True)  # Font Awesome icon class
+    category = models.CharField(max_length=50, choices=[
+        ('general', 'General'),
+        ('internet', 'Internet'),
+        ('parking', 'Parking'),
+        ('transportation', 'Transportation'),
+        ('services', 'Services'),
+        ('business', 'Business'),
+        ('wellness', 'Wellness & Fitness'),
+        ('food_drink', 'Food & Drink'),
+        ('entertainment', 'Entertainment'),
+        ('family', 'Family'),
+        ('accessibility', 'Accessibility'),
+        ('safety', 'Safety & Security'),
+    ], default='general')
+    is_popular = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Amenities"
+        ordering = ['category', 'name']
+    
+    def __str__(self):
+        return self.name
+
+
+class Hotel(models.Model):
+    """Main Hotel model"""
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
+    
+    # Location
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='hotels')
+    address = models.TextField()
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    
+    # Basic Information
+    description = models.TextField()
+    star_rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Hotel star rating (1-5)"
+    )
+    hotel_chain = models.ForeignKey(HotelChain, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Contact Information
+    phone_number = PhoneNumberField(blank=True, null=True)
+    email = models.EmailField(blank=True)
+    website = models.URLField(blank=True)
+    
+    # Features
+    amenities = models.ManyToManyField(Amenity, blank=True)
+    image_url = models.URLField(blank=True, help_text="Primary hotel image URL")
+    
+    # Policies
+    check_in_time = models.TimeField(default='15:00')
+    check_out_time = models.TimeField(default='11:00')
+    cancellation_policy = models.TextField(blank=True)
+    child_policy = models.TextField(blank=True)
+    pet_policy = models.TextField(blank=True)
+    
+    # Pricing
+    price_from = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        validators=[MinValueValidator(Decimal('0.01'))],
+        help_text="Starting price per night"
+    )
+    currency = models.CharField(max_length=3, default='USD')
+    
+    # Status
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    
+    # SEO
+    meta_title = models.CharField(max_length=200, blank=True)
+    meta_description = models.CharField(max_length=300, blank=True)
+    
+    # Statistics (cached values)
+    total_rooms = models.PositiveIntegerField(default=0)
+    average_rating = models.DecimalField(
+        max_digits=3, 
+        decimal_places=2, 
+        default=0.00,
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
+    )
+    total_reviews = models.PositiveIntegerField(default=0)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_featured', '-average_rating', 'name']
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.name}-{self.city.name}")
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.name} - {self.city}"
+    
+    def get_absolute_url(self):
+        return reverse('hotel_detail', kwargs={'slug': self.slug})
+    
+    @property
+    def location_string(self):
+        return f"{self.city.name}, {self.city.country.name}"
+    
+    @property
+    def star_range(self):
+        return range(self.star_rating)
+    
+    def get_star_display(self):
+        return '★' * self.star_rating + '☆' * (5 - self.star_rating)
+
+
+class HotelImage(models.Model):
+    """Hotel images model"""
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='hotels/')
+    caption = models.CharField(max_length=200, blank=True)
+    alt_text = models.CharField(max_length=200, blank=True)
+    is_primary = models.BooleanField(default=False)
+    
+    # Image categories
+    category = models.CharField(max_length=50, choices=[
+        ('exterior', 'Exterior'),
+        ('lobby', 'Lobby'),
+        ('room', 'Room'),
+        ('bathroom', 'Bathroom'),
+        ('restaurant', 'Restaurant'),
+        ('pool', 'Pool'),
+        ('gym', 'Gym/Fitness'),
+        ('spa', 'Spa'),
+        ('meeting', 'Meeting Room'),
+        ('amenity', 'Amenity'),
+        ('view', 'View'),
+        ('other', 'Other'),
+    ], default='other')
+    
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['display_order', '-is_primary', 'created_at']
+    
+    def __str__(self):
+        return f"{self.hotel.name} - {self.category} Image"
+
+
+class RoomType(models.Model):
+    """Room types model"""
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='room_types')
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=150, blank=True)
+    
+    # Room Details
+    description = models.TextField()
+    size_sqm = models.PositiveIntegerField(blank=True, null=True, help_text="Room size in square meters")
+    max_occupancy = models.PositiveIntegerField(default=2)
+    max_adults = models.PositiveIntegerField(default=2)
+    max_children = models.PositiveIntegerField(default=0)
+    
+    # Bed Configuration
+    bed_type = models.CharField(max_length=50, choices=[
+        ('single', 'Single Bed'),
+        ('twin', 'Twin Beds'),
+        ('double', 'Double Bed'),
+        ('queen', 'Queen Bed'),
+        ('king', 'King Bed'),
+        ('sofa', 'Sofa Bed'),
+        ('bunk', 'Bunk Bed'),
+        ('murphy', 'Murphy Bed'),
+    ], default='double')
+    number_of_beds = models.PositiveIntegerField(default=1)
+    
+    # Room Features
+    amenities = models.ManyToManyField(Amenity, blank=True)
+    
+    # Pricing
+    base_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
+    
+    # Policies
+    is_refundable = models.BooleanField(default=True)
+    free_cancellation_hours = models.PositiveIntegerField(
+        default=24, 
+        help_text="Hours before check-in for free cancellation"
+    )
+    
+    # Status
+    is_active = models.BooleanField(default=True)
+    total_rooms = models.PositiveIntegerField(default=1)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['hotel', 'slug']
+        ordering = ['base_price']
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.hotel.name} - {self.name}"
+
+
+class RoomImage(models.Model):
+    """Room type images"""
+    room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='rooms/')
+    caption = models.CharField(max_length=200, blank=True)
+    is_primary = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['display_order', '-is_primary']
+    
+    def __str__(self):
+        return f"{self.room_type} - Image"
+
+
+class RoomAvailability(models.Model):
+    """Room availability and pricing by date"""
+    room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE, related_name='availability')
+    date = models.DateField()
+    available_rooms = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
+    
+    # Dynamic pricing factors
+    is_weekend = models.BooleanField(default=False)
+    is_holiday = models.BooleanField(default=False)
+    demand_multiplier = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        default=Decimal('1.00')
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['room_type', 'date']
+        ordering = ['date']
+    
+    def __str__(self):
+        return f"{self.room_type} - {self.date} - {self.available_rooms} rooms"
+
+
+class HotelFacility(models.Model):
+    """Detailed hotel facilities with descriptions"""
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='facilities')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, blank=True)
+    
+    category = models.CharField(max_length=50, choices=[
+        ('dining', 'Dining'),
+        ('recreation', 'Recreation'),
+        ('business', 'Business'),
+        ('wellness', 'Wellness'),
+        ('connectivity', 'Connectivity'),
+        ('transportation', 'Transportation'),
+        ('services', 'Services'),
+        ('accessibility', 'Accessibility'),
+    ])
+    
+    is_free = models.BooleanField(default=True)
+    additional_cost = models.DecimalField(
+        max_digits=8, 
+        decimal_places=2, 
+        blank=True, 
+        null=True,
+        help_text="Cost if not free"
+    )
+    
+    operating_hours = models.CharField(max_length=100, blank=True)
+    is_24_hours = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['category', 'name']
+    
+    def __str__(self):
+        return f"{self.hotel.name} - {self.name}"
+
+
+class Review(models.Model):
+    """Hotel review model"""
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Rating from 1 to 5 stars"
+    )
+    title = models.CharField(max_length=200)
+    comment = models.TextField()
+    
+    # Helpful for moderation
+    is_verified = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['hotel', 'user']  # One review per user per hotel
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.hotel.name} ({self.rating}★)"
+    
+    @property
+    def star_display(self):
+        return '★' * self.rating + '☆' * (5 - self.rating)

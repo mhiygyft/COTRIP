@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .payment-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 2rem 0;
+    }
+    
+    .payment-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .booking-summary {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .flight-info {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .payment-method-option {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .payment-method-option:hover {
+        border-color: #28a745;
+        background: #f8fff9;
+    }
+    
+    .payment-method-option.selected {
+        border-color: #28a745;
+        background: linear-gradient(135deg, #f8fff9 0%, #e8f9ef 100%);
+    }
+    
+    .payment-method-option.skip-payment {
+        border-color: #ffc107;
+        background: linear-gradient(135deg, #fffbf0 0%, #fff3cd 100%);
+    }
+    
+    .payment-method-option.skip-payment.selected {
+        border-color: #f57c00;
+        background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    }
+    
+    .card-fields {
+        display: none;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .card-fields.show {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .price-breakdown {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .total-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+        border-top: 2px solid #28a745;
+        padding-top: 1rem;
+    }
+    
+    .complete-booking-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        width: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .complete-booking-btn:hover {
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+    }
+    
+    .complete-booking-btn:disabled {
+        background: #6c757d;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .skip-payment-note {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: none;
+    }
+    
+    .skip-payment-note.show {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .security-badges {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        opacity: 0.7;
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+    }
+    
+    .step.completed {
+        color: #28a745;
+    }
+    
+    .step.active {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .step.completed .step-number {
+        background: #28a745;
+        color: white;
+    }
+    
+    .step.active .step-number {
+        background: #28a745;
+        color: white;
+    }
+    
+    .step-connector {
+        width: 3rem;
+        height: 2px;
+        background: #e9ecef;
+        margin: 0 1rem;
+    }
+    
+    .step.completed + .step .step-connector {
+        background: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-header">
+    <div class="container">
+        <h1 class="h3 mb-1">Secure Payment</h1>
+        <p class="mb-0">Complete your booking for {{ flight.flight_code }}</p>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+        <div class="step completed">
+            <div class="step-number">
+                <i class="fas fa-check"></i>
+            </div>
+            <span>Flight Selected</span>
+        </div>
+        <div class="step-connector"></div>
+        
+        <div class="step completed">
+            <div class="step-number">
+                <i class="fas fa-check"></i>
+            </div>
+            <span>Passenger Details</span>
+        </div>
+        <div class="step-connector"></div>
+        
+        <div class="step active">
+            <div class="step-number">3</div>
+            <span>Payment</span>
+        </div>
+        <div class="step-connector"></div>
+        
+        <div class="step">
+            <div class="step-number">4</div>
+            <span>Confirmation</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="payment-card">
+                <div class="card-body p-4">
+                    <form method="post" id="payment-form">
+                        {% csrf_token %}
+                        
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-credit-card me-2"></i>Payment Method
+                        </h5>
+                        
+                        <!-- Payment Method Selection -->
+                        {% for choice in payment_form.payment_method %}
+                        <div class="payment-method-option {% if choice.choice_value == 'skip' %}skip-payment{% endif %}" 
+                             data-method="{{ choice.choice_value }}">
+                            <div class="form-check">
+                                {{ choice.tag }}
+                                <label class="form-check-label w-100" for="{{ choice.id_for_label }}">
+                                    <div class="d-flex align-items-center">
+                                        {% if choice.choice_value == 'card' %}
+                                            <i class="fas fa-credit-card me-3 fs-4"></i>
+                                            <div>
+                                                <strong>{{ choice.choice_label }}</strong>
+                                                <div class="small text-muted">Visa, MasterCard, American Express</div>
+                                            </div>
+                                        {% elif choice.choice_value == 'paypal' %}
+                                            <i class="fab fa-paypal me-3 fs-4 text-primary"></i>
+                                            <div>
+                                                <strong>{{ choice.choice_label }}</strong>
+                                                <div class="small text-muted">Pay with your PayPal account</div>
+                                            </div>
+                                        {% elif choice.choice_value == 'bank_transfer' %}
+                                            <i class="fas fa-university me-3 fs-4"></i>
+                                            <div>
+                                                <strong>{{ choice.choice_label }}</strong>
+                                                <div class="small text-muted">Direct bank transfer</div>
+                                            </div>
+                                        {% elif choice.choice_value == 'skip' %}
+                                            <i class="fas fa-forward me-3 fs-4 text-warning"></i>
+                                            <div>
+                                                <strong>{{ choice.choice_label }}</strong>
+                                                <div class="small text-muted">For testing and development only</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Skip Payment Note -->
+                        <div class="skip-payment-note" id="skip-payment-note">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                <div>
+                                    <strong>Testing Mode</strong>
+                                    <p class="mb-0">You've selected to skip payment. This option is available for testing purposes while the payment system is being finalized. Your booking will be confirmed without actual payment.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Credit Card Fields -->
+                        <div class="card-fields" id="card-fields">
+                            <h6 class="mb-3">Card Information</h6>
+                            
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="{{ payment_form.card_number.id_for_label }}" class="form-label">Card Number</label>
+                                    {{ payment_form.card_number }}
+                                    {% if payment_form.card_number.errors %}
+                                        <div class="text-danger small">{{ payment_form.card_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="{{ payment_form.card_name.id_for_label }}" class="form-label">Name on Card</label>
+                                    {{ payment_form.card_name }}
+                                    {% if payment_form.card_name.errors %}
+                                        <div class="text-danger small">{{ payment_form.card_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Expiry Date</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            {{ payment_form.card_expiry_month }}
+                                            {% if payment_form.card_expiry_month.errors %}
+                                                <div class="text-danger small">{{ payment_form.card_expiry_month.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-6">
+                                            {{ payment_form.card_expiry_year }}
+                                            {% if payment_form.card_expiry_year.errors %}
+                                                <div class="text-danger small">{{ payment_form.card_expiry_year.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ payment_form.card_cvv.id_for_label }}" class="form-label">CVV</label>
+                                    {{ payment_form.card_cvv }}
+                                    {% if payment_form.card_cvv.errors %}
+                                        <div class="text-danger small">{{ payment_form.card_cvv.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <h6 class="mb-3 mt-4">Billing Address</h6>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    {{ payment_form.billing_address }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ payment_form.billing_city }}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    {{ payment_form.billing_country }}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    {{ payment_form.billing_postal_code }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions -->
+                        <div class="form-check mt-4">
+                            {{ payment_form.accept_terms }}
+                            <label class="form-check-label" for="{{ payment_form.accept_terms.id_for_label }}">
+                                I accept the <a href="#" target="_blank">Terms and Conditions</a> and <a href="#" target="_blank">Privacy Policy</a>
+                            </label>
+                            {% if payment_form.accept_terms.errors %}
+                                <div class="text-danger small">{{ payment_form.accept_terms.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="complete-booking-btn mt-4" id="complete-booking-btn" disabled>
+                            <i class="fas fa-lock me-2"></i>Complete Booking
+                        </button>
+                        
+                        <!-- Security Badges -->
+                        <div class="security-badges">
+                            <i class="fas fa-shield-alt fs-5" title="Secure Payment"></i>
+                            <i class="fas fa-lock fs-5" title="SSL Encrypted"></i>
+                            <i class="fas fa-award fs-5" title="PCI Compliant"></i>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="booking-summary">
+                <!-- Flight Information -->
+                <div class="flight-info">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-plane me-2"></i>Flight Details
+                    </h6>
+                    
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="airline-logo me-2" style="width: 30px; height: 30px; background: #667eea; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: bold;">
+                            {{ flight.airline.iata_code }}
+                        </div>
+                        <div>
+                            <strong>{{ flight.airline.name }}</strong>
+                            <div class="small text-muted">{{ flight.flight_number }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col">
+                            <div class="fw-bold">{{ flight.departure_time|date:"H:i" }}</div>
+                            <div class="small text-muted">{{ flight.origin.iata_code }}</div>
+                            <div class="small text-muted">{{ flight.origin.city }}</div>
+                        </div>
+                        <div class="col-2">
+                            <div class="small text-muted">{{ flight.duration_minutes|floatformat:0 }}m</div>
+                            <i class="fas fa-arrow-right text-primary"></i>
+                            {% if flight.stops > 0 %}
+                                <div class="small text-muted">{{ flight.stops }} stop{{ flight.stops|pluralize }}</div>
+                            {% else %}
+                                <div class="small text-success">Direct</div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold">{{ flight.arrival_time|date:"H:i" }}</div>
+                            <div class="small text-muted">{{ flight.destination.iata_code }}</div>
+                            <div class="small text-muted">{{ flight.destination.city }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="small text-muted">
+                        <i class="fas fa-calendar me-1"></i>{{ flight.departure_time|date:"F d, Y" }}
+                    </div>
+                    <div class="small text-muted">
+                        <i class="fas fa-chair me-1"></i>{{ cabin_class|capfirst }} Class
+                    </div>
+                </div>
+                
+                <!-- Passenger Information -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-user me-2"></i>Passenger
+                    </h6>
+                    <div class="border rounded p-2">
+                        <div class="fw-bold">
+                            {{ passenger_data.title|capfirst }}. {{ passenger_data.first_name }} {{ passenger_data.last_name }}
+                        </div>
+                        <div class="small text-muted">{{ passenger_data.passenger_type|capfirst }}</div>
+                    </div>
+                </div>
+                
+                <!-- Price Breakdown -->
+                <div class="price-breakdown">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-receipt me-2"></i>Price Breakdown
+                    </h6>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Base fare (1 passenger)</span>
+                        <span>${{ base_price }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Taxes & fees</span>
+                        <span>${{ taxes_and_fees }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between total-price">
+                        <span><strong>Total</strong></span>
+                        <span><strong>${{ total_price }}</strong></span>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Prices include all taxes and fees
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentOptions = document.querySelectorAll('.payment-method-option');
+    const cardFields = document.getElementById('card-fields');
+    const skipPaymentNote = document.getElementById('skip-payment-note');
+    const completeBookingBtn = document.getElementById('complete-booking-btn');
+    const acceptTermsCheckbox = document.querySelector('input[name="accept_terms"]');
+    
+    let selectedPaymentMethod = null;
+    
+    // Handle payment method selection
+    paymentOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            paymentOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            this.classList.add('selected');
+            
+            // Get the radio button inside this option and check it
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                selectedPaymentMethod = radio.value;
+                
+                // Show/hide card fields based on selection
+                if (selectedPaymentMethod === 'card') {
+                    cardFields.classList.add('show');
+                    skipPaymentNote.classList.remove('show');
+                } else if (selectedPaymentMethod === 'skip') {
+                    cardFields.classList.remove('show');
+                    skipPaymentNote.classList.add('show');
+                } else {
+                    cardFields.classList.remove('show');
+                    skipPaymentNote.classList.remove('show');
+                }
+                
+                updateButtonState();
+            }
+        });
+    });
+    
+    // Handle terms and conditions checkbox
+    acceptTermsCheckbox.addEventListener('change', updateButtonState);
+    
+    function updateButtonState() {
+        const isPaymentMethodSelected = selectedPaymentMethod !== null;
+        const isTermsAccepted = acceptTermsCheckbox.checked;
+        
+        completeBookingBtn.disabled = !(isPaymentMethodSelected && isTermsAccepted);
+        
+        // Update button text based on payment method
+        if (selectedPaymentMethod === 'skip') {
+            completeBookingBtn.innerHTML = '<i class="fas fa-forward me-2"></i>Complete Booking (Skip Payment)';
+        } else if (selectedPaymentMethod) {
+            completeBookingBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Complete Booking & Pay';
+        } else {
+            completeBookingBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Complete Booking';
+        }
+    }
+    
+    // Card number formatting
+    const cardNumberInput = document.querySelector('input[name="card_number"]');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function(e) {
+            // Remove all non-digit characters
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Add spaces every 4 digits
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            
+            e.target.value = value;
+        });
+    }
+    
+    // Form submission handling
+    document.getElementById('payment-form').addEventListener('submit', function(e) {
+        completeBookingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        completeBookingBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}
