@@ -445,6 +445,9 @@
                         <div class="class-name">Economy</div>
                         <div class="class-price">${{ flight.economy_price }}</div>
                         <div class="seats-available">{{ flight.economy_available }} seats left</div>
+                        <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=economy">
+                            Dat ve Economy
+                        </a>
                     </div>
                     {% endif %}
                     
@@ -453,6 +456,9 @@
                         <div class="class-name">Premium Economy</div>
                         <div class="class-price">${{ flight.premium_economy_price }}</div>
                         <div class="seats-available">{{ flight.premium_economy_available }} seats left</div>
+                        <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=premium_economy">
+                            Dat ve Premium
+                        </a>
                     </div>
                     {% endif %}
                     
@@ -461,6 +467,9 @@
                         <div class="class-name">Business</div>
                         <div class="class-price">${{ flight.business_price }}</div>
                         <div class="seats-available">{{ flight.business_available }} seats left</div>
+                        <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=business">
+                            Dat ve Business
+                        </a>
                     </div>
                     {% endif %}
                     
@@ -469,6 +478,9 @@
                         <div class="class-name">First Class</div>
                         <div class="class-price">${{ flight.first_class_price }}</div>
                         <div class="seats-available">{{ flight.first_class_available }} seats left</div>
+                        <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=first_class">
+                            Dat ve First Class
+                        </a>
                     </div>
                     {% endif %}
                 </div>

@@ -390,8 +390,11 @@
                                     seats left
                                 </div>
                                 <div class="mt-3">
-                                    <a href="{% url 'flights:detail' flight.id %}" class="select-flight-btn btn">
-                                        Select Flight
+                                    <a href="{% url 'bookings:start_booking' flight.id %}?cabin_class={{ cabin_class }}" class="select-flight-btn btn">
+                                        Dat ve
+                                    </a>
+                                    <a href="{% url 'flights:detail' flight.id %}" class="btn btn-link btn-sm d-block mt-2">
+                                        Xem chi tiet
                                     </a>
                                 </div>
                                 {% if user.is_authenticated %}

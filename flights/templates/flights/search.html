@@ -269,7 +269,10 @@
                             <div class="small text-muted">{{ flight.departure_time|date:"d/m/Y H:i" }}</div>
                             <strong>{{ flight.economy_price }} USD</strong>
                         </div>
-                        <a class="btn btn-primary btn-sm" href="{% url 'flights:detail' flight.id %}">Dat chuyen</a>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-outline-primary btn-sm" href="{% url 'flights:detail' flight.id %}">Chi tiet</a>
+                            <a class="btn btn-primary btn-sm" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=economy">Dat ve</a>
+                        </div>
                     </div>
                 </div>
             </div>
