@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Booking {{ booking.booking_reference }} - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="booking-detail-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <p class="mb-1 text-white-50">Chi tiet booking ve bay</p>
+                <h1 class="h3 mb-0">{{ booking.booking_reference }}</h1>
+            </div>
+            <a class="btn btn-light" href="{% url 'bookings:my_bookings' %}">Tat ca booking</a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="panel mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="h5 mb-1">{{ booking.flight.airline.name }} {{ booking.flight.flight_number }}</h2>
+                        <p class="text-muted mb-0">{{ booking.flight.aircraft.manufacturer }} {{ booking.flight.aircraft.model }}</p>
+                    </div>
+                    <span class="status-pill status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                </div>
+
+                <div class="route-row">
+                    <div>
+                        <div class="time">{{ booking.flight.departure_time|date:"H:i" }}</div>
+                        <div class="code">{{ booking.flight.origin.iata_code }}</div>
+                        <div class="text-muted">{{ booking.flight.origin.city }}</div>
+                    </div>
+                    <div class="route-mid">
+                        <div>{{ booking.flight.duration_display }}</div>
+                        <div class="line"></div>
+                        <div class="small text-muted">{% if booking.flight.stops == 0 %}Bay thang{% else %}{{ booking.flight.stops }} diem dung{% endif %}</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="time">{{ booking.flight.arrival_time|date:"H:i" }}</div>
+                        <div class="code">{{ booking.flight.destination.iata_code }}</div>
+                        <div class="text-muted">{{ booking.flight.destination.city }}</div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-4">
+                    <div class="col-md-4"><span class="label">Ngay bay</span><strong>{{ booking.flight.departure_time|date:"d/m/Y" }}</strong></div>
+                    <div class="col-md-4"><span class="label">Hang ghe</span><strong>{{ booking.get_cabin_class_display }}</strong></div>
+                    <div class="col-md-4"><span class="label">Thanh toan</span><strong>{{ booking.payment_status }}</strong></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2 class="h5 mb-3">Hanh khach</h2>
+                {% for passenger in passengers %}
+                    <div class="passenger-row">
+                        <div>
+                            <strong>{{ passenger.display_name }}</strong>
+                            <div class="text-muted small">
+                                {{ passenger.email|default:booking.contact_email }} · {{ passenger.phone|default:booking.contact_phone }}
+                            </div>
+                        </div>
+                        <span class="badge text-bg-light">{{ passenger.get_passenger_type_display }}</span>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">Chua co thong tin hanh khach.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="panel mb-4">
+                <h2 class="h5 mb-3">Tong quan</h2>
+                <div class="summary-row"><span>Ma booking</span><strong>{{ booking.booking_reference }}</strong></div>
+                <div class="summary-row"><span>Ngay dat</span><strong>{{ booking.created_at|date:"d/m/Y H:i" }}</strong></div>
+                <div class="summary-row"><span>Email</span><strong>{{ booking.contact_email }}</strong></div>
+                <div class="summary-row"><span>Dien thoai</span><strong>{{ booking.contact_phone|default:"Chua cap nhat" }}</strong></div>
+                <div class="summary-row total"><span>Tong tien</span><strong>${{ booking.total_price }}</strong></div>
+            </div>
+
+            <div class="d-grid gap-2">
+                {% if booking.status == "pending" and booking.payment_status == "pending" %}
+                    <a class="btn btn-primary" href="{% url 'payments:checkout' 'flight' booking.id %}">Tiep tuc thanh toan</a>
+                    <form method="post" action="{% url 'payments:cancel_pending' 'flight' booking.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-danger w-100" type="submit">Huy booking</button>
+                    </form>
+                {% elif booking.is_cancellable %}
+                    <a class="btn btn-outline-danger" href="{% url 'bookings:cancel_booking' booking.booking_reference %}">Huy booking</a>
+                {% endif %}
+                <a class="btn btn-outline-secondary" href="{% url 'flights:search' %}">Dat ve khac</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.booking-detail-header {
+    background: linear-gradient(135deg, #13795b, #0f766e);
+    color: #fff;
+    padding: 28px 0;
+}
+.panel {
+    background: #fff;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(10, 31, 28, .05);
+    padding: 20px;
+}
+.status-pill {
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 12px;
+    padding: 6px 12px;
+}
+.status-confirmed,
+.status-completed {
+    background: #e4f6ee;
+    color: #13795b;
+}
+.status-cancelled,
+.status-refunded {
+    background: #fde8e8;
+    color: #b42318;
+}
+.status-pending {
+    background: #fff4d6;
+    color: #8a5a00;
+}
+.route-row {
+    align-items: center;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1.5fr 1fr;
+}
+.time {
+    font-size: 28px;
+    font-weight: 700;
+}
+.code {
+    color: #13795b;
+    font-size: 20px;
+    font-weight: 700;
+}
+.route-mid {
+    color: #64736f;
+    text-align: center;
+}
+.line {
+    background: #cbd5d1;
+    height: 2px;
+    margin: 8px 0;
+}
+.label {
+    color: #64736f;
+    display: block;
+    font-size: 13px;
+}
+.passenger-row,
+.summary-row {
+    align-items: center;
+    border-bottom: 1px solid #edf0ef;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+}
+.summary-row.total {
+    border-bottom: 0;
+    color: #13795b;
+    font-size: 20px;
+}
+</style>
+{% endblock %}
