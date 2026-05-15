@@ -84,6 +84,20 @@ class PassengerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.flight = kwargs.pop('flight', None)
         super().__init__(*args, **kwargs)
+
+        required_fields = ['first_name', 'last_name', 'email', 'phone']
+        optional_fields = [
+            'title', 'middle_name', 'date_of_birth', 'passenger_type',
+            'passport_number', 'passport_country', 'passport_expiry',
+            'national_id', 'meal_preference', 'seat_preference',
+            'special_assistance',
+        ]
+        for field_name in required_fields:
+            self.fields[field_name].required = True
+            self.fields[field_name].widget.attrs['required'] = True
+        for field_name in optional_fields:
+            self.fields[field_name].required = False
+            self.fields[field_name].widget.attrs.pop('required', None)
         
         # Set date limits
         today = date.today()
@@ -147,7 +161,8 @@ class BookingContactForm(forms.ModelForm):
             }),
             'contact_phone': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '+1 234 567 8900'
+                'placeholder': '+1 234 567 8900',
+                'required': True
             }),
             'special_requests': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -155,6 +170,12 @@ class BookingContactForm(forms.ModelForm):
                 'placeholder': 'Any special requests or additional information...'
             })
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['contact_email'].required = True
+        self.fields['contact_phone'].required = True
+        self.fields['special_requests'].required = False
 
 
 class PaymentForm(forms.Form):

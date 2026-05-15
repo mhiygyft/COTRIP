@@ -81,18 +81,24 @@ def passenger_details(request):
         contact_form = BookingContactForm(request.POST)
         
         if passenger_form.is_valid() and contact_form.is_valid():
+            passenger_cleaned = passenger_form.cleaned_data.copy()
+            passenger_cleaned['title'] = passenger_cleaned.get('title') or 'mr'
+            passenger_cleaned['passenger_type'] = passenger_cleaned.get('passenger_type') or 'adult'
+
             # Store passenger data in session
-            request.session['passenger_data'] = make_session_safe(passenger_form.cleaned_data)
+            request.session['passenger_data'] = make_session_safe(passenger_cleaned)
             request.session['contact_data'] = make_session_safe(contact_form.cleaned_data)
             
             return redirect('bookings:payment')
     else:
         passenger_form = PassengerForm(flight=flight, initial={
             'email': request.user.email,
+            'phone': request.user.phone_number,
             'title': 'mr' if not hasattr(request.user, 'gender') else ('mr' if request.user.gender == 'male' else 'ms')
         })
         contact_form = BookingContactForm(initial={
             'contact_email': request.user.email,
+            'contact_phone': request.user.phone_number,
         })
     
     context = {

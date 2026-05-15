@@ -84,6 +84,8 @@ def require_complete_profile(view_func):
             missing_fields.append('last name')
         if not user.email:
             missing_fields.append('email')
+        if not user.phone_number:
+            missing_fields.append('phone number')
         
         if missing_fields:
             messages.warning(
@@ -110,7 +112,7 @@ def get_user_booking_context(request):
         user = request.user
         context.update({
             'user_bookings_count': user.bookings.count() if hasattr(user, 'bookings') else 0,
-            'user_has_profile': bool(user.first_name and user.last_name),
+            'user_has_profile': bool(user.first_name and user.last_name and user.email and user.phone_number),
             'user_email_verified': getattr(user, 'emailaddress_set', None) and 
                                  user.emailaddress_set.filter(verified=True).exists(),
         })

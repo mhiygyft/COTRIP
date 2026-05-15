@@ -41,7 +41,7 @@ class User(AbstractUser):
 
     @property
     def profile_complete(self):
-        return bool(self.first_name and self.last_name and self.email)
+        return bool(self.first_name and self.last_name and self.email and self.phone_number)
 
     def get_absolute_url(self):
         return reverse("users:account_profile")

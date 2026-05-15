@@ -135,7 +135,7 @@ class Passenger(models.Model):
     last_name = models.CharField(max_length=50)
     
     # Date of birth and passenger type
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True, blank=True)
     
     PASSENGER_TYPE_CHOICES = [
         ('adult', 'Adult (12+ years)'),
@@ -207,6 +207,8 @@ class Passenger(models.Model):
     @property
     def age_at_travel(self):
         """Calculate age at the time of travel"""
+        if not self.date_of_birth:
+            return None
         travel_date = self.booking.flight.departure_time.date()
         age = travel_date.year - self.date_of_birth.year
         

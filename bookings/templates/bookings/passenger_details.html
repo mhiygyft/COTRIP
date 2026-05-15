@@ -176,7 +176,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.date_of_birth.id_for_label }}" class="form-label">Date of Birth *</label>
+                                <label for="{{ passenger_form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
                                 {{ passenger_form.date_of_birth }}
                                 {% if passenger_form.date_of_birth.errors %}
                                     <div class="text-danger small">{{ passenger_form.date_of_birth.errors }}</div>
@@ -214,14 +214,14 @@
                         <h6 class="mt-4 mb-3">Contact Information</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.email.id_for_label }}" class="form-label">Email</label>
+                                <label for="{{ passenger_form.email.id_for_label }}" class="form-label">Email *</label>
                                 {{ passenger_form.email }}
                                 {% if passenger_form.email.errors %}
                                     <div class="text-danger small">{{ passenger_form.email.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.phone.id_for_label }}" class="form-label">Phone</label>
+                                <label for="{{ passenger_form.phone.id_for_label }}" class="form-label">Phone *</label>
                                 {{ passenger_form.phone }}
                                 {% if passenger_form.phone.errors %}
                                     <div class="text-danger small">{{ passenger_form.phone.errors }}</div>
@@ -260,7 +260,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ contact_form.contact_phone.id_for_label }}" class="form-label">Contact Phone</label>
+                                <label for="{{ contact_form.contact_phone.id_for_label }}" class="form-label">Contact Phone *</label>
                                 {{ contact_form.contact_phone }}
                                 {% if contact_form.contact_phone.errors %}
                                     <div class="text-danger small">{{ contact_form.contact_phone.errors }}</div>
