@@ -1,10 +1,38 @@
 from django.contrib import admin
+from django import forms
 from django.utils.html import format_html
-from django.db.models import Count
+from django.db.models import Count, IntegerField, OuterRef, Subquery, Sum
+from django.utils import timezone
 from .models import (
     Country, City, HotelChain, Amenity, Hotel, HotelImage, 
     RoomType, RoomImage, RoomAvailability, HotelReservation, HotelFacility
 )
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleImageField(forms.ImageField):
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+        files = data if isinstance(data, (list, tuple)) else [data]
+        return [super(MultipleImageField, self).clean(file, initial) for file in files]
+
+
+class HotelAdminForm(forms.ModelForm):
+    additional_images = MultipleImageField(
+        required=False,
+        label='Them nhieu anh',
+        help_text='Chon mot hoac nhieu anh de them vao thu vien anh khach san.',
+    )
+
+    class Meta:
+        model = Hotel
+        fields = '__all__'
 
 MODEL_LABELS = {
     Country: ('quoc gia', 'Quoc gia'),
@@ -97,9 +125,11 @@ class HotelFacilityInline(admin.TabularInline):
 
 @admin.register(Hotel)
 class HotelAdmin(admin.ModelAdmin):
+    form = HotelAdminForm
     list_display = [
         'name', 'city', 'star_rating', 'price_from', 'average_rating', 
-        'total_reviews', 'is_active', 'is_featured', 'is_verified'
+        'rooms_available_display', 'reservations_count', 'total_reviews',
+        'is_active', 'is_featured', 'is_verified'
     ]
     list_filter = [
         'star_rating', 'is_active', 'is_featured', 'is_verified', 
@@ -124,6 +154,9 @@ class HotelAdmin(admin.ModelAdmin):
         ('Pricing & Features', {
             'fields': ('price_from', 'currency', 'amenities')
         }),
+        ('Images', {
+            'fields': ('image_url', 'additional_images')
+        }),
         ('Policies', {
             'fields': ('check_in_time', 'check_out_time', 'cancellation_policy', 'child_policy', 'pet_policy'),
             'classes': ('collapse',)
@@ -138,9 +171,55 @@ class HotelAdmin(admin.ModelAdmin):
     )
     
     inlines = [HotelImageInline, RoomTypeInline, HotelFacilityInline]
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        images = request.FILES.getlist('additional_images')
+        has_primary = obj.images.filter(is_primary=True).exists()
+        base_order = obj.images.count()
+        for index, image in enumerate(images):
+            HotelImage.objects.create(
+                hotel=obj,
+                image=image,
+                is_primary=not has_primary and index == 0,
+                display_order=base_order + index,
+            )
     
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('city', 'city__country', 'hotel_chain')
+        today = timezone.localdate()
+        room_availability = (
+            RoomAvailability.objects
+            .filter(room_type__hotel=OuterRef('pk'), date__gte=today)
+            .values('room_type__hotel')
+            .annotate(total=Sum('available_rooms'))
+            .values('total')
+        )
+        reservations = (
+            HotelReservation.objects
+            .filter(room_type__hotel=OuterRef('pk'))
+            .values('room_type__hotel')
+            .annotate(total=Count('id'))
+            .values('total')
+        )
+        return (
+            super()
+            .get_queryset(request)
+            .select_related('city', 'city__country', 'hotel_chain')
+            .annotate(
+                rooms_available_total=Subquery(room_availability, output_field=IntegerField()),
+                reservations_total=Subquery(reservations, output_field=IntegerField()),
+            )
+        )
+
+    def rooms_available_display(self, obj):
+        return obj.rooms_available_total or 0
+    rooms_available_display.short_description = 'Phong con'
+    rooms_available_display.admin_order_field = 'rooms_available_total'
+
+    def reservations_count(self, obj):
+        return obj.reservations_total
+    reservations_count.short_description = 'Booking'
+    reservations_count.admin_order_field = 'reservations_total'
 
 
 @admin.register(HotelImage)

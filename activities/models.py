@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from decimal import Decimal
@@ -76,6 +77,31 @@ class Activity(models.Model):
         if reviews.exists():
             return reviews.aggregate(models.Avg('rating'))['rating__avg']
         return 0
+
+    @property
+    def primary_image_url(self):
+        primary_image = self.images.filter(is_primary=True).first() or self.images.first()
+        if primary_image and primary_image.image:
+            return primary_image.image.url
+        if self.image_url and not self.image_url.startswith(('http://', 'https://', '/')):
+            return f"{settings.MEDIA_URL}{self.image_url.lstrip('/')}"
+        return self.image_url
+
+
+class ActivityImage(models.Model):
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='activities/')
+    caption = models.CharField(max_length=200, blank=True)
+    alt_text = models.CharField(max_length=200, blank=True)
+    is_primary = models.BooleanField(default=False)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['display_order', '-is_primary', 'created_at']
+
+    def __str__(self):
+        return f'{self.activity.title} - Image'
 
 class ActivityBooking(models.Model):
     STATUS_CHOICES = [

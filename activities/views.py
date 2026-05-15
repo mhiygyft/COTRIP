@@ -13,7 +13,7 @@ class ActivitySearchView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        activities = Activity.objects.filter(is_active=True).select_related('category')
+        activities = Activity.objects.filter(is_active=True).select_related('category').prefetch_related('images')
         location = self.request.GET.get('location', '').strip()
         category = self.request.GET.get('category', '').strip()
 
@@ -35,7 +35,10 @@ class ActivityDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['activity'] = Activity.objects.filter(id=kwargs.get('activity_id'), is_active=True).select_related('category').first()
+        context['activity'] = Activity.objects.filter(
+            id=kwargs.get('activity_id'),
+            is_active=True,
+        ).select_related('category').prefetch_related('images').first()
         return context
 
 class ActivitySearchAPIView(TemplateView):

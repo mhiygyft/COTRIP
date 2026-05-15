@@ -5,9 +5,21 @@
 {% block content %}
 <div class="container py-5">
     {% if activity %}
+        {% if activity.primary_image_url %}
+            <img src="{{ activity.primary_image_url }}" class="detail-hero-image mb-3" alt="{{ activity.title }}">
+        {% endif %}
         <h1 class="h3">{{ activity.title }}</h1>
         <p class="text-muted">{{ activity.city }}, {{ activity.country }}</p>
         <p>{{ activity.description }}</p>
+        {% if activity.images.all %}
+            <div class="row g-2 mb-4">
+                {% for image in activity.images.all %}
+                    <div class="col-6 col-md-3">
+                        <img src="{{ image.image.url }}" class="gallery-thumb" alt="{{ image.alt_text|default:activity.title }}">
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <p><strong>{{ activity.price_adult }} USD</strong> moi nguoi lon</p>
         <p class="text-success">{{ activity.max_participants }} suat moi ngay</p>
         <form method="post" action="{% url 'activities:book' activity.id %}" class="row g-3 border rounded p-3 mt-3">
@@ -32,4 +44,21 @@
         <h1 class="h3">Khong tim thay trai nghiem</h1>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-hero-image {
+    border-radius: 8px;
+    height: 360px;
+    object-fit: cover;
+    width: 100%;
+}
+.gallery-thumb {
+    border-radius: 6px;
+    height: 140px;
+    object-fit: cover;
+    width: 100%;
+}
+</style>
 {% endblock %}

@@ -68,8 +68,10 @@
                 <ul class="navbar-nav me-auto">
                     {% if request.user.is_authenticated and request.user.is_staff %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Tong quan admin</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}#manage-hotels">Tinh trang khach san</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}#manage-flights">Tinh trang chuyen bay</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:hotels_hotel_changelist' %}">Khach san</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:flights_flight_changelist' %}">Chuyen bay</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:packages_travelpackage_changelist' %}">Tour</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:activities_activity_changelist' %}">Trai nghiem</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}#bookings">Dat cho</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'hotels:search' %}">Khach san</a></li>

@@ -137,9 +137,13 @@
             <div class="card mb-4 hotel-card">
                 <div class="row g-0">
                     <div class="col-md-4">
-                        <div class="hotel-image-placeholder bg-light d-flex align-items-center justify-content-center h-100">
-                            <i class="bi bi-building fs-1 text-muted"></i>
-                        </div>
+                        {% if hotel.primary_image_url %}
+                            <img src="{{ hotel.primary_image_url }}" class="hotel-result-image" alt="{{ hotel.name }}">
+                        {% else %}
+                            <div class="hotel-image-placeholder bg-light d-flex align-items-center justify-content-center h-100">
+                                <i class="bi bi-building fs-1 text-muted"></i>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col-md-5">
                         <div class="card-body h-100 d-flex flex-column">
@@ -265,6 +269,13 @@ document.addEventListener('DOMContentLoaded', function() {
 .hotel-image-placeholder {
     height: 200px;
     min-height: 200px;
+}
+
+.hotel-result-image {
+    height: 100%;
+    min-height: 220px;
+    object-fit: cover;
+    width: 100%;
 }
 
 .hotel-card {

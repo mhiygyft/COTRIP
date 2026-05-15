@@ -29,7 +29,7 @@ class HomeView(TemplateView):
         
         context.update({
             'popular_cities': popular_cities,
-            'featured_hotels': Hotel.objects.filter(is_featured=True, is_active=True)[:6],
+            'featured_hotels': Hotel.objects.filter(is_featured=True, is_active=True).prefetch_related('images')[:6],
             'total_hotels': Hotel.objects.filter(is_active=True).count(),
         })
         return context
@@ -43,7 +43,7 @@ class HotelSearchView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        queryset = Hotel.objects.filter(is_active=True)
+        queryset = Hotel.objects.filter(is_active=True).prefetch_related('images', 'amenities')
         
         # Search filters
         location = self.request.GET.get('location')
@@ -110,7 +110,7 @@ class HotelListView(ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        return Hotel.objects.filter(is_active=True).order_by('-is_featured', '-average_rating')
+        return Hotel.objects.filter(is_active=True).prefetch_related('images', 'amenities').order_by('-is_featured', '-average_rating')
 
 
 class HotelDetailView(DetailView):
@@ -126,10 +126,10 @@ class HotelDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         hotel = self.get_object()
         context.update({
-            'room_types': hotel.room_types.filter(is_active=True),
+            'room_types': hotel.room_types.filter(is_active=True).prefetch_related('images', 'amenities'),
             'nearby_hotels': Hotel.objects.filter(
                 city=hotel.city, is_active=True
-            ).exclude(id=hotel.id)[:4],
+            ).exclude(id=hotel.id).prefetch_related('images')[:4],
             'default_stay_date': timezone.localdate() + timedelta(days=1),
         })
         return context

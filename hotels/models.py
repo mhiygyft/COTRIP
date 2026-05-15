@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
@@ -177,6 +178,16 @@ class Hotel(models.Model):
     
     def get_star_display(self):
         return '★' * self.star_rating + '☆' * (5 - self.star_rating)
+
+
+    @property
+    def primary_image_url(self):
+        primary_image = self.images.filter(is_primary=True).first() or self.images.first()
+        if primary_image and primary_image.image:
+            return primary_image.image.url
+        if self.image_url and not self.image_url.startswith(('http://', 'https://', '/')):
+            return f"{settings.MEDIA_URL}{self.image_url.lstrip('/')}"
+        return self.image_url
 
 
 class HotelImage(models.Model):

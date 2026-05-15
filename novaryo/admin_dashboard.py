@@ -165,39 +165,6 @@ def admin_dashboard(request):
         "rooms_available": _money(RoomAvailability.objects.filter(date__gte=today).aggregate(total=Sum("available_rooms"))["total"]),
     }
 
-    admin_links = {
-        "hotels": reverse("admin:hotels_hotel_changelist"),
-        "hotel_add": reverse("admin:hotels_hotel_add"),
-        "rooms": reverse("admin:hotels_roomavailability_changelist"),
-        "flights": reverse("admin:flights_flight_changelist"),
-        "flight_add": reverse("admin:flights_flight_add"),
-        "packages": reverse("admin:packages_travelpackage_changelist"),
-        "package_add": reverse("admin:packages_travelpackage_add"),
-        "activities": reverse("admin:activities_activity_changelist"),
-        "activity_add": reverse("admin:activities_activity_add"),
-        "flight_bookings": reverse("admin:bookings_booking_changelist"),
-        "hotel_bookings": reverse("admin:hotels_hotelreservation_changelist"),
-        "package_bookings": reverse("admin:packages_packagebooking_changelist"),
-        "activity_bookings": reverse("admin:activities_activitybooking_changelist"),
-    }
-
-    hotel_status = Hotel.objects.annotate(
-        rooms_available=Sum(
-            "room_types__availability__available_rooms",
-            filter=Q(room_types__availability__date__gte=today),
-        ),
-        reservations_count=Count("room_types__reservations", distinct=True),
-    ).order_by("-is_active", "name")[:8]
-    flight_status = Flight.objects.select_related("airline", "origin", "destination").order_by("departure_time")[:8]
-    package_status = TravelPackage.objects.annotate(
-        booking_count=Count("bookings", distinct=True),
-        paid_count=Count("bookings", filter=Q(bookings__payment_status="completed"), distinct=True),
-    ).order_by("-is_active", "title")[:8]
-    activity_status = Activity.objects.annotate(
-        booking_count=Count("bookings", distinct=True),
-        paid_count=Count("bookings", filter=Q(bookings__payment_status="completed"), distinct=True),
-    ).order_by("-is_active", "title")[:8]
-
     customer_rows = User.objects.filter(is_staff=False).annotate(
         flight_orders=Count(
             "flight_bookings",
@@ -250,11 +217,6 @@ def admin_dashboard(request):
         "recent_bookings": recent_bookings,
         "top_tours": top_tours,
         "active_services": active_services,
-        "admin_links": admin_links,
-        "hotel_status": hotel_status,
-        "flight_status": flight_status,
-        "package_status": package_status,
-        "activity_status": activity_status,
         "customers": customer_rows,
         "staff_users": User.objects.filter(is_staff=True).order_by("email")[:10],
         "activity_logs": LogEntry.objects.select_related("user", "content_type")[:8],

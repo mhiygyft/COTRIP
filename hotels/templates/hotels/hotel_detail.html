@@ -70,36 +70,43 @@
 <div class="container-fluid px-0 mb-4">
     <div class="row g-1">
         <div class="col-md-6">
-            <div class="hotel-main-image bg-light d-flex align-items-center justify-content-center">
-                <i class="bi bi-building fs-1 text-muted"></i>
-                <small class="position-absolute bottom-0 end-0 bg-dark text-white p-1 m-2 rounded">Main Image</small>
-            </div>
+            {% if hotel.primary_image_url %}
+                <img src="{{ hotel.primary_image_url }}" class="hotel-main-image object-image" alt="{{ hotel.name }}">
+            {% else %}
+                <div class="hotel-main-image bg-light d-flex align-items-center justify-content-center">
+                    <i class="bi bi-building fs-1 text-muted"></i>
+                    <small class="position-absolute bottom-0 end-0 bg-dark text-white p-1 m-2 rounded">Main Image</small>
+                </div>
+            {% endif %}
         </div>
         <div class="col-md-6">
             <div class="row g-1 h-100">
-                <div class="col-6">
-                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
-                        <i class="bi bi-image fs-3 text-muted"></i>
+                {% for image in hotel.images.all|slice:":4" %}
+                    <div class="col-6">
+                        <img src="{{ image.image.url }}" class="hotel-gallery-image object-image" alt="{{ image.alt_text|default:hotel.name }}">
                     </div>
-                </div>
-                <div class="col-6">
-                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
-                        <i class="bi bi-image fs-3 text-muted"></i>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
-                        <i class="bi bi-image fs-3 text-muted"></i>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center position-relative">
-                        <i class="bi bi-images fs-3 text-muted"></i>
-                        <div class="overlay-badge position-absolute top-50 start-50 translate-middle">
-                            <span class="badge bg-dark">+10 Photos</span>
+                {% empty %}
+                    <div class="col-6">
+                        <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image fs-3 text-muted"></i>
                         </div>
                     </div>
-                </div>
+                    <div class="col-6">
+                        <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image fs-3 text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image fs-3 text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="hotel-gallery-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-images fs-3 text-muted"></i>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -139,12 +146,18 @@
                 <div class="card mb-4 border shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <div class="room-image-placeholder bg-light d-flex align-items-center justify-content-center h-100">
-                                <div class="text-center">
-                                    <i class="bi bi-door-open fs-1 text-muted mb-2"></i>
-                                    <div class="small text-muted">{{ room_type.name }}</div>
-                                </div>
-                            </div>
+                            {% with room_image=room_type.images.first %}
+                                {% if room_image %}
+                                    <img src="{{ room_image.image.url }}" class="room-image-placeholder object-image" alt="{{ room_image.caption|default:room_type.name }}">
+                                {% else %}
+                                    <div class="room-image-placeholder bg-light d-flex align-items-center justify-content-center h-100">
+                                        <div class="text-center">
+                                            <i class="bi bi-door-open fs-1 text-muted mb-2"></i>
+                                            <div class="small text-muted">{{ room_type.name }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
                         </div>
                         <div class="col-md-5">
                             <div class="card-body h-100">
@@ -259,26 +272,34 @@
                 <div class="card-body">
                     <h5 class="card-title">Contact Information</h5>
                     
-                    {% if hotel.phone_number %}
                     <p class="mb-2">
-                        <i class="bi bi-telephone"></i> {{ hotel.phone_number }}
+                        <i class="bi bi-telephone"></i>
+                        {% if hotel.phone_number %}
+                            {{ hotel.phone_number }}
+                        {% else %}
+                            <span class="text-muted">Chua cap nhat so dien thoai</span>
+                        {% endif %}
                     </p>
-                    {% endif %}
-                    
-                    {% if hotel.email %}
+
                     <p class="mb-2">
-                        <i class="bi bi-envelope"></i> {{ hotel.email }}
+                        <i class="bi bi-envelope"></i>
+                        {% if hotel.email %}
+                            {{ hotel.email }}
+                        {% else %}
+                            <span class="text-muted">Chua cap nhat email</span>
+                        {% endif %}
                     </p>
-                    {% endif %}
-                    
-                    {% if hotel.website %}
+
                     <p class="mb-2">
                         <i class="bi bi-globe"></i> 
-                        <a href="{{ hotel.website }}" target="_blank" class="text-decoration-none">
-                            Visit Website
-                        </a>
+                        {% if hotel.website %}
+                            <a href="{{ hotel.website }}" target="_blank" class="text-decoration-none">
+                                Visit Website
+                            </a>
+                        {% else %}
+                            <span class="text-muted">Chua cap nhat website</span>
+                        {% endif %}
                     </p>
-                    {% endif %}
                     
                     <!-- Map Placeholder -->
                     <div class="map-placeholder bg-light d-flex align-items-center justify-content-center mt-3" style="height: 200px;">
@@ -300,7 +321,11 @@
                     {% for nearby_hotel in nearby_hotels %}
                     <div class="d-flex mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
                         <div class="hotel-thumb bg-light d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
-                            <i class="bi bi-building text-muted"></i>
+                            {% if nearby_hotel.primary_image_url %}
+                                <img src="{{ nearby_hotel.primary_image_url }}" class="nearby-thumb" alt="{{ nearby_hotel.name }}">
+                            {% else %}
+                                <i class="bi bi-building text-muted"></i>
+                            {% endif %}
                         </div>
                         <div class="flex-grow-1">
                             <h6 class="mb-1">
@@ -341,6 +366,17 @@
 .room-image-placeholder {
     height: 200px;
     min-height: 200px;
+}
+
+.object-image {
+    object-fit: cover;
+    width: 100%;
+}
+
+.nearby-thumb {
+    height: 60px;
+    object-fit: cover;
+    width: 60px;
 }
 
 .breadcrumb-item + .breadcrumb-item::before {

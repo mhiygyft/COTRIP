@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count, Q
 
 from .models import Aircraft, Airline, Airport, BaggageAllowance, Country, Flight, Route
 
@@ -57,13 +58,35 @@ class RouteAdmin(admin.ModelAdmin):
 class FlightAdmin(admin.ModelAdmin):
     list_display = [
         "flight_code", "airline", "origin", "destination", "departure_time",
-        "economy_price", "economy_available", "status", "is_active",
+        "economy_price", "economy_available", "booking_count_display",
+        "paid_count_display", "status", "is_active",
     ]
     list_filter = ["is_active", "status", "airline", "origin", "destination", "departure_time"]
     search_fields = ["flight_number", "airline__name", "origin__iata_code", "destination__iata_code"]
     list_editable = ["economy_available", "status", "is_active"]
     date_hierarchy = "departure_time"
     autocomplete_fields = ["airline", "aircraft", "origin", "destination", "route"]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("airline", "origin", "destination", "aircraft", "route")
+            .annotate(
+                booking_total=Count("bookings", distinct=True),
+                paid_total=Count("bookings", filter=Q(bookings__payment_status="completed"), distinct=True),
+            )
+        )
+
+    def booking_count_display(self, obj):
+        return obj.booking_total
+    booking_count_display.short_description = "Booking"
+    booking_count_display.admin_order_field = "booking_total"
+
+    def paid_count_display(self, obj):
+        return obj.paid_total
+    paid_count_display.short_description = "Da thanh toan"
+    paid_count_display.admin_order_field = "paid_total"
 
 
 @admin.register(BaggageAllowance)

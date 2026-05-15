@@ -9,10 +9,6 @@
         <a href="#overview"><i class="bi bi-speedometer2"></i> Tong quan</a>
         <a href="#bookings"><i class="bi bi-calendar-check"></i> Booking</a>
         <a href="#services"><i class="bi bi-map"></i> Tour & dich vu</a>
-        <a href="#manage-hotels"><i class="bi bi-building"></i> Tinh trang khach san</a>
-        <a href="#manage-flights"><i class="bi bi-airplane"></i> Tinh trang chuyen bay</a>
-        <a href="#manage-packages"><i class="bi bi-luggage"></i> Tinh trang tour</a>
-        <a href="#manage-activities"><i class="bi bi-compass"></i> Tinh trang trai nghiem</a>
         <a href="#customers"><i class="bi bi-people"></i> Khach hang</a>
         <a href="#finance"><i class="bi bi-cash-stack"></i> Tai chinh</a>
         <a href="#marketing"><i class="bi bi-megaphone"></i> Marketing</a>
@@ -185,126 +181,6 @@
                 {% empty %}
                     <p class="text-muted">Chua co tour nao duoc dat.</p>
                 {% endfor %}
-            </div>
-        </section>
-
-        <section id="manage-hotels" class="panel">
-            <div class="panel-title">
-                <h2>Tinh trang khach san</h2>
-                <span>
-                    <a class="btn btn-sm btn-outline-primary" href="{{ admin_links.hotel_add }}">Them khach san</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ admin_links.hotels }}">Cap nhat</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ admin_links.rooms }}">Phong & availability</a>
-                </span>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead><tr><th>Khach san</th><th>Dia diem</th><th>Phong con</th><th>Booking</th><th>Trang thai</th><th></th></tr></thead>
-                    <tbody>
-                    {% for hotel in hotel_status %}
-                        <tr>
-                            <td>{{ hotel.name }}</td>
-                            <td>{{ hotel.city.name }}</td>
-                            <td>{{ hotel.rooms_available|default:0|floatformat:0 }}</td>
-                            <td>{{ hotel.reservations_count }}</td>
-                            <td>{% if hotel.is_active %}<span class="badge text-bg-success">Dang ban</span>{% else %}<span class="badge text-bg-secondary">Tam tat</span>{% endif %}</td>
-                            <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'admin:hotels_hotel_change' hotel.id %}">Sua</a></td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="6" class="text-muted">Chua co khach san.</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="manage-flights" class="panel">
-            <div class="panel-title">
-                <h2>Tinh trang chuyen bay</h2>
-                <span>
-                    <a class="btn btn-sm btn-outline-primary" href="{{ admin_links.flight_add }}">Them chuyen bay</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ admin_links.flights }}">Cap nhat</a>
-                </span>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead><tr><th>Ma bay</th><th>Hang</th><th>Tuyen</th><th>Gio bay</th><th>Ghe economy</th><th>Trang thai</th><th></th></tr></thead>
-                    <tbody>
-                    {% for flight in flight_status %}
-                        <tr>
-                            <td>{{ flight.flight_code }}</td>
-                            <td>{{ flight.airline.name }}</td>
-                            <td>{{ flight.origin.iata_code }} - {{ flight.destination.iata_code }}</td>
-                            <td>{{ flight.departure_time|date:"d/m H:i" }}</td>
-                            <td>{{ flight.economy_available }}</td>
-                            <td>{% if flight.is_active %}<span class="badge text-bg-success">Dang ban</span>{% else %}<span class="badge text-bg-secondary">Tam tat</span>{% endif %}</td>
-                            <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'admin:flights_flight_change' flight.id %}">Sua</a></td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="7" class="text-muted">Chua co chuyen bay.</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="manage-packages" class="panel">
-            <div class="panel-title">
-                <h2>Tinh trang tour tron goi</h2>
-                <span>
-                    <a class="btn btn-sm btn-outline-primary" href="{{ admin_links.package_add }}">Them tour</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ admin_links.packages }}">Cap nhat</a>
-                </span>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead><tr><th>Tour</th><th>Diem den</th><th>Gia</th><th>So cho</th><th>Booking / da thanh toan</th><th>Trang thai</th><th></th></tr></thead>
-                    <tbody>
-                    {% for package in package_status %}
-                        <tr>
-                            <td>{{ package.title }}</td>
-                            <td>{{ package.destination_city }}</td>
-                            <td>${{ package.base_price_per_person }}</td>
-                            <td>{{ package.max_participants }}</td>
-                            <td>{{ package.booking_count }} / {{ package.paid_count }}</td>
-                            <td>{% if package.is_active %}<span class="badge text-bg-success">Dang ban</span>{% else %}<span class="badge text-bg-secondary">Tam tat</span>{% endif %}</td>
-                            <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'admin:packages_travelpackage_change' package.id %}">Sua</a></td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="7" class="text-muted">Chua co tour.</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="manage-activities" class="panel">
-            <div class="panel-title">
-                <h2>Tinh trang trai nghiem</h2>
-                <span>
-                    <a class="btn btn-sm btn-outline-primary" href="{{ admin_links.activity_add }}">Them trai nghiem</a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ admin_links.activities }}">Cap nhat</a>
-                </span>
-            </div>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead><tr><th>Trai nghiem</th><th>Dia diem</th><th>Gia</th><th>So cho</th><th>Booking / da thanh toan</th><th>Trang thai</th><th></th></tr></thead>
-                    <tbody>
-                    {% for activity in activity_status %}
-                        <tr>
-                            <td>{{ activity.title }}</td>
-                            <td>{{ activity.city }}</td>
-                            <td>${{ activity.price_adult }}</td>
-                            <td>{{ activity.max_participants }}</td>
-                            <td>{{ activity.booking_count }} / {{ activity.paid_count }}</td>
-                            <td>{% if activity.is_active %}<span class="badge text-bg-success">Dang ban</span>{% else %}<span class="badge text-bg-secondary">Tam tat</span>{% endif %}</td>
-                            <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'admin:activities_activity_change' activity.id %}">Sua</a></td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="7" class="text-muted">Chua co trai nghiem.</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
             </div>
         </section>
 

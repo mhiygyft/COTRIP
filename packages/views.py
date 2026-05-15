@@ -14,7 +14,7 @@ class PackageSearchView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        packages = TravelPackage.objects.filter(is_active=True)
+        packages = TravelPackage.objects.filter(is_active=True).prefetch_related('images')
         destination = self.request.GET.get('destination', '').strip()
         package_type = self.request.GET.get('type', '').strip()
 
@@ -39,7 +39,10 @@ class PackageDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['package'] = TravelPackage.objects.filter(id=kwargs.get('package_id'), is_active=True).first()
+        context['package'] = TravelPackage.objects.filter(
+            id=kwargs.get('package_id'),
+            is_active=True,
+        ).prefetch_related('images', 'components').first()
         return context
 
 class PackageSearchAPIView(TemplateView):
