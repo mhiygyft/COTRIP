@@ -421,6 +421,9 @@ STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default="")
 GOOGLE_MAPS_API_KEY = config("GOOGLE_MAPS_API_KEY", default="")
 AMADEUS_API_KEY = config("AMADEUS_API_KEY", default="")
 AMADEUS_API_SECRET = config("AMADEUS_API_SECRET", default="")
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+OPENAI_MODEL = config("OPENAI_MODEL", default="gpt-4o-mini")
+OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
 
 
 # Security Settings

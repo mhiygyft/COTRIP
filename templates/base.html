@@ -53,6 +53,79 @@
             transform: translateY(-2px);
             box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .12) !important;
         }
+        .ai-chat-launcher {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 50%;
+            z-index: 1080;
+            box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .18);
+        }
+        .ai-chat-panel {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 5rem;
+            width: min(25rem, calc(100vw - 2rem));
+            max-height: min(40rem, calc(100vh - 6rem));
+            display: none;
+            z-index: 1080;
+            overflow: hidden;
+            border-radius: .5rem;
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, .18);
+        }
+        .ai-chat-panel.is-open {
+            display: flex;
+        }
+        .ai-chat-messages {
+            min-height: 16rem;
+            max-height: 24rem;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+        .ai-chat-bubble {
+            max-width: 88%;
+            border-radius: .75rem;
+            padding: .65rem .8rem;
+            font-size: .92rem;
+            line-height: 1.35;
+        }
+        .ai-chat-bubble.user {
+            margin-left: auto;
+            background: var(--vn-green);
+            color: #fff;
+        }
+        .ai-chat-bubble.bot {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            color: var(--vn-ink);
+        }
+        .ai-rec-card {
+            display: grid;
+            grid-template-columns: 4.75rem 1fr;
+            gap: .75rem;
+            color: inherit;
+            text-decoration: none;
+        }
+        .ai-rec-image {
+            width: 4.75rem;
+            height: 4.75rem;
+            object-fit: cover;
+            border-radius: .4rem;
+            background: #e5e7eb;
+        }
+        @media (max-width: 575.98px) {
+            .ai-chat-panel {
+                right: .75rem;
+                bottom: 4.5rem;
+                width: calc(100vw - 1.5rem);
+            }
+            .ai-chat-launcher {
+                right: .75rem;
+                bottom: .75rem;
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
     {% block extra_css %}{% endblock %}
@@ -109,12 +182,172 @@
 
     {% block content %}{% endblock %}
 
+    {% if not request.user.is_authenticated or not request.user.is_staff %}
+        <section class="ai-chat-panel flex-column bg-white border" id="aiChatPanel" aria-label="AI travel consultant">
+            <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                <div>
+                    <div class="fw-semibold">Tu van AI</div>
+                    <div class="small text-muted">Goi y khach san, tour, trai nghiem, chuyen bay</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="aiChatClose" aria-label="Dong chatbot">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="ai-chat-messages p-3" id="aiChatMessages">
+                <div class="ai-chat-bubble bot mb-2">
+                    Ban muon di dau, ngan sach bao nhieu, thich nghi duong hay trai nghiem? Minh se goi y cac lua chon dang co tren website.
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Khach san o Da Nang</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Tour gia dinh 3 ngay</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Trai nghiem am thuc</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Chuyen bay con cho</button>
+                </div>
+            </div>
+            <form class="border-top p-3" id="aiChatForm">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="aiChatInput" autocomplete="off" placeholder="Nhap yeu cau cua ban..." aria-label="Nhap yeu cau tu van">
+                    <button class="btn btn-primary" type="submit" aria-label="Gui">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+        <button type="button" class="btn btn-primary ai-chat-launcher" id="aiChatLauncher" aria-label="Mo chatbot AI">
+            <i class="bi bi-stars"></i>
+        </button>
+    {% endif %}
+
     <footer class="border-top py-4 mt-5">
         <div class="container text-muted small">
             &copy; 2026 Vietnam Travel. Hanh trinh Viet Nam, tu nui rung den bien dao.
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% if not request.user.is_authenticated or not request.user.is_staff %}
+        <script>
+            (() => {
+                const panel = document.getElementById("aiChatPanel");
+                const launcher = document.getElementById("aiChatLauncher");
+                const closeButton = document.getElementById("aiChatClose");
+                const form = document.getElementById("aiChatForm");
+                const input = document.getElementById("aiChatInput");
+                const messages = document.getElementById("aiChatMessages");
+
+                if (!panel || !launcher || !form || !input || !messages) {
+                    return;
+                }
+
+                const scrollToBottom = () => {
+                    messages.scrollTop = messages.scrollHeight;
+                };
+
+                const appendBubble = (text, role = "bot") => {
+                    const bubble = document.createElement("div");
+                    bubble.className = `ai-chat-bubble ${role} mb-2`;
+                    bubble.textContent = text;
+                    messages.appendChild(bubble);
+                    scrollToBottom();
+                    return bubble;
+                };
+
+                const renderRecommendations = (recommendations) => {
+                    recommendations.forEach((item) => {
+                        const card = document.createElement("a");
+                        card.className = "ai-rec-card border rounded p-2 bg-white mb-2";
+                        card.href = item.url;
+                        if (item.image) {
+                            const image = document.createElement("img");
+                            image.className = "ai-rec-image";
+                            image.src = item.image;
+                            image.alt = "";
+                            card.appendChild(image);
+                        } else {
+                            const placeholder = document.createElement("div");
+                            placeholder.className = "ai-rec-image d-flex align-items-center justify-content-center text-muted";
+                            const icon = document.createElement("i");
+                            icon.className = "bi bi-map";
+                            placeholder.appendChild(icon);
+                            card.appendChild(placeholder);
+                        }
+
+                        const content = document.createElement("span");
+                        [
+                            ["d-block small text-primary fw-semibold", item.type],
+                            ["d-block fw-semibold", item.title],
+                            ["d-block small text-muted", item.subtitle || ""],
+                            ["d-block small", item.price || ""],
+                        ].forEach(([className, text]) => {
+                            const row = document.createElement("span");
+                            row.className = className;
+                            row.textContent = text;
+                            content.appendChild(row);
+                        });
+                        card.appendChild(content);
+                        messages.appendChild(card);
+                    });
+                    scrollToBottom();
+                };
+
+                const sendMessage = async (text) => {
+                    const message = text.trim();
+                    if (!message) {
+                        return;
+                    }
+                    appendBubble(message, "user");
+                    input.value = "";
+                    input.disabled = true;
+                    const loading = appendBubble("Dang tim goi y phu hop...", "bot");
+
+                    try {
+                        const response = await fetch("{% url 'chatbot_api' %}", {
+                            method: "POST",
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({message}),
+                        });
+                        const data = await response.json();
+                        loading.remove();
+                        if (!response.ok) {
+                            appendBubble(data.error || "Chua gui duoc yeu cau. Vui long thu lai.");
+                            return;
+                        }
+                        appendBubble(data.answer || "Minh da tim thay mot so goi y cho ban.");
+                        renderRecommendations(data.recommendations || []);
+                    } catch (error) {
+                        loading.remove();
+                        appendBubble("Ket noi chatbot dang gap loi. Ban vui long thu lai sau.");
+                    } finally {
+                        input.disabled = false;
+                        input.focus();
+                    }
+                };
+
+                launcher.addEventListener("click", () => {
+                    panel.classList.toggle("is-open");
+                    if (panel.classList.contains("is-open")) {
+                        input.focus();
+                        scrollToBottom();
+                    }
+                });
+
+                closeButton.addEventListener("click", () => {
+                    panel.classList.remove("is-open");
+                });
+
+                form.addEventListener("submit", (event) => {
+                    event.preventDefault();
+                    sendMessage(input.value);
+                });
+
+                messages.addEventListener("click", (event) => {
+                    const chip = event.target.closest(".ai-chat-chip");
+                    if (chip) {
+                        sendMessage(chip.textContent || "");
+                    }
+                });
+            })();
+        </script>
+    {% endif %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

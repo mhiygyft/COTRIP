@@ -20,6 +20,7 @@ from django.views.generic import TemplateView
 from hotels.views import HomeView
 from users import views as user_views
 from . import admin_dashboard
+from . import chatbot
 from .swagger_settings import schema_view
 
 admin.site.site_header = "Vietnam Travel Administration"
@@ -56,6 +57,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('dashboard/', user_views.dashboard, name='customer_dashboard'),
     path('profile/', user_views.profile, name='account_profile'),
+    path('chatbot/api/', chatbot.chatbot_api, name='chatbot_api'),
     
     # Web app URLs
     path('hotels/', include('hotels.urls')),
