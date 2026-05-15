@@ -18,10 +18,27 @@ def flight_search(request):
     """Main flight search page"""
     form = FlightSearchForm(request.GET or None)
     airports = Airport.objects.filter(is_popular=True).order_by('name')
+    available_flights = (
+        Flight.objects
+        .filter(
+            is_active=True,
+            status='scheduled',
+            departure_time__gte=timezone.now(),
+        )
+        .filter(
+            Q(economy_available__gt=0) |
+            Q(premium_economy_available__gt=0) |
+            Q(business_available__gt=0) |
+            Q(first_class_available__gt=0)
+        )
+        .select_related('airline', 'origin', 'destination', 'aircraft')
+        .order_by('departure_time')[:12]
+    )
     
     context = {
         'form': form,
         'airports': airports,
+        'available_flights': available_flights,
         'page_title': 'Search Flights'
     }
     

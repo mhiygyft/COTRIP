@@ -120,6 +120,15 @@
         color: white;
         transform: translate(-50%, -50%) rotate(180deg);
     }
+
+    .available-flight-card {
+        background: #fff;
+        border: 1px solid #e7ecea;
+        border-radius: 8px;
+        box-shadow: 0 8px 18px rgba(10, 31, 28, .06);
+        height: 100%;
+        padding: 1rem;
+    }
 </style>
 {% endblock %}
 
@@ -221,6 +230,53 @@
             </div>
         </div>
     </div>
+
+    {% if available_flights %}
+    <div class="available-flights mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="h5 mb-1">Chuyen bay dang co san</h3>
+                <p class="text-muted mb-0">Cac chuyen bay sap khoi hanh van con ghe de dat ngay.</p>
+            </div>
+        </div>
+        <div class="row g-3">
+            {% for flight in available_flights %}
+            <div class="col-md-6 col-xl-4">
+                <div class="available-flight-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <strong>{{ flight.flight_code }}</strong>
+                            <div class="small text-muted">{{ flight.airline.name }}</div>
+                        </div>
+                        <span class="badge text-bg-success">{{ flight.economy_available }} ghe</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-semibold">{{ flight.origin.iata_code }}</div>
+                            <small class="text-muted">{{ flight.origin.city }}</small>
+                        </div>
+                        <div class="text-center text-muted small">
+                            <i class="bi bi-arrow-right"></i>
+                            <div>{{ flight.duration_display }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-semibold">{{ flight.destination.iata_code }}</div>
+                            <small class="text-muted">{{ flight.destination.city }}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <div class="small text-muted">{{ flight.departure_time|date:"d/m/Y H:i" }}</div>
+                            <strong>{{ flight.economy_price }} USD</strong>
+                        </div>
+                        <a class="btn btn-primary btn-sm" href="{% url 'flights:detail' flight.id %}">Dat chuyen</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Popular Destinations -->
     <div class="popular-destinations">
