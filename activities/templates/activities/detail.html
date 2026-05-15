@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiet trai nghiem - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    {% if activity %}
+        <h1 class="h3">{{ activity.title }}</h1>
+        <p class="text-muted">{{ activity.city }}, {{ activity.country }}</p>
+        <p>{{ activity.description }}</p>
+        <p><strong>{{ activity.price_adult }} USD</strong> moi nguoi lon</p>
+        <p class="text-success">{{ activity.max_participants }} suat moi ngay</p>
+        <form method="post" action="{% url 'activities:book' activity.id %}" class="row g-3 border rounded p-3 mt-3">
+            {% csrf_token %}
+            <div class="col-md-4">
+                <label class="form-label" for="booking_date">Ngay di</label>
+                <input class="form-control" id="booking_date" name="booking_date" type="date" value="{% now 'Y-m-d' %}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="adults">Nguoi lon</label>
+                <input class="form-control" id="adults" name="adults" type="number" min="1" value="1">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="children">Tre em</label>
+                <input class="form-control" id="children" name="children" type="number" min="0" value="0">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="submit">Dat ngay</button>
+            </div>
+        </form>
+    {% else %}
+        <h1 class="h3">Khong tim thay trai nghiem</h1>
+    {% endif %}
+</div>
+{% endblock %}

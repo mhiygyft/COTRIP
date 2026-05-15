@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Tour tron goi Viet Nam - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Tour tron goi Viet Nam</h1>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-5">
+            <label class="form-label" for="destination">Diem den</label>
+            <input class="form-control" id="destination" name="destination" value="{{ destination }}" placeholder="Ha Long, Sapa, Hue, Mekong...">
+        </div>
+        <div class="col-md-5">
+            <label class="form-label" for="type">Kieu tour</label>
+            <select class="form-select" id="type" name="type">
+                <option value="">Tat ca</option>
+                {% for value, label in package_types %}
+                    <option value="{{ value }}" {% if package_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">Tim tour</button>
+        </div>
+    </form>
+
+    <div class="row g-3">
+        {% for package in packages %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="h5">{{ package.title }}</h2>
+                        <p class="text-muted">{{ package.destination_city }}, {{ package.destination_country }}</p>
+                        <p>{{ package.short_description }}</p>
+                        <strong>{{ package.base_price_per_person }} USD</strong>
+                        <div class="mt-3">
+                            <a class="btn btn-primary btn-sm" href="{% url 'packages:detail' package.id %}">Xem va dat</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="row g-3">
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Ha Noi - Ha Long - Ninh Binh</h2><p class="text-muted mb-0">4 ngay cho lan dau den mien Bac.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Da Nang - Hoi An - Hue</h2><p class="text-muted mb-0">Di san mien Trung, bien va am thuc.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">TP.HCM - Mekong - Phu Quoc</h2><p class="text-muted mb-0">Pho thi, song nuoc va nghi duong dao.</p></div></div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

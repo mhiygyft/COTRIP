@@ -1,7 +1,37 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.contrib import messages
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
+from activities.models import ActivityBooking
+from hotels.models import HotelReservation
+from packages.models import PackageBooking
 from .models import PaymentTransaction
+
+
+BOOKING_MODELS = {
+    "hotel": HotelReservation,
+    "package": PackageBooking,
+    "activity": ActivityBooking,
+}
+
+
+def _get_customer_booking_or_404(user, booking_type, object_id):
+    model = BOOKING_MODELS.get(booking_type)
+    if not model:
+        raise Http404("Booking type is not supported")
+    return get_object_or_404(model, id=object_id, user=user)
+
+
+def _booking_label(booking_type, booking):
+    if booking_type == "hotel":
+        return f"HTL-{booking.id} - {booking.room_type.hotel.name}"
+    if booking_type == "package":
+        return f"PKG-{booking.id} - {booking.package.title}"
+    if booking_type == "activity":
+        return f"ACT-{booking.id} - {booking.activity.title}"
+    return f"Booking {booking.id}"
 
 
 @login_required
@@ -12,3 +42,39 @@ def payment_history(request):
         "page_title": "Payment History",
     })
 
+
+@login_required
+def checkout(request, booking_type, object_id):
+    booking = _get_customer_booking_or_404(request.user, booking_type, object_id)
+    if booking.payment_status in {"completed", "refunded", "refund_pending"}:
+        messages.info(request, "Booking nay da duoc xu ly thanh toan.")
+        return redirect("customer_dashboard")
+
+    if request.method == "POST":
+        method = request.POST.get("payment_method", "manual")
+        if method not in {"card", "paypal", "bank_transfer", "manual"}:
+            method = "manual"
+
+        PaymentTransaction.objects.create(
+            user=request.user,
+            amount=booking.total_price,
+            currency=getattr(booking, "currency", "USD"),
+            method=method,
+            status="completed",
+            booking_type=booking_type,
+            object_id=booking.id,
+            metadata={"label": _booking_label(booking_type, booking)},
+        )
+        booking.payment_status = "completed"
+        booking.status = "pending"
+        booking.save(update_fields=["payment_status", "status", "updated_at"])
+        messages.success(request, "Thanh toan thanh cong. Booking cua ban dang cho admin xac nhan.")
+        return redirect("customer_dashboard")
+
+    return render(request, "payments/checkout.html", {
+        "booking": booking,
+        "booking_type": booking_type,
+        "booking_label": _booking_label(booking_type, booking),
+        "amount": booking.total_price,
+        "page_title": "Thanh toan",
+    })

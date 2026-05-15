@@ -192,6 +192,7 @@
 </div>
 
 <div class="container mt-4">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <div class="row">
         <!-- Filters Sidebar -->
         <div class="col-lg-3">
@@ -261,7 +262,7 @@
                             <input class="form-check-input" type="checkbox" 
                                    name="airlines" value="{{ airline.id }}" 
                                    id="airline_{{ airline.id }}"
-                                   {% if airline.id in request.GET.airlines %}checked{% endif %}>
+                                   {% if airline.id in selected_airlines %}checked{% endif %}>
                             <label class="form-check-label small" for="airline_{{ airline.id }}">
                                 {{ airline.name }}
                                 <span class="airline-rating">
@@ -468,7 +469,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     sortRadios.forEach(radio => {
         radio.addEventListener('change', function() {
-            const sortBy = this.id.replace('sort-', '').replace('-', '_');
+            const sortMap = {
+                'sort-price': 'price_low_high',
+                'sort-duration': 'duration',
+                'sort-departure': 'departure_time'
+            };
             
             // Add sort parameter to form
             let sortInput = filterForm.querySelector('input[name="sort_by"]');
@@ -478,11 +483,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 sortInput.name = 'sort_by';
                 filterForm.appendChild(sortInput);
             }
-            sortInput.value = sortBy === 'price' ? 'price_low_high' : sortBy + '_time';
+            sortInput.value = sortMap[this.id] || 'price_low_high';
             
             filterForm.submit();
         });
     });
+    if (filterForm) {
+        filterForm.querySelectorAll('select, input[type="checkbox"]').forEach(control => {
+            control.addEventListener('change', () => filterForm.submit());
+        });
+    }
     
     // Save flight functionality
     document.querySelectorAll('.save-flight-btn').forEach(btn => {

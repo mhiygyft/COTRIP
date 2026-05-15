@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.db import transaction
 from django.utils import timezone
 from decimal import Decimal
+from datetime import date, datetime
 import logging
 from .emails import send_booking_confirmation_email, send_payment_receipt_email, send_booking_cancellation_email
 
@@ -22,6 +23,19 @@ from .forms import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def make_session_safe(data):
+    """Convert cleaned form data to JSON-serializable values for session storage."""
+    safe_data = {}
+    for key, value in data.items():
+        if isinstance(value, (date, datetime)):
+            safe_data[key] = value.isoformat()
+        elif value is None:
+            safe_data[key] = None
+        else:
+            safe_data[key] = str(value) if not isinstance(value, (str, int, float, bool)) else value
+    return safe_data
 
 
 @booking_login_required
@@ -68,8 +82,8 @@ def passenger_details(request):
         
         if passenger_form.is_valid() and contact_form.is_valid():
             # Store passenger data in session
-            request.session['passenger_data'] = passenger_form.cleaned_data
-            request.session['contact_data'] = contact_form.cleaned_data
+            request.session['passenger_data'] = make_session_safe(passenger_form.cleaned_data)
+            request.session['contact_data'] = make_session_safe(contact_form.cleaned_data)
             
             return redirect('bookings:payment')
     else:
@@ -151,9 +165,8 @@ def payment(request):
                             notes='Payment skipped for testing purposes'
                         )
                         
-                        booking.status = 'confirmed'
+                        booking.status = 'pending'
                         booking.payment_status = 'skipped'
-                        booking.confirmed_at = timezone.now()
                         booking.save()
                         
                         # Update flight availability
@@ -162,7 +175,7 @@ def payment(request):
                         setattr(flight, availability_field, current_availability - 1)
                         flight.save()
                         
-                        messages.success(request, 'Booking confirmed! (Payment skipped for testing)')
+                        messages.success(request, 'Payment skipped. Booking is waiting for admin confirmation.')
 
                         # Send confirmation email
                         try:
@@ -186,9 +199,8 @@ def payment(request):
                         payment.processed_at = timezone.now()
                         payment.save()
                         
-                        booking.status = 'confirmed'
+                        booking.status = 'pending'
                         booking.payment_status = 'completed'
-                        booking.confirmed_at = timezone.now()
                         booking.save()
                         
                         # Update flight availability
@@ -197,7 +209,7 @@ def payment(request):
                         setattr(flight, availability_field, current_availability - 1)
                         flight.save()
                         
-                        messages.success(request, 'Payment successful! Your booking is confirmed.')
+                        messages.success(request, 'Payment successful. Your booking is waiting for admin confirmation.')
 
                         # Send confirmation and receipt emails
                         try:

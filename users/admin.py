@@ -3,6 +3,9 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from .models import User
 
+User._meta.verbose_name = "nguoi dung"
+User._meta.verbose_name_plural = "Nguoi dung"
+
 
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):

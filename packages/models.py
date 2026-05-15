@@ -116,6 +116,14 @@ class PackageBooking(models.Model):
         ('confirmed', 'Confirmed'),
         ('cancelled', 'Cancelled'),
         ('completed', 'Completed'),
+        ('refunded', 'Refunded'),
+    ]
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('refund_pending', 'Refund Pending'),
+        ('refunded', 'Refunded'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='package_bookings')
@@ -146,6 +154,7 @@ class PackageBooking(models.Model):
     
     # Status
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -155,4 +164,4 @@ class PackageBooking(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f'{self.user.username} - {self.package.title} ({self.departure_date})'
+        return f'{self.user.email} - {self.package.title} ({self.departure_date})'

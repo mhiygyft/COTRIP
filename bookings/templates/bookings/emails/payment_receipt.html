@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+<body>
+    <h1>Payment receipt</h1>
+    <p>Booking: {{ booking.booking_reference }}</p>
+    <p>Amount: {{ payment.amount }} {{ payment.currency }}</p>
+    <p>Method: {{ payment.get_payment_method_display }}</p>
+    <p>Status: {{ payment.get_status_display }}</p>
+</body>
+</html>

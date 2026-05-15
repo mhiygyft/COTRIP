@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.generic import ListView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 from .models import Review, ReviewHelpful
 from bookings.models import Booking
 from django.db.models import Avg, Count
@@ -16,8 +16,10 @@ class ReviewListView(ListView):
     def get_queryset(self):
         return Review.objects.filter(is_approved=True).select_related('user', 'hotel', 'flight')
 
-class ReviewDetailView(TemplateView):
+class ReviewDetailView(DetailView):
+    model = Review
     template_name = 'reviews/detail.html'
+    context_object_name = 'review'
 
 class WriteReviewView(TemplateView):
     template_name = 'reviews/write.html'

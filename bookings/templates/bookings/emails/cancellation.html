@@ -1,0 +1,9 @@
+<!doctype html>
+<html>
+<body>
+    <h1>Booking {{ booking.booking_reference }} cancelled</h1>
+    <p>Your booking has been cancelled.</p>
+    {% if reason %}<p>Reason: {{ reason }}</p>{% endif %}
+    <p>{{ booking.flight.flight_code }}: {{ booking.flight.origin.city }} to {{ booking.flight.destination.city }}</p>
+</body>
+</html>

@@ -106,15 +106,15 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.facebook",
     
     # Novaryo apps
-    "users",
-    "hotels",
-    "flights",
-    "packages",
-    "activities",
-    "bookings",
-    "payments",
-    "reviews",
-    "loyalty",
+    "users.apps.UsersConfig",
+    "hotels.apps.HotelsConfig",
+    "flights.apps.FlightsConfig",
+    "packages.apps.PackagesConfig",
+    "activities.apps.ActivitiesConfig",
+    "bookings.apps.BookingsConfig",
+    "payments.apps.PaymentsConfig",
+    "reviews.apps.ReviewsConfig",
+    "loyalty.apps.LoyaltyConfig",
 ]
 
 MIDDLEWARE = [
@@ -198,9 +198,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "vi"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Ho_Chi_Minh"
 
 USE_I18N = True
 
@@ -364,13 +364,14 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_ADAPTER = "users.adapters.RoleBasedAccountAdapter"
 LOGOUT_REDIRECT_URL = "/"
 
 # Social Authentication

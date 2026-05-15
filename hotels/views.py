@@ -1,13 +1,23 @@
-from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView
 from django.http import JsonResponse
 from django.db.models import Q
-from .models import Hotel, City, Country, Amenity
+from django.utils import timezone
+from datetime import datetime, timedelta
+from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType
 
 
 class HomeView(TemplateView):
     """Home page with hotel search functionality"""
     template_name = 'hotels/home.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.is_staff:
+            return redirect('admin_dashboard')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -60,15 +70,7 @@ class HotelSearchView(ListView):
         # Amenities filter
         selected_amenities = self.request.GET.getlist('amenities')
         if selected_amenities:
-            for amenity in selected_amenities:
-                if amenity == 'wifi':
-                    queryset = queryset.filter(amenities__name__icontains='WiFi')
-                elif amenity == 'pool':
-                    queryset = queryset.filter(amenities__name__icontains='Pool')
-                elif amenity == 'gym':
-                    queryset = queryset.filter(amenities__name__icontains='Fitness')
-                elif amenity == 'parking':
-                    queryset = queryset.filter(amenities__name__icontains='Parking')
+            queryset = queryset.filter(amenities__id__in=selected_amenities)
         
         # Sort by
         sort_by = self.request.GET.get('sort', 'featured')
@@ -81,7 +83,7 @@ class HotelSearchView(ListView):
         else:  # featured
             queryset = queryset.order_by('-is_featured', '-average_rating')
         
-        return queryset
+        return queryset.distinct()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -91,6 +93,11 @@ class HotelSearchView(ListView):
             'checkout': self.request.GET.get('checkout', ''),
             'guests': self.request.GET.get('guests', '2'),
             'popular_amenities': Amenity.objects.filter(is_popular=True),
+            'min_price': self.request.GET.get('min_price', ''),
+            'max_price': self.request.GET.get('max_price', ''),
+            'selected_stars': self.request.GET.getlist('stars'),
+            'selected_amenities': self.request.GET.getlist('amenities'),
+            'sort': self.request.GET.get('sort', 'featured'),
         })
         return context
 
@@ -123,6 +130,7 @@ class HotelDetailView(DetailView):
             'nearby_hotels': Hotel.objects.filter(
                 city=hotel.city, is_active=True
             ).exclude(id=hotel.id)[:4],
+            'default_stay_date': timezone.localdate() + timedelta(days=1),
         })
         return context
 
@@ -236,6 +244,53 @@ class HotelAvailabilityView(TemplateView):
                 {'type': 'Deluxe Room', 'price': 180, 'available': 2},
             ]
         })
+
+
+@login_required
+def reserve_room(request, room_type_id):
+    room_type = get_object_or_404(RoomType.objects.select_related('hotel'), id=room_type_id, is_active=True)
+    if request.method != 'POST':
+        return redirect('hotels:hotel_detail', slug=room_type.hotel.slug)
+
+    stay_date_raw = request.POST.get('stay_date')
+    try:
+        stay_date = datetime.strptime(stay_date_raw, '%Y-%m-%d').date() if stay_date_raw else timezone.localdate()
+    except ValueError:
+        stay_date = timezone.localdate()
+
+    if stay_date < timezone.localdate():
+        messages.error(request, 'Ngay nhan phong khong duoc o qua khu.')
+        return redirect('hotels:hotel_detail', slug=room_type.hotel.slug)
+
+    with transaction.atomic():
+        availability, _ = RoomAvailability.objects.select_for_update().get_or_create(
+            room_type=room_type,
+            date=stay_date,
+            defaults={
+                'available_rooms': max(1, int(room_type.total_rooms * 0.7)),
+                'price': room_type.base_price,
+            },
+        )
+        if availability.available_rooms <= 0:
+            messages.error(request, 'Phong nay da het cho ngay ban chon.')
+            return redirect('hotels:hotel_detail', slug=room_type.hotel.slug)
+
+        availability.available_rooms -= 1
+        availability.save()
+        reservation = HotelReservation.objects.create(
+            user=request.user,
+            room_type=room_type,
+            stay_date=stay_date,
+            rooms=1,
+            price_per_room=availability.price,
+            total_price=availability.price,
+            contact_email=request.user.email,
+            status='pending',
+            payment_status='pending',
+        )
+
+    messages.info(request, f'Da giu 1 phong {room_type.name}. Vui long thanh toan de gui admin xac nhan.')
+    return redirect('payments:checkout', booking_type='hotel', object_id=reservation.id)
 
 
 class FilterOptionsView(TemplateView):

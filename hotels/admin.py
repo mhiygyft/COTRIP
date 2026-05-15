@@ -3,8 +3,25 @@ from django.utils.html import format_html
 from django.db.models import Count
 from .models import (
     Country, City, HotelChain, Amenity, Hotel, HotelImage, 
-    RoomType, RoomImage, RoomAvailability, HotelFacility
+    RoomType, RoomImage, RoomAvailability, HotelReservation, HotelFacility
 )
+
+MODEL_LABELS = {
+    Country: ('quoc gia', 'Quoc gia'),
+    City: ('thanh pho', 'Thanh pho'),
+    HotelChain: ('chuoi khach san', 'Chuoi khach san'),
+    Amenity: ('tien nghi', 'Tien nghi'),
+    Hotel: ('khach san', 'Khach san'),
+    HotelImage: ('anh khach san', 'Anh khach san'),
+    RoomType: ('loai phong', 'Loai phong'),
+    RoomImage: ('anh phong', 'Anh phong'),
+    RoomAvailability: ('lich phong', 'Lich phong'),
+    HotelReservation: ('booking khach san', 'Booking khach san'),
+    HotelFacility: ('co so vat chat', 'Co so vat chat'),
+}
+for model, (singular, plural) in MODEL_LABELS.items():
+    model._meta.verbose_name = singular
+    model._meta.verbose_name_plural = plural
 
 
 @admin.register(Country)
@@ -198,6 +215,22 @@ class RoomAvailabilityAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related('room_type', 'room_type__hotel')
 
 
+@admin.register(HotelReservation)
+class HotelReservationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'hotel_name', 'room_type', 'stay_date', 'rooms', 'total_price', 'status', 'payment_status']
+    list_filter = ['status', 'payment_status', 'stay_date', 'created_at']
+    search_fields = ['user__email', 'contact_email', 'room_type__hotel__name', 'room_type__name']
+    readonly_fields = ['created_at', 'updated_at']
+    date_hierarchy = 'stay_date'
+
+    def hotel_name(self, obj):
+        return obj.room_type.hotel.name
+    hotel_name.short_description = 'Hotel'
+
+    def get_model_perms(self, request):
+        return {}
+
+
 @admin.register(HotelFacility)
 class HotelFacilityAdmin(admin.ModelAdmin):
     list_display = ['name', 'hotel', 'category', 'is_free', 'additional_cost', 'is_24_hours']
@@ -207,6 +240,6 @@ class HotelFacilityAdmin(admin.ModelAdmin):
 
 
 # Custom admin site configuration
-admin.site.site_header = 'Novaryo Administration'
-admin.site.site_title = 'Novaryo Admin'
-admin.site.index_title = 'Welcome to Novaryo Administration Portal'
+admin.site.site_header = 'Vietnam Travel Administration'
+admin.site.site_title = 'Vietnam Travel Admin'
+admin.site.index_title = 'Quan tri he thong du lich Viet Nam'

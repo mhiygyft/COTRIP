@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Thanh toan - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <p class="text-muted mb-1">Thanh toan booking</p>
+                    <h1 class="h3 mb-3">{{ booking_label }}</h1>
+                    <div class="payment-total mb-4">
+                        <span>So tien can thanh toan</span>
+                        <strong>${{ amount|floatformat:2 }}</strong>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Phuong thuc thanh toan</label>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay_card" value="card" checked>
+                                <label for="pay_card">The tin dung / ghi no</label>
+                            </div>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay_paypal" value="paypal">
+                                <label for="pay_paypal">PayPal</label>
+                            </div>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay_bank" value="bank_transfer">
+                                <label for="pay_bank">Chuyen khoan ngan hang</label>
+                            </div>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay_manual" value="manual">
+                                <label for="pay_manual">Thanh toan thu cong tai quay</label>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label" for="card_number">So the</label>
+                                <input class="form-control" id="card_number" placeholder="4242 4242 4242 4242">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="card_cvv">CVV</label>
+                                <input class="form-control" id="card_cvv" placeholder="123">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info small">
+                            Day la thanh toan demo: khi bam thanh toan, giao dich se duoc danh dau thanh cong va booking chuyen sang trang thai cho admin xac nhan.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" type="submit">Thanh toan</button>
+                            <a class="btn btn-outline-secondary" href="{% url 'customer_dashboard' %}">De sau</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.payment-total {
+    align-items: center;
+    background: #eef7f4;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+}
+.payment-total span {
+    color: #64736f;
+}
+.payment-total strong {
+    color: #13795b;
+    font-size: 28px;
+}
+.payment-option {
+    align-items: center;
+    border: 1px solid #e4e8eb;
+    border-radius: 8px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 12px;
+}
+</style>
+{% endblock %}

@@ -1,6 +1,15 @@
 from django.contrib import admin
 from .models import Activity, ActivityCategory, ActivityBooking
 
+MODEL_LABELS = {
+    ActivityCategory: ("loai trai nghiem", "Loai trai nghiem"),
+    Activity: ("trai nghiem", "Trai nghiem"),
+    ActivityBooking: ("booking trai nghiem", "Booking trai nghiem"),
+}
+for model, (singular, plural) in MODEL_LABELS.items():
+    model._meta.verbose_name = singular
+    model._meta.verbose_name_plural = plural
+
 @admin.register(ActivityCategory)
 class ActivityCategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'created_at']
@@ -26,7 +35,10 @@ class ActivityAdmin(admin.ModelAdmin):
 
 @admin.register(ActivityBooking)
 class ActivityBookingAdmin(admin.ModelAdmin):
-    list_display = ['user', 'activity', 'booking_date', 'adults', 'children', 'total_price', 'status']
-    list_filter = ['status', 'booking_date', 'created_at']
-    search_fields = ['user__username', 'activity__title', 'contact_email']
+    list_display = ['user', 'activity', 'booking_date', 'adults', 'children', 'total_price', 'status', 'payment_status']
+    list_filter = ['status', 'payment_status', 'booking_date', 'created_at']
+    search_fields = ['user__email', 'activity__title', 'contact_email']
     readonly_fields = ['created_at', 'updated_at']
+
+    def get_model_perms(self, request):
+        return {}

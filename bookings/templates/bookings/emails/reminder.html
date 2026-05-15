@@ -1,0 +1,8 @@
+<!doctype html>
+<html>
+<body>
+    <h1>Travel reminder</h1>
+    <p>Your flight departs in {{ days_until_departure }} days.</p>
+    <p>{{ booking.flight.flight_code }}: {{ booking.flight.departure_time|date:"M d, Y H:i" }}</p>
+</body>
+</html>

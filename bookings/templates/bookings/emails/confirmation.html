@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<body>
+    <h1>Booking {{ booking.booking_reference }} confirmed</h1>
+    <p>Hello {{ passenger.full_name|default:booking.user.email }},</p>
+    <p>Your Vietnam Travel booking is confirmed.</p>
+    <ul>
+        <li>Flight: {{ booking.flight.flight_code }}</li>
+        <li>Route: {{ booking.flight.origin.city }} ({{ booking.flight.origin.iata_code }}) to {{ booking.flight.destination.city }} ({{ booking.flight.destination.iata_code }})</li>
+        <li>Departure: {{ booking.flight.departure_time|date:"M d, Y H:i" }}</li>
+        <li>Cabin: {{ booking.get_cabin_class_display }}</li>
+        <li>Total: {{ booking.total_price }} {{ booking.currency }}</li>
+    </ul>
+</body>
+</html>

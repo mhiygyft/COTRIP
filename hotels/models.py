@@ -165,7 +165,7 @@ class Hotel(models.Model):
         return f"{self.name} - {self.city}"
     
     def get_absolute_url(self):
-        return reverse('hotel_detail', kwargs={'slug': self.slug})
+        return reverse('hotels:hotel_detail', kwargs={'slug': self.slug})
     
     @property
     def location_string(self):
@@ -321,6 +321,52 @@ class RoomAvailability(models.Model):
     
     def __str__(self):
         return f"{self.room_type} - {self.date} - {self.available_rooms} rooms"
+
+
+class HotelReservation(models.Model):
+    """Operational booking record for hotel room reservations."""
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+        ('completed', 'Completed'),
+        ('refunded', 'Refunded'),
+    ]
+
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('refunded', 'Refunded'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hotel_reservations')
+    room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE, related_name='reservations')
+    stay_date = models.DateField()
+    rooms = models.PositiveIntegerField(default=1)
+    price_per_room = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3, default='USD')
+    contact_email = models.EmailField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='confirmed')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='completed')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['stay_date']),
+        ]
+
+    def __str__(self):
+        return f"Hotel reservation {self.id} - {self.room_type.hotel.name}"
+
+    @property
+    def hotel(self):
+        return self.room_type.hotel
 
 
 class HotelFacility(models.Model):

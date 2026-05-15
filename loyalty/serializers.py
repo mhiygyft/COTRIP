@@ -17,8 +17,10 @@ class LoyaltyTierSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoyaltyTier
         fields = [
-            'id', 'name', 'slug', 'color', 'order', 'description',
-            'min_points', 'points_multiplier', 'benefits', 'perks',
+            'id', 'name', 'slug', 'color_code', 'icon', 'order', 'description',
+            'min_spending', 'min_flights', 'min_points', 'points_multiplier',
+            'priority_boarding', 'free_baggage_allowance', 'lounge_access',
+            'free_seat_selection', 'upgrade_priority',
             'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -34,13 +36,15 @@ class LoyaltyMembershipSerializer(serializers.ModelSerializer):
         model = LoyaltyMembership
         fields = [
             'id', 'user', 'user_email', 'member_id', 'tier', 'tier_id',
-            'points_balance', 'lifetime_points', 'tier_qualifying_points',
-            'tier_expires_at', 'joined_at', 'last_activity',
-            'status', 'created_at', 'updated_at'
+            'points_balance', 'lifetime_points', 'annual_spending',
+            'annual_flights', 'annual_points_earned', 'tier_achieved_date',
+            'tier_expires_date', 'joined_date', 'last_activity_date',
+            'tracking_year', 'is_active'
         ]
         read_only_fields = [
             'id', 'user', 'member_id', 'points_balance', 'lifetime_points',
-            'tier_qualifying_points', 'joined_at', 'last_activity', 'created_at', 'updated_at'
+            'annual_spending', 'annual_flights', 'annual_points_earned',
+            'tier_achieved_date', 'joined_date', 'last_activity_date'
         ]
 
 
@@ -53,10 +57,10 @@ class PointsTransactionSerializer(serializers.ModelSerializer):
         model = PointsTransaction
         fields = [
             'id', 'membership', 'membership_id', 'transaction_type', 'points',
-            'description', 'reference_type', 'reference_id', 'booking_reference',
-            'expires_at', 'is_expired', 'processed_at', 'created_at'
+            'balance_after', 'description', 'reference_id',
+            'expires_at', 'is_expired', 'created_at', 'created_by'
         ]
-        read_only_fields = ['id', 'is_expired', 'processed_at', 'created_at']
+        read_only_fields = ['id', 'is_expired', 'created_at']
 
 
 class RewardSerializer(serializers.ModelSerializer):
@@ -66,9 +70,9 @@ class RewardSerializer(serializers.ModelSerializer):
         model = Reward
         fields = [
             'id', 'name', 'slug', 'description', 'points_required',
-            'category', 'reward_type', 'terms_conditions', 'stock_quantity',
-            'unlimited_stock', 'min_tier_required', 'valid_from', 'valid_until',
-            'is_active', 'created_at', 'updated_at'
+            'cash_equivalent', 'category', 'stock_quantity', 'minimum_tier',
+            'valid_from', 'valid_until', 'is_available', 'featured', 'order',
+            'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
 
@@ -84,12 +88,12 @@ class RewardRedemptionSerializer(serializers.ModelSerializer):
         model = RewardRedemption
         fields = [
             'id', 'membership', 'membership_id', 'reward', 'reward_id',
-            'points_used', 'status', 'redemption_code', 'notes',
-            'redeemed_at', 'fulfilled_at', 'cancelled_at', 'created_at'
+            'redemption_id', 'points_redeemed', 'status', 'booking_reference',
+            'notes', 'fulfilled_at', 'fulfilled_by', 'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'points_used', 'redemption_code', 'redeemed_at', 
-            'fulfilled_at', 'cancelled_at', 'created_at'
+            'id', 'redemption_id', 'points_redeemed', 'fulfilled_at',
+            'fulfilled_by', 'created_at', 'updated_at'
         ]
 
 
@@ -100,12 +104,11 @@ class LoyaltyPromotionSerializer(serializers.ModelSerializer):
         model = LoyaltyPromotion
         fields = [
             'id', 'name', 'slug', 'description', 'promotion_type',
-            'bonus_multiplier', 'bonus_points', 'min_spend', 'max_bonus',
-            'eligible_tiers', 'terms_conditions', 'promo_code',
-            'usage_limit_per_user', 'total_usage_limit', 'current_usage',
+            'multiplier', 'bonus_points', 'minimum_spending',
+            'eligible_tiers', 'max_uses_per_member',
             'valid_from', 'valid_until', 'is_active', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'slug', 'current_usage', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
 
 
 class PromotionUsageSerializer(serializers.ModelSerializer):
@@ -119,9 +122,9 @@ class PromotionUsageSerializer(serializers.ModelSerializer):
         model = PromotionUsage
         fields = [
             'id', 'membership', 'membership_id', 'promotion', 'promotion_id',
-            'booking_amount', 'points_earned', 'bonus_points', 'used_at', 'created_at'
+            'spending_amount', 'points_earned', 'booking_reference', 'used_at'
         ]
-        read_only_fields = ['id', 'used_at', 'created_at']
+        read_only_fields = ['id', 'used_at']
 
 
 # Custom serializers for specific API endpoints
@@ -129,11 +132,11 @@ class MembershipStatsSerializer(serializers.Serializer):
     """Serializer for membership statistics"""
     total_points = serializers.IntegerField()
     lifetime_points = serializers.IntegerField()
-    tier_qualifying_points = serializers.IntegerField()
+    annual_points_earned = serializers.IntegerField()
     current_tier = LoyaltyTierSerializer()
     next_tier = LoyaltyTierSerializer(allow_null=True)
     points_to_next_tier = serializers.IntegerField(allow_null=True)
-    tier_expires_at = serializers.DateTimeField(allow_null=True)
+    tier_expires_date = serializers.DateTimeField(allow_null=True)
     total_redemptions = serializers.IntegerField()
     last_activity = serializers.DateTimeField(allow_null=True)
 
@@ -145,7 +148,7 @@ class TierProgressSerializer(serializers.Serializer):
     progress_percentage = serializers.FloatField()
     points_earned_this_period = serializers.IntegerField()
     points_needed = serializers.IntegerField(allow_null=True)
-    tier_expires_at = serializers.DateTimeField(allow_null=True)
+    tier_expires_date = serializers.DateTimeField(allow_null=True)
 
 
 class PointsCalculationSerializer(serializers.Serializer):
@@ -154,7 +157,7 @@ class PointsCalculationSerializer(serializers.Serializer):
     tier_multiplier = serializers.FloatField()
     promotion_bonus = serializers.IntegerField()
     total_points = serializers.IntegerField()
-    tier_qualifying_points = serializers.IntegerField()
+    annual_points_earned = serializers.IntegerField()
 
 
 class RewardAvailabilitySerializer(serializers.Serializer):
@@ -192,7 +195,7 @@ class PublicRewardSerializer(serializers.ModelSerializer):
         model = Reward
         fields = [
             'id', 'name', 'description', 'points_required', 'category',
-            'reward_type', 'min_tier_required', 'is_active'
+            'minimum_tier', 'is_available'
         ]
 
 
@@ -202,8 +205,8 @@ class PublicLoyaltyTierSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoyaltyTier
         fields = [
-            'id', 'name', 'color', 'description', 'min_points',
-            'points_multiplier', 'benefits', 'perks', 'is_active'
+            'id', 'name', 'color_code', 'description', 'min_points',
+            'points_multiplier', 'is_active'
         ]
 
 
@@ -214,6 +217,6 @@ class PublicPromotionSerializer(serializers.ModelSerializer):
         model = LoyaltyPromotion
         fields = [
             'id', 'name', 'description', 'promotion_type',
-            'bonus_multiplier', 'bonus_points', 'min_spend',
+            'multiplier', 'bonus_points', 'minimum_spending',
             'valid_from', 'valid_until', 'is_active'
         ]

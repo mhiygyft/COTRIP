@@ -1,21 +1,20 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
-from .models import Airport, Flight, FlightSearch
+from .models import Airline, Airport, Flight, FlightSearch
 
 
 class FlightSearchForm(forms.Form):
     TRIP_TYPE_CHOICES = [
         ('round_trip', 'Round Trip'),
         ('one_way', 'One Way'),
-        ('multi_city', 'Multi City'),
     ]
     
     CLASS_CHOICES = [
         ('economy', 'Economy'),
         ('premium_economy', 'Premium Economy'),
         ('business', 'Business'),
-        ('first', 'First Class'),
+        ('first_class', 'First Class'),
     ]
     
     PASSENGER_CHOICES = [(i, str(i)) for i in range(1, 10)]
@@ -137,7 +136,7 @@ class FlightFilterForm(forms.Form):
     )
     
     airlines = forms.ModelMultipleChoiceField(
-        queryset=None,  # Will be set in view
+        queryset=Airline.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'})
     )
@@ -180,8 +179,7 @@ class FlightFilterForm(forms.Form):
     
     def __init__(self, *args, airlines_queryset=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if airlines_queryset:
-            self.fields['airlines'].queryset = airlines_queryset
+        self.fields['airlines'].queryset = airlines_queryset or Airline.objects.none()
     
     def clean(self):
         cleaned_data = super().clean()

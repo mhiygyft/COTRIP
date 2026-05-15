@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Danh gia du lich Viet Nam - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Danh gia hanh trinh</h1>
+    {% for review in reviews %}
+        <article class="border-bottom py-3">
+            <div class="d-flex justify-content-between">
+                <h2 class="h5 mb-1">{{ review.title }}</h2>
+                <span class="text-warning">{{ review.rating }}/5</span>
+            </div>
+            <p class="mb-1">{{ review.comment }}</p>
+            <small class="text-muted">{{ review.get_review_type_display }} review by {{ review.user.email }}</small>
+        </article>
+    {% empty %}
+        <p class="text-muted">Chua co danh gia nao.</p>
+    {% endfor %}
+</div>
+{% endblock %}

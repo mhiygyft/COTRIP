@@ -1,0 +1,5 @@
+Payment receipt for booking {{ booking.booking_reference }}
+
+Amount: {{ payment.amount }} {{ payment.currency }}
+Method: {{ payment.get_payment_method_display }}
+Status: {{ payment.get_status_display }}

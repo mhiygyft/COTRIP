@@ -7,6 +7,19 @@ from .models import (
     Reward, RewardRedemption, LoyaltyPromotion, PromotionUsage
 )
 
+MODEL_LABELS = {
+    LoyaltyTier: ("hang thanh vien", "Hang thanh vien"),
+    LoyaltyMembership: ("hoi vien", "Hoi vien"),
+    PointsTransaction: ("giao dich diem", "Giao dich diem"),
+    Reward: ("phan thuong", "Phan thuong"),
+    RewardRedemption: ("doi thuong", "Doi thuong"),
+    LoyaltyPromotion: ("khuyen mai thanh vien", "Khuyen mai thanh vien"),
+    PromotionUsage: ("luot dung khuyen mai", "Luot dung khuyen mai"),
+}
+for model, (singular, plural) in MODEL_LABELS.items():
+    model._meta.verbose_name = singular
+    model._meta.verbose_name_plural = plural
+
 
 @admin.register(LoyaltyTier)
 class LoyaltyTierAdmin(admin.ModelAdmin):

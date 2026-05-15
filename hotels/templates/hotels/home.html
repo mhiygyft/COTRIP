@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Novaryo - Book Hotels, Flights & More | Best Deals Guaranteed{% endblock %}
+{% block title %}Vietnam Travel - Dat khach san, chuyen bay va tour Viet Nam{% endblock %}
 
 {% block content %}
 <!-- Hero Section with Search -->
@@ -8,52 +8,52 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h1 class="display-4 fw-bold mb-3">Discover Comfort. Discover Novaryo.</h1>
-                <p class="lead mb-5">Find and book the perfect accommodation for your next adventure</p>
+                <h1 class="display-4 fw-bold mb-3">Kham pha Viet Nam theo cach rieng cua ban</h1>
+                <p class="lead mb-5">Dat khach san, chuyen bay noi dia, tour tron goi va trai nghiem ban dia tren khap Viet Nam</p>
                 
                 <!-- Hotel Search Form -->
                 <div class="search-form mx-auto" style="max-width: 700px;">
                     <form action="{% url 'hotels:search' %}" method="GET" class="row g-3">
                         <div class="col-md-6">
-                            <label for="location" class="form-label text-dark">Where are you going?</label>
+                            <label for="location" class="form-label text-dark">Ban muon den dau?</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                                 <input type="text" class="form-control" id="location" name="location" 
-                                       placeholder="City, hotel, or destination" required>
+                                       placeholder="Da Nang, Ha Noi, Hoi An, Phu Quoc..." required>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label for="checkin" class="form-label text-dark">Check-in</label>
+                            <label for="checkin" class="form-label text-dark">Nhan phong</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar"></i></span>
                                 <input type="date" class="form-control" id="checkin" name="checkin" required>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label for="checkout" class="form-label text-dark">Check-out</label>
+                            <label for="checkout" class="form-label text-dark">Tra phong</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar"></i></span>
                                 <input type="date" class="form-control" id="checkout" name="checkout" required>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="guests" class="form-label text-dark">Guests</label>
+                            <label for="guests" class="form-label text-dark">Khach</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-people"></i></span>
                                 <select class="form-select" id="guests" name="guests" required>
-                                    <option value="1">1 Guest</option>
-                                    <option value="2" selected>2 Guests</option>
-                                    <option value="3">3 Guests</option>
-                                    <option value="4">4 Guests</option>
-                                    <option value="5">5 Guests</option>
-                                    <option value="6">6+ Guests</option>
+                                    <option value="1">1 khach</option>
+                                    <option value="2" selected>2 khach</option>
+                                    <option value="3">3 khach</option>
+                                    <option value="4">4 khach</option>
+                                    <option value="5">5 khach</option>
+                                    <option value="6">6+ khach</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-dark">&nbsp;</label>
                             <button type="submit" class="btn btn-primary w-100 py-3">
-                                <i class="bi bi-search"></i> Search Hotels
+                                <i class="bi bi-search"></i> Tim khach san
                             </button>
                         </div>
                     </form>
@@ -67,8 +67,8 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-12 text-center mb-5">
-            <h2>Popular Destinations</h2>
-            <p class="text-muted">Explore our most loved destinations around the world</p>
+            <h2>Diem den noi bat tai Viet Nam</h2>
+            <p class="text-muted">Tu pho co, vinh bien, mien nui den cac thanh pho nang dong</p>
         </div>
     </div>
     
@@ -82,17 +82,22 @@
                     </div>
                     <h5 class="card-title">{{ city.name }}</h5>
                     <p class="text-muted">{{ city.country.name }}</p>
-                    <p class="text-muted small">{{ city.hotel_count }} hotels available</p>
+                    <p class="text-muted small">{{ city.hotel_count }} khach san kha dung</p>
                     <a href="{% url 'hotels:city_hotels' city.country.code city.id %}" 
                        class="btn btn-outline-primary">
-                        Explore Hotels
+                        Xem khach san
                     </a>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center">
-            <p class="text-muted">No popular destinations available</p>
+            <div class="row g-3 text-start">
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Ha Noi</strong><p class="text-muted mb-0 small">Pho co, am thuc via he, di san van hoa.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Da Nang</strong><p class="text-muted mb-0 small">Bien My Khe, Ba Na Hills, Son Tra.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Hoi An</strong><p class="text-muted mb-0 small">Pho den long, nha co, lang nghe.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Phu Quoc</strong><p class="text-muted mb-0 small">Bai bien, resort, dao va san ho.</p></div></div>
+            </div>
         </div>
         {% endfor %}
     </div>
@@ -103,8 +108,8 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center mb-5">
-                <h2>Featured Hotels</h2>
-                <p class="text-muted">Handpicked accommodations for an exceptional stay</p>
+                <h2>Khach san goi y</h2>
+                <p class="text-muted">Lua chon luu tru phu hop cho hanh trinh Viet Nam</p>
             </div>
         </div>
         
@@ -119,7 +124,7 @@
                                     <i class="bi bi-star-fill star-rating"></i>
                                 {% endfor %}
                             </div>
-                            <span class="badge bg-primary">Featured</span>
+                            <span class="badge bg-primary">Goi y</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -149,11 +154,11 @@
                         <!-- Price -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="text-muted small">From</span>
-                                <div class="fw-bold text-primary fs-5">${{ hotel.price_from }}<small>/night</small></div>
+                                <span class="text-muted small">Tu</span>
+                                <div class="fw-bold text-primary fs-5">{{ hotel.price_from }} {{ hotel.currency }}<small>/dem</small></div>
                             </div>
                             <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary">
-                                View Details
+                                Xem chi tiet
                             </a>
                         </div>
                     </div>
@@ -161,19 +166,19 @@
             </div>
             {% empty %}
             <div class="col-12 text-center">
-                <p class="text-muted">No featured hotels available</p>
+                <p class="text-muted">Chua co khach san goi y. Hay thu tim Ha Noi, Da Nang, Hoi An hoac Phu Quoc.</p>
             </div>
             {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- Why Choose Novaryo -->
+<!-- Why Choose Vietnam Travel -->
 <div class="container my-5">
     <div class="row">
         <div class="col-12 text-center mb-5">
-            <h2>Why Choose Novaryo?</h2>
-            <p class="text-muted">Experience the difference with our exceptional service</p>
+            <h2>Vi sao chon Vietnam Travel?</h2>
+            <p class="text-muted">Tap trung vao hanh trinh Viet Nam voi goi y thuc te va de dat</p>
         </div>
     </div>
     
@@ -182,29 +187,29 @@
             <div class="feature-icon mb-3">
                 <i class="bi bi-shield-check fs-1 text-primary"></i>
             </div>
-            <h5>Best Price Guarantee</h5>
-            <p class="text-muted">Find a lower price? We'll match it and give you even more savings.</p>
+            <h5>Gia ro rang</h5>
+            <p class="text-muted">So sanh luu tru, chuyen bay va tour theo ngan sach cua ban.</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4 text-center">
             <div class="feature-icon mb-3">
                 <i class="bi bi-calendar-x fs-1 text-primary"></i>
             </div>
-            <h5>Free Cancellation</h5>
-            <p class="text-muted">Plans change? No problem. Cancel or modify your booking for free.</p>
+            <h5>Linh hoat lich trinh</h5>
+            <p class="text-muted">De dang dieu chinh ke hoach khi thoi tiet hoac lich trinh thay doi.</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4 text-center">
             <div class="feature-icon mb-3">
                 <i class="bi bi-headset fs-1 text-primary"></i>
             </div>
-            <h5>24/7 Support</h5>
-            <p class="text-muted">Our customer support team is available around the clock to help you.</p>
+            <h5>Ho tro dia phuong</h5>
+            <p class="text-muted">Thong tin phu hop voi du lich noi dia va khach quoc te den Viet Nam.</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4 text-center">
             <div class="feature-icon mb-3">
                 <i class="bi bi-star-fill fs-1 text-primary"></i>
             </div>
-            <h5>Verified Reviews</h5>
-            <p class="text-muted">Read genuine reviews from verified guests to make informed choices.</p>
+            <h5>Trai nghiem chon loc</h5>
+            <p class="text-muted">Uu tien diem den, am thuc va hoat dong mang ban sac Viet Nam.</p>
         </div>
     </div>
 </div>

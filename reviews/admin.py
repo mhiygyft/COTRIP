@@ -1,11 +1,16 @@
 from django.contrib import admin
 from .models import Review, ReviewHelpful
 
+Review._meta.verbose_name = "danh gia"
+Review._meta.verbose_name_plural = "Danh gia"
+ReviewHelpful._meta.verbose_name = "phan hoi danh gia"
+ReviewHelpful._meta.verbose_name_plural = "Phan hoi danh gia"
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ['user', 'title', 'rating', 'review_type', 'is_verified', 'is_approved', 'created_at']
     list_filter = ['review_type', 'rating', 'is_verified', 'is_approved', 'created_at']
-    search_fields = ['title', 'comment', 'user__username', 'user__email']
+    search_fields = ['title', 'comment', 'user__email']
     readonly_fields = ['created_at', 'updated_at']
     actions = ['approve_reviews', 'verify_reviews']
     
@@ -23,4 +28,4 @@ class ReviewAdmin(admin.ModelAdmin):
 class ReviewHelpfulAdmin(admin.ModelAdmin):
     list_display = ['review', 'user', 'is_helpful', 'created_at']
     list_filter = ['is_helpful', 'created_at']
-    search_fields = ['review__title', 'user__username']
+    search_fields = ['review__title', 'user__email']

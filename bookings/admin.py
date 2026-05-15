@@ -4,6 +4,15 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import Booking, Passenger, BookingPayment
 
+MODEL_LABELS = {
+    Booking: ("booking ve bay", "Booking ve bay"),
+    Passenger: ("hanh khach", "Hanh khach"),
+    BookingPayment: ("thanh toan ve bay", "Thanh toan ve bay"),
+}
+for model, (singular, plural) in MODEL_LABELS.items():
+    model._meta.verbose_name = singular
+    model._meta.verbose_name_plural = plural
+
 
 class PassengerInline(admin.TabularInline):
     """Inline for managing passengers within a booking"""
@@ -151,6 +160,8 @@ class BookingAdmin(admin.ModelAdmin):
             'completed': '#28a745',
             'failed': '#dc3545',
             'refunded': '#17a2b8',
+            'refund_pending': '#fd7e14',
+            'cancelled': '#dc3545',
             'skipped': '#6c757d'
         }
         color = colors.get(obj.payment_status, '#6c757d')
@@ -165,6 +176,9 @@ class BookingAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related(
             'user', 'flight', 'flight__airline'
         ).prefetch_related('passengers')
+
+    def get_model_perms(self, request):
+        return {}
 
 
 @admin.register(Passenger)
@@ -234,6 +248,9 @@ class PassengerAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('booking')
+
+    def get_model_perms(self, request):
+        return {}
 
 
 @admin.register(BookingPayment)
@@ -312,12 +329,15 @@ class BookingPaymentAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('booking')
 
+    def get_model_perms(self, request):
+        return {}
+
 
 
 
 
 
 # Customize admin site header and title
-admin.site.site_header = "Novaryo Booking Administration"
-admin.site.site_title = "Novaryo Admin"
-admin.site.index_title = "Welcome to Novaryo Administration"
+admin.site.site_header = "Vietnam Travel Administration"
+admin.site.site_title = "Vietnam Travel Admin"
+admin.site.index_title = "Quan tri he thong du lich Viet Nam"

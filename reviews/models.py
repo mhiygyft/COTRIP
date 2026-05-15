@@ -50,7 +50,7 @@ class Review(models.Model):
         unique_together = ['user', 'booking']  # One review per booking per user
     
     def __str__(self):
-        return f'{self.user.username} - {self.title} ({self.rating}/5)'
+        return f'{self.user.email} - {self.title} ({self.rating}/5)'
     
     @property
     def average_category_rating(self):

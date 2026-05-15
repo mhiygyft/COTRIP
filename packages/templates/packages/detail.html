@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiet tour - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    {% if package %}
+        <h1 class="h3">{{ package.title }}</h1>
+        <p class="text-muted">{{ package.destination_city }}, {{ package.destination_country }}</p>
+        <p>{{ package.description }}</p>
+        <p><strong>{{ package.base_price_per_person }} USD</strong> moi nguoi</p>
+        <p class="text-success">Con {{ package.max_participants }} suat moi dot khoi hanh</p>
+        <form method="post" action="{% url 'packages:book' package.id %}" class="row g-3 border rounded p-3 mt-3">
+            {% csrf_token %}
+            <div class="col-md-4">
+                <label class="form-label" for="departure_date">Ngay khoi hanh</label>
+                <input class="form-control" id="departure_date" name="departure_date" type="date" value="{% now 'Y-m-d' %}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="adults">Nguoi lon</label>
+                <input class="form-control" id="adults" name="adults" type="number" min="1" value="1">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="children">Tre em</label>
+                <input class="form-control" id="children" name="children" type="number" min="0" value="0">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="infants">Em be</label>
+                <input class="form-control" id="infants" name="infants" type="number" min="0" value="0">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="submit">Dat tour</button>
+            </div>
+        </form>
+    {% else %}
+        <h1 class="h3">Khong tim thay tour</h1>
+    {% endif %}
+</div>
+{% endblock %}

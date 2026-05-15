@@ -1,0 +1,7 @@
+Booking {{ booking.booking_reference }} cancelled
+
+Your booking has been cancelled.
+{% if reason %}Reason: {{ reason }}{% endif %}
+
+Flight: {{ booking.flight.flight_code }}
+Route: {{ booking.flight.origin.city }} to {{ booking.flight.destination.city }}

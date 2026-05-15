@@ -9,6 +9,7 @@ urlpatterns = [
     path('search/', views.HotelSearchView.as_view(), name='search'),
     path('hotels/', views.HotelListView.as_view(), name='hotel_list'),
     path('hotel/<slug:slug>/', views.HotelDetailView.as_view(), name='hotel_detail'),
+    path('rooms/<int:room_type_id>/reserve/', views.reserve_room, name='reserve_room'),
     
     # Location-based URLs
     path('destinations/', views.DestinationListView.as_view(), name='destinations'),

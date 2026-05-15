@@ -52,8 +52,18 @@ def flight_search_results(request):
     departure_date = request.GET.get('departure_date')
     return_date = request.GET.get('return_date')
     trip_type = request.GET.get('trip_type', 'one_way')
-    passengers = int(request.GET.get('passengers', 1))
+    try:
+        passengers = int(request.GET.get('passengers', 1))
+    except (TypeError, ValueError):
+        passengers = 1
     cabin_class = request.GET.get('cabin_class', 'economy')
+
+    if trip_type not in {'one_way', 'round_trip'}:
+        messages.info(request, 'Multi-city search is not available yet. Showing one-way results instead.')
+        trip_type = 'one_way'
+    if cabin_class not in {'economy', 'premium_economy', 'business', 'first_class'}:
+        messages.info(request, 'Invalid cabin class. Showing economy results instead.')
+        cabin_class = 'economy'
     
     # Validate required parameters
     if not all([origin_id, destination_id, departure_date]):
@@ -162,6 +172,7 @@ def flight_search_results(request):
         'save_form': save_form,
         'price_range': price_range,
         'sort_by': sort_by,
+        'selected_airlines': [int(value) for value in request.GET.getlist('airlines') if value.isdigit()],
         'page_title': f'Flights from {origin.city} to {destination.city}'
     }
     
@@ -245,7 +256,7 @@ def flight_detail(request, flight_id):
     )
     
     # Get baggage allowances for this airline
-    baggage_allowances = flight.airline.baggageallowance_set.all().order_by('fare_type')
+    baggage_allowances = flight.airline.baggage_allowances.all().order_by('fare_type')
     
     # Check if user has saved this flight
     is_saved = False

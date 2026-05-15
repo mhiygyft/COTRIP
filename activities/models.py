@@ -72,7 +72,7 @@ class Activity(models.Model):
     @property
     def average_rating(self):
         from reviews.models import Review
-        reviews = Review.objects.filter(activity=self, is_approved=True)
+        reviews = Review.objects.filter(review_type='service', is_approved=True)
         if reviews.exists():
             return reviews.aggregate(models.Avg('rating'))['rating__avg']
         return 0
@@ -83,6 +83,14 @@ class ActivityBooking(models.Model):
         ('confirmed', 'Confirmed'),
         ('cancelled', 'Cancelled'),
         ('completed', 'Completed'),
+        ('refunded', 'Refunded'),
+    ]
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('refund_pending', 'Refund Pending'),
+        ('refunded', 'Refunded'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activity_bookings')
@@ -106,6 +114,7 @@ class ActivityBooking(models.Model):
     
     # Status
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     special_requests = models.TextField(blank=True)
     
     # Timestamps
@@ -117,4 +126,4 @@ class ActivityBooking(models.Model):
         unique_together = ['user', 'activity', 'booking_date']  # One booking per day per activity
     
     def __str__(self):
-        return f'{self.user.username} - {self.activity.title} ({self.booking_date})'
+        return f'{self.user.email} - {self.activity.title} ({self.booking_date})'

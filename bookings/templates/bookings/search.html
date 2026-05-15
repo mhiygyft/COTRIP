@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Tim dat cho - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Tim dat cho cua toi</h1>
+    <form method="post" class="row g-3 mb-4">
+        {% csrf_token %}
+        <div class="col-md-5">{{ form.booking_reference.label_tag }}{{ form.booking_reference }}</div>
+        <div class="col-md-5">{{ form.email.label_tag }}{{ form.email }}</div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if booking %}
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h5">{{ booking.booking_reference }}</h2>
+                <p class="mb-1">{{ booking.flight.flight_code }}: {{ booking.flight.origin.iata_code }} to {{ booking.flight.destination.iata_code }}</p>
+                <p class="text-muted mb-3">{{ booking.flight.departure_time|date:"M d, Y H:i" }}</p>
+                <a class="btn btn-outline-primary" href="{% url 'bookings:booking_detail' booking.booking_reference %}">View details</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

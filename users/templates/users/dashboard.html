@@ -1,42 +1,178 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ page_title }}</title>
-</head>
-<body>
-    <main>
-        <h1>Account Dashboard</h1>
-        <p>Welcome, {{ request.user.full_name }}.</p>
+{% extends "base.html" %}
 
-        <h2>Recent Bookings</h2>
-        <ul>
-            {% for booking in bookings %}
-                <li>{{ booking.booking_reference }} - {{ booking.status }}</li>
-            {% empty %}
-                <li>No bookings yet.</li>
-            {% endfor %}
-        </ul>
+{% block title %}Dashboard khach hang - Vietnam Travel{% endblock %}
 
-        <h2>Saved Flights</h2>
-        <ul>
-            {% for saved in saved_flights %}
-                <li>{{ saved.flight.flight_code }} - {{ saved.cabin_class }}</li>
-            {% empty %}
-                <li>No saved flights yet.</li>
-            {% endfor %}
-        </ul>
+{% block content %}
+<div class="customer-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <p class="mb-1 text-white-50">Tai khoan khach hang</p>
+                <h1 class="h3 mb-0">Xin chao, {{ request.user.full_name }}</h1>
+            </div>
+            <a class="btn btn-light" href="{% url 'account_profile' %}">Cap nhat ho so</a>
+        </div>
+    </div>
+</div>
 
-        <h2>Saved Searches</h2>
-        <ul>
-            {% for search in saved_searches %}
-                <li>{{ search.origin }} to {{ search.destination }}</li>
-            {% empty %}
-                <li>No saved searches yet.</li>
-            {% endfor %}
-        </ul>
-    </main>
-</body>
-</html>
+<div class="container py-4">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="summary-card">
+                <span>Tong booking</span>
+                <strong>{{ booking_total }}</strong>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <span>Ve may bay</span>
+                <strong>{{ flight_bookings.count }}</strong>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <span>Phong khach san</span>
+                <strong>{{ hotel_reservations.count }}</strong>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card">
+                <span>Da thanh toan</span>
+                <strong>${{ total_spent|floatformat:2 }}</strong>
+            </div>
+        </div>
+    </div>
 
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">Booking cua ban</h2>
+                    <div class="btn-group btn-group-sm">
+                        <a class="btn btn-outline-primary" href="{% url 'hotels:search' %}">Dat phong</a>
+                        <a class="btn btn-outline-primary" href="{% url 'flights:search' %}">Dat ve bay</a>
+                        <a class="btn btn-outline-primary" href="{% url 'packages:search' %}">Dat tour</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ma</th>
+                                <th>Loai</th>
+                                <th>Dich vu</th>
+                                <th>Ngay</th>
+                                <th>Thanh toan</th>
+                                <th>Trang thai</th>
+                                <th>Tong</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_items %}
+                            <tr>
+                                <td class="fw-semibold">{{ item.code }}</td>
+                                <td><span class="badge text-bg-light">{{ item.type }}</span></td>
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.date|date:"d/m/Y" }}</td>
+                                <td>{{ item.payment_status }}</td>
+                                <td><span class="status-pill status-{{ item.status }}">{{ item.status_label }}</span></td>
+                                <td>${{ item.total|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Ban chua co booking nao. Hay bat dau voi khach san, chuyen bay hoac tour Viet Nam.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="panel mb-4">
+                <h2 class="h5">Thong tin khach hang</h2>
+                <div class="info-row"><span>Email</span><strong>{{ request.user.email }}</strong></div>
+                <div class="info-row"><span>Ho ten</span><strong>{{ request.user.full_name }}</strong></div>
+                <div class="info-row"><span>Dien thoai</span><strong>{{ request.user.phone_number|default:"Chua cap nhat" }}</strong></div>
+                <div class="info-row"><span>Thanh pho</span><strong>{{ request.user.city|default:"Chua cap nhat" }}</strong></div>
+            </div>
+
+            <div class="panel">
+                <h2 class="h5">Da luu</h2>
+                <h3 class="h6 mt-3">Chuyen bay da luu</h3>
+                {% for saved in saved_flights %}
+                    <div class="saved-item">{{ saved.flight.flight_code }} - {{ saved.cabin_class }}</div>
+                {% empty %}
+                    <p class="text-muted small">Chua luu chuyen bay nao.</p>
+                {% endfor %}
+                <h3 class="h6 mt-3">Tim kiem da luu</h3>
+                {% for search in saved_searches %}
+                    <div class="saved-item">{{ search.origin.iata_code }} - {{ search.destination.iata_code }}</div>
+                {% empty %}
+                    <p class="text-muted small">Chua co tim kiem da luu.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.customer-header {
+    background: linear-gradient(135deg, #13795b, #0f766e);
+    color: #fff;
+    padding: 32px 0;
+}
+.summary-card,
+.panel {
+    background: #fff;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(10, 31, 28, .05);
+    padding: 18px;
+}
+.summary-card span {
+    color: #65746f;
+    display: block;
+}
+.summary-card strong {
+    display: block;
+    font-size: 28px;
+    margin-top: 6px;
+}
+.status-pill {
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 12px;
+    padding: 4px 10px;
+}
+.status-confirmed,
+.status-completed {
+    background: #e4f6ee;
+    color: #13795b;
+}
+.status-cancelled,
+.status-refunded {
+    background: #fde8e8;
+    color: #b42318;
+}
+.status-pending {
+    background: #fff4d6;
+    color: #8a5a00;
+}
+.info-row,
+.saved-item {
+    border-bottom: 1px solid #edf0ef;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+.saved-item {
+    display: block;
+}
+</style>
+{% endblock %}

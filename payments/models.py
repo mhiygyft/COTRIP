@@ -24,6 +24,8 @@ class PaymentTransaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="payment_transactions")
     booking = models.ForeignKey("bookings.Booking", on_delete=models.SET_NULL, null=True, blank=True, related_name="transactions")
+    booking_type = models.CharField(max_length=30, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3, default="USD")
     method = models.CharField(max_length=30, choices=METHOD_CHOICES, default="manual")
@@ -44,4 +46,3 @@ class PaymentTransaction(models.Model):
 
     def __str__(self):
         return f"{self.amount} {self.currency} - {self.status}"
-

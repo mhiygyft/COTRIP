@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Khach san tai {{ country.name }} - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Khach san tai {{ country.name }}</h1>
+    <div class="row g-3">
+        {% for hotel in hotels %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="h5">{{ hotel.name }}</h2>
+                        <p class="text-muted">{{ hotel.city.name }}</p>
+                        <p class="mb-2">{{ hotel.description|truncatewords:20 }}</p>
+                        <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary btn-sm">Xem khach san</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">Chua co khach san cho khu vuc nay.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

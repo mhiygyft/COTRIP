@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Hotels in {{ city.name }}, {{ city.country.name }} - Novaryo{% endblock %}
+{% block title %}Khach san tai {{ city.name }}, {{ city.country.name }} - Vietnam Travel{% endblock %}
 
 {% block content %}
 <!-- City Header -->
@@ -20,7 +20,7 @@
                     </ol>
                 </nav>
                 
-                <h1 class="display-5 fw-bold">Hotels in {{ city.name }}</h1>
+                <h1 class="display-5 fw-bold">Khach san tai {{ city.name }}</h1>
                 <p class="lead mb-0">{{ city.country.name }}</p>
                 <p class="mb-0">{{ hotels|length }} hotels available</p>
             </div>

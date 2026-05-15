@@ -19,11 +19,22 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from hotels.views import HomeView
 from users import views as user_views
+from . import admin_dashboard
 from .swagger_settings import schema_view
+
+admin.site.site_header = "Vietnam Travel Administration"
+admin.site.site_title = "Vietnam Travel Admin"
+admin.site.index_title = "Quan tri he thong du lich Viet Nam"
 
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
+    path("admin-dashboard/", admin_dashboard.admin_dashboard, name="admin_dashboard"),
+    path(
+        "admin-dashboard/bookings/<str:booking_type>/<int:object_id>/<str:action>/",
+        admin_dashboard.admin_booking_action,
+        name="admin_booking_action",
+    ),
     
     # Authentication URLs
     path('accounts/', include('allauth.urls')),
@@ -43,6 +54,7 @@ urlpatterns = [
     
     # Home page
     path('', HomeView.as_view(), name='home'),
+    path('dashboard/', user_views.dashboard, name='customer_dashboard'),
     path('profile/', user_views.profile, name='account_profile'),
     
     # Web app URLs
@@ -52,6 +64,7 @@ urlpatterns = [
     path('activities/', include('activities.urls')),
     path('users/', include('users.urls')),
     path('bookings/', include('bookings.urls')),
+    path('payments/', include('payments.urls')),
     path('reviews/', include('reviews.urls')),
     path('loyalty/', include('loyalty.urls')),
     

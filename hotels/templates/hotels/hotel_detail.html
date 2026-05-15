@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ hotel.name }} - {{ hotel.city.name }}, {{ hotel.city.country.name }} | Novaryo{% endblock %}
+{% block title %}{{ hotel.name }} - {{ hotel.city.name }}, {{ hotel.city.country.name }} | Vietnam Travel{% endblock %}
 
 {% block content %}
 <!-- Hero Section with Hotel Main Info -->
@@ -197,11 +197,15 @@
                                         <div class="fw-bold fs-4 text-primary">${{ room_type.base_price }}</div>
                                         <small class="text-muted">per night</small>
                                     </div>
-                                    
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-primary">Reserve Now</button>
-                                        <button class="btn btn-outline-primary btn-sm">Check Availability</button>
+                                    <div class="small text-success mb-2">
+                                        {{ room_type.total_rooms }} rooms in inventory
                                     </div>
+                                    
+                                    <form class="d-grid gap-2" method="post" action="{% url 'hotels:reserve_room' room_type.id %}">
+                                        {% csrf_token %}
+                                        <input class="form-control form-control-sm" type="date" name="stay_date" value="{{ default_stay_date|date:'Y-m-d' }}">
+                                        <button class="btn btn-primary" type="submit">Reserve Now</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -359,14 +363,5 @@ function scrollToRooms() {
     });
 }
 
-// Mock availability check
-document.addEventListener('DOMContentLoaded', function() {
-    const checkButtons = document.querySelectorAll('button:contains("Check Availability")');
-    checkButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            alert('Availability check feature coming soon!');
-        });
-    });
-});
 </script>
 {% endblock %}

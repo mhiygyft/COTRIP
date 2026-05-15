@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Diem den Viet Nam - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Diem den noi bat tai Viet Nam</h1>
+    <div class="row g-3">
+        {% for city in cities %}
+            <div class="col-md-6 col-lg-4">
+                <a class="card h-100 text-decoration-none text-dark" href="{% url 'hotels:city_hotels' city.country.code city.id %}">
+                    <div class="card-body">
+                        <h2 class="h5">{{ city.name }}</h2>
+                        <p class="text-muted mb-0">{{ city.country.name }}</p>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <p class="text-muted">Chua co diem den trong du lieu. Ban co the bat dau voi Ha Noi, Da Nang, Hoi An hoac Phu Quoc.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

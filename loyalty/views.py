@@ -28,7 +28,7 @@ def loyalty_dashboard(request):
         
         if not basic_tier:
             messages.error(request, "Loyalty program is not currently available.")
-            return redirect('bookings:dashboard')
+            return redirect('users:dashboard')
         
         membership = LoyaltyMembership.objects.create(
             user=request.user,

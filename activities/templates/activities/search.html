@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Trai nghiem Viet Nam - Vietnam Travel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="h3 mb-4">Trai nghiem ban dia tai Viet Nam</h1>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-5">
+            <label class="form-label" for="location">Dia diem</label>
+            <input class="form-control" id="location" name="location" value="{{ location }}" placeholder="Ha Noi, Hue, Da Lat, Can Tho...">
+        </div>
+        <div class="col-md-5">
+            <label class="form-label" for="category">Loai trai nghiem</label>
+            <select class="form-select" id="category" name="category">
+                <option value="">Tat ca</option>
+                {% for item in categories %}
+                    <option value="{{ item.id }}" {% if category == item.id|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">Tim trai nghiem</button>
+        </div>
+    </form>
+
+    <div class="row g-3">
+        {% for activity in activities %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="h5">{{ activity.title }}</h2>
+                        <p class="text-muted">{{ activity.city }}, {{ activity.country }}</p>
+                        <p>{{ activity.short_description }}</p>
+                        <strong>{{ activity.price_adult }} USD</strong>
+                        <div class="mt-3">
+                            <a class="btn btn-primary btn-sm" href="{% url 'activities:detail' activity.id %}">Xem va dat</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="row g-3">
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Lop nau an Hoi An</h2><p class="text-muted mb-0">Di cho, nau mon Viet va thuong thuc cung nguoi ban dia.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Trekking Sapa</h2><p class="text-muted mb-0">Ban lang, ruong bac thang va van hoa Tay Bac.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Thuyen Mekong</h2><p class="text-muted mb-0">Cho noi, vuon trai cay va song nuoc mien Tay.</p></div></div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

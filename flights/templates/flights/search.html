@@ -126,8 +126,8 @@
 {% block content %}
 <div class="flight-search-hero">
     <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-3">Find Your Perfect Flight</h1>
-        <p class="lead">Search and compare flights from hundreds of airlines worldwide</p>
+        <h1 class="display-4 fw-bold mb-3">Tim chuyen bay den va trong Viet Nam</h1>
+        <p class="lead">So sanh cac chang bay noi dia pho bien nhu Ha Noi, Da Nang, Nha Trang, TP. Ho Chi Minh va Phu Quoc</p>
     </div>
 </div>
 
@@ -158,7 +158,7 @@
                             <div class="position-relative">
                                 <div class="form-floating">
                                     {{ form.origin }}
-                                    <label for="{{ form.origin.id_for_label }}">From</label>
+                                    <label for="{{ form.origin.id_for_label }}">Diem di</label>
                                 </div>
                                 <div class="swap-airports-btn" onclick="swapAirports()">
                                     <i class="fas fa-exchange-alt"></i>
@@ -169,7 +169,7 @@
                         <div class="col-md-6">
                             <div class="form-floating">
                                 {{ form.destination }}
-                                <label for="{{ form.destination.id_for_label }}">To</label>
+                                <label for="{{ form.destination.id_for_label }}">Diem den</label>
                             </div>
                         </div>
 
@@ -177,14 +177,14 @@
                         <div class="col-md-6">
                             <div class="form-floating">
                                 {{ form.departure_date }}
-                                <label for="{{ form.departure_date.id_for_label }}">Departure Date</label>
+                                <label for="{{ form.departure_date.id_for_label }}">Ngay di</label>
                             </div>
                         </div>
                         
                         <div class="col-md-6" id="return-date-container">
                             <div class="form-floating">
                                 {{ form.return_date }}
-                                <label for="{{ form.return_date.id_for_label }}">Return Date</label>
+                                <label for="{{ form.return_date.id_for_label }}">Ngay ve</label>
                             </div>
                         </div>
 
@@ -192,14 +192,14 @@
                         <div class="col-md-6">
                             <div class="form-floating">
                                 {{ form.passengers }}
-                                <label for="{{ form.passengers.id_for_label }}">Passengers</label>
+                                <label for="{{ form.passengers.id_for_label }}">Hanh khach</label>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <div class="form-floating">
                                 {{ form.cabin_class }}
-                                <label for="{{ form.cabin_class.id_for_label }}">Class</label>
+                                <label for="{{ form.cabin_class.id_for_label }}">Hang ghe</label>
                             </div>
                         </div>
                     </div>
@@ -214,7 +214,7 @@
                     <!-- Search Button -->
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-primary search-btn btn-lg">
-                            <i class="fas fa-search me-2"></i>Search Flights
+                            <i class="fas fa-search me-2"></i>Tim chuyen bay
                         </button>
                     </div>
                 </form>
@@ -224,34 +224,34 @@
 
     <!-- Popular Destinations -->
     <div class="popular-destinations">
-        <h3 class="text-center mb-4">Popular Destinations</h3>
+        <h3 class="text-center mb-4">Chang bay Viet Nam pho bien</h3>
         <div class="row g-3">
             <div class="col-md-3 col-sm-6">
                 <a href="#" class="destination-card d-block text-center">
                     <i class="fas fa-plane text-primary fs-2 mb-2"></i>
-                    <h6 class="fw-bold">London</h6>
-                    <small class="text-muted">From $299</small>
+                    <h6 class="fw-bold">Ha Noi</h6>
+                    <small class="text-muted">Noi Bai - cua ngo mien Bac</small>
                 </a>
             </div>
             <div class="col-md-3 col-sm-6">
                 <a href="#" class="destination-card d-block text-center">
                     <i class="fas fa-torii-gate text-danger fs-2 mb-2"></i>
-                    <h6 class="fw-bold">Tokyo</h6>
-                    <small class="text-muted">From $599</small>
+                    <h6 class="fw-bold">Da Nang</h6>
+                    <small class="text-muted">Bien My Khe va Hoi An</small>
                 </a>
             </div>
             <div class="col-md-3 col-sm-6">
                 <a href="#" class="destination-card d-block text-center">
                     <i class="fas fa-building text-warning fs-2 mb-2"></i>
-                    <h6 class="fw-bold">Dubai</h6>
-                    <small class="text-muted">From $399</small>
+                    <h6 class="fw-bold">TP. Ho Chi Minh</h6>
+                    <small class="text-muted">Tan Son Nhat - trung tam phia Nam</small>
                 </a>
             </div>
             <div class="col-md-3 col-sm-6">
                 <a href="#" class="destination-card d-block text-center">
                     <i class="fas fa-opera-house text-info fs-2 mb-2"></i>
-                    <h6 class="fw-bold">Sydney</h6>
-                    <small class="text-muted">From $799</small>
+                    <h6 class="fw-bold">Phu Quoc</h6>
+                    <small class="text-muted">Dao ngoc va nghi duong bien</small>
                 </a>
             </div>
         </div>

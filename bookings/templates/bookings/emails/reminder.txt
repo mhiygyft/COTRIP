@@ -1,0 +1,5 @@
+Travel reminder for booking {{ booking.booking_reference }}
+
+Your flight departs in {{ days_until_departure }} days.
+Flight: {{ booking.flight.flight_code }}
+Departure: {{ booking.flight.departure_time|date:"M d, Y H:i" }}

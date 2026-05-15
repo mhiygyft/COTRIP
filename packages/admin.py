@@ -1,6 +1,15 @@
 from django.contrib import admin
 from .models import TravelPackage, PackageComponent, PackageBooking
 
+MODEL_LABELS = {
+    TravelPackage: ("tour tron goi", "Tour tron goi"),
+    PackageComponent: ("lich trinh tour", "Lich trinh tour"),
+    PackageBooking: ("booking tour", "Booking tour"),
+}
+for model, (singular, plural) in MODEL_LABELS.items():
+    model._meta.verbose_name = singular
+    model._meta.verbose_name_plural = plural
+
 class PackageComponentInline(admin.TabularInline):
     model = PackageComponent
     extra = 1
@@ -27,7 +36,10 @@ class TravelPackageAdmin(admin.ModelAdmin):
 
 @admin.register(PackageBooking)
 class PackageBookingAdmin(admin.ModelAdmin):
-    list_display = ['user', 'package', 'departure_date', 'adults', 'children', 'total_price', 'status']
-    list_filter = ['status', 'departure_date', 'created_at']
-    search_fields = ['user__username', 'package__title', 'contact_email']
+    list_display = ['user', 'package', 'departure_date', 'adults', 'children', 'total_price', 'status', 'payment_status']
+    list_filter = ['status', 'payment_status', 'departure_date', 'created_at']
+    search_fields = ['user__email', 'package__title', 'contact_email']
     readonly_fields = ['created_at', 'updated_at']
+
+    def get_model_perms(self, request):
+        return {}
