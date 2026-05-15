@@ -9,6 +9,9 @@
         {% for hotel in hotels %}
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100">
+                    {% if hotel.primary_image_url %}
+                        <img src="{{ hotel.primary_image_url }}" class="country-hotel-image" alt="{{ hotel.name }}">
+                    {% endif %}
                     <div class="card-body">
                         <h2 class="h5">{{ hotel.name }}</h2>
                         <p class="text-muted">{{ hotel.city.name }}</p>
@@ -22,4 +25,14 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.country-hotel-image {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+}
+</style>
 {% endblock %}

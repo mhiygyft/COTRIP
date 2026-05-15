@@ -154,7 +154,7 @@ class CountryHotelsView(ListView):
     
     def get_queryset(self):
         country = get_object_or_404(Country, code=self.kwargs['country_code'])
-        return Hotel.objects.filter(city__country=country, is_active=True)
+        return Hotel.objects.filter(city__country=country, is_active=True).prefetch_related('images', 'amenities')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -171,7 +171,7 @@ class CityHotelsView(ListView):
     
     def get_queryset(self):
         city = get_object_or_404(City, id=self.kwargs['city_id'])
-        return Hotel.objects.filter(city=city, is_active=True)
+        return Hotel.objects.filter(city=city, is_active=True).prefetch_related('images', 'amenities')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

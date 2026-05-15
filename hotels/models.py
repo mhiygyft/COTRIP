@@ -45,6 +45,29 @@ class City(models.Model):
     def __str__(self):
         return f"{self.name}, {self.country.name}"
 
+    @property
+    def image_source_url(self):
+        if self.image:
+            return self.image.url
+        city_images = {
+            "Ha Noi": "https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?auto=format&fit=crop&w=900&q=80",
+            "Da Nang": "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=900&q=80",
+            "Hoi An": "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=900&q=80",
+            "Phu Quoc": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+            "Sa Pa": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+            "Hue": "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=900&q=80",
+            "Nha Trang": "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=900&q=80",
+            "Da Lat": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80",
+            "Quy Nhon": "https://images.unsplash.com/photo-1513553404607-988bf2703777?auto=format&fit=crop&w=900&q=80",
+            "Can Tho": "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=900&q=80",
+            "Ha Long": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+            "Ninh Binh": "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=900&q=80",
+            "Ha Giang": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+            "Mui Ne": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+            "Con Dao": "https://images.unsplash.com/photo-1513415564515-763d91423bdd?auto=format&fit=crop&w=900&q=80",
+        }
+        return city_images.get(self.name, "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=900&q=80")
+
 
 class HotelChain(models.Model):
     """Hotel chain/brand model"""

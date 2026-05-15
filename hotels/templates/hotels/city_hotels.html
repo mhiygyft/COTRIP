@@ -103,10 +103,13 @@
                 {% for hotel in hotels %}
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card hotel-card h-100 shadow-sm border-0">
-                        <!-- Hotel Image Placeholder -->
-                        <div class="hotel-image-placeholder bg-light d-flex align-items-center justify-content-center">
-                            <i class="bi bi-building fs-1 text-muted"></i>
-                        </div>
+                        {% if hotel.primary_image_url %}
+                            <img src="{{ hotel.primary_image_url }}" class="hotel-card-image" alt="{{ hotel.name }}">
+                        {% else %}
+                            <div class="hotel-image-placeholder bg-light d-flex align-items-center justify-content-center">
+                                <i class="bi bi-building fs-1 text-muted"></i>
+                            </div>
+                        {% endif %}
                         
                         <div class="card-body">
                             <!-- Header with rating -->
@@ -254,6 +257,12 @@
 .hotel-image-placeholder {
     height: 200px;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.hotel-card-image {
+    height: 220px;
+    object-fit: cover;
+    width: 100%;
 }
 
 .hotel-card {
