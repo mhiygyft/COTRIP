@@ -34,7 +34,7 @@ class ActivityAdminForm(forms.ModelForm):
 class ActivityImageInline(admin.TabularInline):
     model = ActivityImage
     extra = 1
-    fields = ['image', 'caption', 'alt_text', 'is_primary', 'display_order']
+    fields = ['image', 'external_url', 'caption', 'alt_text', 'is_primary', 'display_order']
 
 MODEL_LABELS = {
     ActivityCategory: ("loai trai nghiem", "Loai trai nghiem"),
@@ -137,8 +137,8 @@ class ActivityImageAdmin(admin.ModelAdmin):
     list_editable = ['is_primary', 'display_order']
 
     def image_preview(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" style="max-height: 50px; max-width: 80px; object-fit: cover;"/>', obj.image.url)
+        if obj.image_source_url:
+            return format_html('<img src="{}" style="max-height: 50px; max-width: 80px; object-fit: cover;"/>', obj.image_source_url)
         return 'No image'
     image_preview.short_description = 'Preview'
 

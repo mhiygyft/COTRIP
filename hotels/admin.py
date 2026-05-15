@@ -107,7 +107,7 @@ class AmenityAdmin(admin.ModelAdmin):
 class HotelImageInline(admin.TabularInline):
     model = HotelImage
     extra = 1
-    fields = ['image', 'caption', 'category', 'is_primary', 'display_order']
+    fields = ['image', 'external_url', 'caption', 'category', 'is_primary', 'display_order']
     
 
 class RoomTypeInline(admin.TabularInline):
@@ -230,10 +230,10 @@ class HotelImageAdmin(admin.ModelAdmin):
     list_editable = ['is_primary', 'display_order']
     
     def image_preview(self, obj):
-        if obj.image:
+        if obj.image_source_url:
             return format_html(
                 '<img src="{}" style="max-height: 50px; max-width: 80px;"/>',
-                obj.image.url
+                obj.image_source_url
             )
         return "No image"
     image_preview.short_description = 'Preview'
@@ -242,7 +242,7 @@ class HotelImageAdmin(admin.ModelAdmin):
 class RoomImageInline(admin.TabularInline):
     model = RoomImage
     extra = 1
-    fields = ['image', 'caption', 'is_primary', 'display_order']
+    fields = ['image', 'external_url', 'caption', 'is_primary', 'display_order']
 
 
 @admin.register(RoomType)

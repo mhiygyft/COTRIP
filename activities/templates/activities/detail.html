@@ -15,7 +15,7 @@
             <div class="row g-2 mb-4">
                 {% for image in activity.images.all %}
                     <div class="col-6 col-md-3">
-                        <img src="{{ image.image.url }}" class="gallery-thumb" alt="{{ image.alt_text|default:activity.title }}">
+                        <img src="{{ image.image_source_url }}" class="gallery-thumb" alt="{{ image.alt_text|default:activity.title }}">
                     </div>
                 {% endfor %}
             </div>

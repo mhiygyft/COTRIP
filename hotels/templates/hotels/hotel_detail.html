@@ -83,7 +83,7 @@
             <div class="row g-1 h-100">
                 {% for image in hotel.images.all|slice:":4" %}
                     <div class="col-6">
-                        <img src="{{ image.image.url }}" class="hotel-gallery-image object-image" alt="{{ image.alt_text|default:hotel.name }}">
+                        <img src="{{ image.image_source_url }}" class="hotel-gallery-image object-image" alt="{{ image.alt_text|default:hotel.name }}">
                     </div>
                 {% empty %}
                     <div class="col-6">
@@ -148,7 +148,7 @@
                         <div class="col-md-4">
                             {% with room_image=room_type.images.first %}
                                 {% if room_image %}
-                                    <img src="{{ room_image.image.url }}" class="room-image-placeholder object-image" alt="{{ room_image.caption|default:room_type.name }}">
+                                    <img src="{{ room_image.image_source_url }}" class="room-image-placeholder object-image" alt="{{ room_image.caption|default:room_type.name }}">
                                 {% else %}
                                     <div class="room-image-placeholder bg-light d-flex align-items-center justify-content-center h-100">
                                         <div class="text-center">

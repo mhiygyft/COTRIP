@@ -75,8 +75,8 @@ class TravelPackage(models.Model):
     @property
     def primary_image_url(self):
         primary_image = self.images.filter(is_primary=True).first() or self.images.first()
-        if primary_image and primary_image.image:
-            return primary_image.image.url
+        if primary_image:
+            return primary_image.image_source_url
         if self.image_url and not self.image_url.startswith(('http://', 'https://', '/')):
             return f"{settings.MEDIA_URL}{self.image_url.lstrip('/')}"
         return self.image_url
@@ -84,7 +84,8 @@ class TravelPackage(models.Model):
 
 class PackageImage(models.Model):
     package = models.ForeignKey(TravelPackage, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='packages/')
+    image = models.ImageField(upload_to='packages/', blank=True)
+    external_url = models.URLField(blank=True, help_text="Optional real image URL")
     caption = models.CharField(max_length=200, blank=True)
     alt_text = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
@@ -96,6 +97,14 @@ class PackageImage(models.Model):
 
     def __str__(self):
         return f'{self.package.title} - Image'
+
+    @property
+    def image_source_url(self):
+        if self.external_url:
+            return self.external_url
+        if self.image:
+            return self.image.url
+        return ''
 
 class PackageComponent(models.Model):
     COMPONENT_TYPE_CHOICES = [

@@ -81,8 +81,8 @@ class Activity(models.Model):
     @property
     def primary_image_url(self):
         primary_image = self.images.filter(is_primary=True).first() or self.images.first()
-        if primary_image and primary_image.image:
-            return primary_image.image.url
+        if primary_image:
+            return primary_image.image_source_url
         if self.image_url and not self.image_url.startswith(('http://', 'https://', '/')):
             return f"{settings.MEDIA_URL}{self.image_url.lstrip('/')}"
         return self.image_url
@@ -90,7 +90,8 @@ class Activity(models.Model):
 
 class ActivityImage(models.Model):
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='activities/')
+    image = models.ImageField(upload_to='activities/', blank=True)
+    external_url = models.URLField(blank=True, help_text="Optional real image URL")
     caption = models.CharField(max_length=200, blank=True)
     alt_text = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
@@ -102,6 +103,14 @@ class ActivityImage(models.Model):
 
     def __str__(self):
         return f'{self.activity.title} - Image'
+
+    @property
+    def image_source_url(self):
+        if self.external_url:
+            return self.external_url
+        if self.image:
+            return self.image.url
+        return ''
 
 class ActivityBooking(models.Model):
     STATUS_CHOICES = [

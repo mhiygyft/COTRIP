@@ -183,8 +183,8 @@ class Hotel(models.Model):
     @property
     def primary_image_url(self):
         primary_image = self.images.filter(is_primary=True).first() or self.images.first()
-        if primary_image and primary_image.image:
-            return primary_image.image.url
+        if primary_image:
+            return primary_image.image_source_url
         if self.image_url and not self.image_url.startswith(('http://', 'https://', '/')):
             return f"{settings.MEDIA_URL}{self.image_url.lstrip('/')}"
         return self.image_url
@@ -193,7 +193,8 @@ class Hotel(models.Model):
 class HotelImage(models.Model):
     """Hotel images model"""
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='hotels/')
+    image = models.ImageField(upload_to='hotels/', blank=True)
+    external_url = models.URLField(blank=True, help_text="Optional real image URL")
     caption = models.CharField(max_length=200, blank=True)
     alt_text = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
@@ -222,6 +223,14 @@ class HotelImage(models.Model):
     
     def __str__(self):
         return f"{self.hotel.name} - {self.category} Image"
+
+    @property
+    def image_source_url(self):
+        if self.external_url:
+            return self.external_url
+        if self.image:
+            return self.image.url
+        return ""
 
 
 class RoomType(models.Model):
@@ -290,7 +299,8 @@ class RoomType(models.Model):
 class RoomImage(models.Model):
     """Room type images"""
     room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='rooms/')
+    image = models.ImageField(upload_to='rooms/', blank=True)
+    external_url = models.URLField(blank=True, help_text="Optional real room image URL")
     caption = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
     display_order = models.PositiveIntegerField(default=0)
@@ -301,6 +311,14 @@ class RoomImage(models.Model):
     
     def __str__(self):
         return f"{self.room_type} - Image"
+
+    @property
+    def image_source_url(self):
+        if self.external_url:
+            return self.external_url
+        if self.image:
+            return self.image.url
+        return ""
 
 
 class RoomAvailability(models.Model):
