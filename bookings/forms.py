@@ -182,14 +182,15 @@ class PaymentForm(forms.Form):
     """Form for payment information with skip payment option"""
     
     PAYMENT_METHOD_CHOICES = [
-        ('card', 'Credit/Debit Card'),
+        ('card', 'The tin dung / ghi no'),
         ('paypal', 'PayPal'),
-        ('bank_transfer', 'Bank Transfer'),
-        ('skip', 'Skip Payment (Testing Only)'),
+        ('bank_transfer', 'Chuyen khoan ngan hang'),
+        ('skip', 'Thanh toan demo / bo qua thanh toan'),
     ]
     
     payment_method = forms.ChoiceField(
         choices=PAYMENT_METHOD_CHOICES,
+        initial='card',
         widget=forms.RadioSelect(attrs={
             'class': 'form-check-input'
         })
@@ -292,13 +293,8 @@ class PaymentForm(forms.Form):
     
     def clean_card_number(self):
         card_number = self.cleaned_data.get('card_number', '').replace(' ', '')
-        if self.cleaned_data.get('payment_method') == 'card' and not card_number:
-            raise ValidationError("Card number is required for card payments")
-        
-        # Basic Luhn algorithm validation
         if card_number and not self.validate_luhn(card_number):
             raise ValidationError("Please enter a valid card number")
-        
         return card_number
     
     def validate_luhn(self, card_number):
@@ -316,25 +312,13 @@ class PaymentForm(forms.Form):
     
     def clean_card_cvv(self):
         cvv = self.cleaned_data.get('card_cvv', '')
-        if self.cleaned_data.get('payment_method') == 'card' and not cvv:
-            raise ValidationError("CVV is required for card payments")
-        
         if cvv and not re.match(r'^\d{3,4}$', cvv):
             raise ValidationError("CVV must be 3 or 4 digits")
-        
         return cvv
     
     def clean(self):
         cleaned_data = super().clean()
         payment_method = cleaned_data.get('payment_method')
-        
-        # Validate required fields for card payment
-        if payment_method == 'card':
-            required_card_fields = ['card_number', 'card_name', 'card_expiry_month', 'card_expiry_year', 'card_cvv']
-            
-            for field in required_card_fields:
-                if not cleaned_data.get(field):
-                    self.add_error(field, f"This field is required for card payments")
         
         return cleaned_data
 

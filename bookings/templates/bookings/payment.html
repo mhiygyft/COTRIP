@@ -297,10 +297,14 @@
                             </div>
                         </div>
                         
-                        <!-- Credit Card Fields -->
+                        <div class="alert alert-info small mt-3">
+                            Day la thanh toan demo. Ban chi can chon phuong thuc thanh toan, khong can nhap so the, CVV hay thong tin ngan hang.
+                        </div>
+
+                        <!-- Credit Card Fields (optional demo inputs) -->
                         <div class="card-fields" id="card-fields">
-                            <h6 class="mb-3">Card Information</h6>
-                            
+                            <h6 class="mb-3">Card Information <span class="text-muted small">(optional demo)</span></h6>
+
                             <div class="row">
                                 <div class="col-12 mb-3">
                                     <label for="{{ payment_form.card_number.id_for_label }}" class="form-label">Card Number</label>
@@ -309,7 +313,7 @@
                                         <div class="text-danger small">{{ payment_form.card_number.errors }}</div>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-12 mb-3">
                                     <label for="{{ payment_form.card_name.id_for_label }}" class="form-label">Name on Card</label>
                                     {{ payment_form.card_name }}
@@ -317,25 +321,19 @@
                                         <div class="text-danger small">{{ payment_form.card_name.errors }}</div>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Expiry Date</label>
                                     <div class="row g-2">
                                         <div class="col-6">
                                             {{ payment_form.card_expiry_month }}
-                                            {% if payment_form.card_expiry_month.errors %}
-                                                <div class="text-danger small">{{ payment_form.card_expiry_month.errors }}</div>
-                                            {% endif %}
                                         </div>
                                         <div class="col-6">
                                             {{ payment_form.card_expiry_year }}
-                                            {% if payment_form.card_expiry_year.errors %}
-                                                <div class="text-danger small">{{ payment_form.card_expiry_year.errors }}</div>
-                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6 mb-3">
                                     <label for="{{ payment_form.card_cvv.id_for_label }}" class="form-label">CVV</label>
                                     {{ payment_form.card_cvv }}
@@ -344,8 +342,8 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            
-                            <h6 class="mb-3 mt-4">Billing Address</h6>
+
+                            <h6 class="mb-3 mt-4">Billing Address <span class="text-muted small">(optional)</span></h6>
                             <div class="row">
                                 <div class="col-12 mb-3">
                                     {{ payment_form.billing_address }}
@@ -511,7 +509,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 radio.checked = true;
                 selectedPaymentMethod = radio.value;
                 
-                // Show/hide card fields based on selection
                 if (selectedPaymentMethod === 'card') {
                     cardFields.classList.add('show');
                     skipPaymentNote.classList.remove('show');
@@ -528,6 +525,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    const checkedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+    if (checkedPaymentMethod) {
+        selectedPaymentMethod = checkedPaymentMethod.value;
+        const selectedOption = checkedPaymentMethod.closest('.payment-method-option');
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+        if (selectedPaymentMethod === 'card') {
+            cardFields.classList.add('show');
+        }
+    }
+
     // Handle terms and conditions checkbox
     acceptTermsCheckbox.addEventListener('change', updateButtonState);
     
@@ -547,16 +556,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Card number formatting
+    updateButtonState();
+
     const cardNumberInput = document.querySelector('input[name="card_number"]');
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', function(e) {
-            // Remove all non-digit characters
             let value = e.target.value.replace(/\D/g, '');
-            
-            // Add spaces every 4 digits
             value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-            
             e.target.value = value;
         });
     }
