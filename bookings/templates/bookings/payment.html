@@ -248,43 +248,65 @@
                         </h5>
                         
                         <!-- Payment Method Selection -->
-                        {% for choice in payment_form.payment_method %}
-                        <div class="payment-method-option {% if choice.choice_value == 'skip' %}skip-payment{% endif %}" 
-                             data-method="{{ choice.choice_value }}">
+                        <div class="payment-method-option" data-method="card">
                             <div class="form-check">
-                                {{ choice.tag }}
-                                <label class="form-check-label w-100" for="{{ choice.id_for_label }}">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_card" value="card" checked>
+                                <label class="form-check-label w-100" for="payment_card">
                                     <div class="d-flex align-items-center">
-                                        {% if choice.choice_value == 'card' %}
-                                            <i class="fas fa-credit-card me-3 fs-4"></i>
-                                            <div>
-                                                <strong>{{ choice.choice_label }}</strong>
-                                                <div class="small text-muted">Visa, MasterCard, American Express</div>
-                                            </div>
-                                        {% elif choice.choice_value == 'paypal' %}
-                                            <i class="fab fa-paypal me-3 fs-4 text-primary"></i>
-                                            <div>
-                                                <strong>{{ choice.choice_label }}</strong>
-                                                <div class="small text-muted">Pay with your PayPal account</div>
-                                            </div>
-                                        {% elif choice.choice_value == 'bank_transfer' %}
-                                            <i class="fas fa-university me-3 fs-4"></i>
-                                            <div>
-                                                <strong>{{ choice.choice_label }}</strong>
-                                                <div class="small text-muted">Direct bank transfer</div>
-                                            </div>
-                                        {% elif choice.choice_value == 'skip' %}
-                                            <i class="fas fa-forward me-3 fs-4 text-warning"></i>
-                                            <div>
-                                                <strong>{{ choice.choice_label }}</strong>
-                                                <div class="small text-muted">For testing and development only</div>
-                                            </div>
-                                        {% endif %}
+                                        <i class="fas fa-credit-card me-3 fs-4"></i>
+                                        <div>
+                                            <strong>The tin dung / ghi no</strong>
+                                            <div class="small text-muted">Visa, MasterCard, American Express - thong tin the khong bat buoc</div>
+                                        </div>
                                     </div>
                                 </label>
                             </div>
                         </div>
-                        {% endfor %}
+
+                        <div class="payment-method-option" data-method="paypal">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_paypal" value="paypal">
+                                <label class="form-check-label w-100" for="payment_paypal">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fab fa-paypal me-3 fs-4 text-primary"></i>
+                                        <div>
+                                            <strong>PayPal</strong>
+                                            <div class="small text-muted">Thanh toan demo bang tai khoan PayPal</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="payment-method-option" data-method="bank_transfer">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_bank_transfer" value="bank_transfer">
+                                <label class="form-check-label w-100" for="payment_bank_transfer">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-university me-3 fs-4"></i>
+                                        <div>
+                                            <strong>Chuyen khoan ngan hang</strong>
+                                            <div class="small text-muted">Thanh toan demo bang chuyen khoan</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="payment-method-option skip-payment" data-method="skip">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_skip" value="skip">
+                                <label class="form-check-label w-100" for="payment_skip">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-forward me-3 fs-4 text-warning"></i>
+                                        <div>
+                                            <strong>Thanh toan demo / bo qua thanh toan</strong>
+                                            <div class="small text-muted">Danh cho kiem thu, khong can thanh toan that</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                         
                         <!-- Skip Payment Note -->
                         <div class="skip-payment-note" id="skip-payment-note">
