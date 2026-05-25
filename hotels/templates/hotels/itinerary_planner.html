@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo lịch trình du lịch - Du lịch Việt Nam{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb text-white-50 mb-0">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item active text-white">Tạo lịch trình</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-1">Tạo lịch trình du lịch</h1>
+        <p class="mb-0 text-white-50">Tạo plan theo điểm đến, ngân sách, số người rồi chỉnh sửa theo ý bạn.</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    {% include "hotels/itinerary_builder_widget.html" %}
+</div>
+{% endblock %}

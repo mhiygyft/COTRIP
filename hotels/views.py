@@ -33,6 +33,7 @@ def serialize_editable_itinerary(itinerary):
             'title': stop.place_name,
             'description': stop.description,
             'estimated_cost': int(stop.estimated_cost or 0),
+            'google_maps_url': stop.google_maps_url,
             'order': stop.order,
         })
     return {
@@ -95,6 +96,7 @@ def default_activity_suggestions(city_name):
             'title': title,
             'description': description,
             'estimated_cost': cost,
+            'google_maps_url': f"https://www.google.com/maps/search/?api=1&query={title.replace(' ', '+')}",
         }
         for activity_type, title, description, cost in raw_items
     ]
@@ -145,6 +147,7 @@ def option_to_stop(editable_itinerary, option, day_number, order, time_value):
         estimated_cost=Decimal(str(option['estimated_cost'])),
         currency='VND',
         cost_note='Gợi ý theo plan',
+        google_maps_url=option.get('google_maps_url', ''),
         order=order,
     )
 
@@ -335,6 +338,10 @@ class CityHotelsView(ListView):
         return context
 
 
+class ItineraryPlannerView(TemplateView):
+    template_name = 'hotels/itinerary_planner.html'
+
+
 # API Views for AJAX requests
 class SearchSuggestionsView(TemplateView):
     """API endpoint for search suggestions"""
@@ -500,6 +507,7 @@ class ItineraryBuilderAPIView(TemplateView):
                     'title': stop.place_name,
                     'description': stop.description,
                     'estimated_cost': int(stop.estimated_cost or 0),
+                    'google_maps_url': stop.google_maps_url,
                 }
                 for stop in itinerary.stops.all()
             ]
@@ -595,6 +603,7 @@ def editable_itinerary_api(request, itinerary_id):
                     duration_hours=Decimal('1.0'),
                     estimated_cost=Decimal(str(activity.get('estimated_cost') or 0)),
                     currency='VND',
+                    google_maps_url=activity.get('google_maps_url') or '',
                     order=order,
                 ))
         ItineraryStop.objects.bulk_create(new_stops)
