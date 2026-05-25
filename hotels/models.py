@@ -462,6 +462,13 @@ class HotelFacility(models.Model):
 
 class Itinerary(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='itineraries')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='custom_itineraries',
+        blank=True,
+        null=True,
+    )
     title = models.CharField(max_length=200)
     days = models.PositiveIntegerField()
     description = models.TextField(blank=True)
@@ -481,6 +488,12 @@ class Itinerary(models.Model):
 
 
 class ItineraryStop(models.Model):
+    ACTIVITY_TYPES = [
+        ('attraction', 'Attraction'),
+        ('transport', 'Transport'),
+        ('accommodation', 'Accommodation'),
+        ('food', 'Food'),
+    ]
     DAY_SESSION = [
         ('morning', 'Buổi sáng'),
         ('afternoon', 'Buổi chiều'),
@@ -489,6 +502,7 @@ class ItineraryStop(models.Model):
 
     itinerary = models.ForeignKey(Itinerary, on_delete=models.CASCADE, related_name='stops')
     day_number = models.PositiveIntegerField()
+    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES, default='attraction')
     session = models.CharField(max_length=20, choices=DAY_SESSION, default='morning')
     place_name = models.CharField(max_length=200)
     description = models.TextField()

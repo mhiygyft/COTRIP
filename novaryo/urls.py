@@ -18,6 +18,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from hotels.views import HomeView
+from hotels import views as hotel_views
 from users import views as user_views
 from . import admin_dashboard
 from . import chatbot
@@ -55,6 +56,7 @@ urlpatterns = [
     
     # Home page
     path('', HomeView.as_view(), name='home'),
+    path('api/itineraries/<int:itinerary_id>/', hotel_views.editable_itinerary_api, name='editable_itinerary_api'),
     path('dashboard/', user_views.dashboard, name='customer_dashboard'),
     path('profile/', user_views.profile, name='account_profile'),
     path('chatbot/api/', chatbot.chatbot_api, name='chatbot_api'),

@@ -1,4 +1,6 @@
 import unicodedata
+import json
+from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -7,8 +9,10 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.http import JsonResponse
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.dateparse import parse_time
+from django.views.decorators.http import require_http_methods
 from datetime import datetime, timedelta
-from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType, Itinerary
+from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType, Itinerary, ItineraryStop
 
 
 def normalize_location(value):
@@ -17,6 +21,31 @@ def normalize_location(value):
         char for char in unicodedata.normalize("NFD", value)
         if unicodedata.category(char) != "Mn"
     )
+
+
+def serialize_editable_itinerary(itinerary):
+    stops_by_day = {}
+    for stop in itinerary.stops.all():
+        stops_by_day.setdefault(stop.day_number, []).append({
+            'id': stop.id,
+            'type': stop.activity_type,
+            'time_start': stop.start_time.strftime('%H:%M') if stop.start_time else '',
+            'title': stop.place_name,
+            'description': stop.description,
+            'estimated_cost': int(stop.estimated_cost or 0),
+            'order': stop.order,
+        })
+    return {
+        'id': itinerary.id,
+        'title': itinerary.title,
+        'days': [
+            {
+                'day': day_number,
+                'activities': stops_by_day.get(day_number, []),
+            }
+            for day_number in range(1, itinerary.days + 1)
+        ],
+    }
 
 
 class HomeView(TemplateView):
@@ -304,6 +333,56 @@ class ItineraryBuilderAPIView(TemplateView):
             stop for stop in itinerary.stops.all()
             if stop.day_number <= days
         ]
+        editable_payload = None
+        replacement_options = []
+        if request.user.is_authenticated:
+            editable_itinerary, _ = Itinerary.objects.update_or_create(
+                created_by=request.user,
+                title=f"Lịch trình {itinerary.city.name} tự chỉnh",
+                defaults={
+                    'city': itinerary.city,
+                    'days': days,
+                    'description': f'Lịch trình gợi ý từ {itinerary.title}, có thể chỉnh sửa theo nhu cầu cá nhân.',
+                    'is_active': True,
+                    'order': 0,
+                },
+            )
+            editable_itinerary.stops.all().delete()
+            ItineraryStop.objects.bulk_create([
+                ItineraryStop(
+                    itinerary=editable_itinerary,
+                    day_number=stop.day_number,
+                    activity_type=stop.activity_type,
+                    session=stop.session,
+                    start_time=stop.start_time,
+                    place_name=stop.place_name,
+                    description=stop.description,
+                    duration_hours=stop.duration_hours,
+                    estimated_cost=stop.estimated_cost,
+                    currency=stop.currency,
+                    cost_note=stop.cost_note,
+                    image_url=stop.image_url,
+                    google_maps_url=stop.google_maps_url,
+                    latitude=stop.latitude,
+                    longitude=stop.longitude,
+                    order=stop.order,
+                )
+                for stop in stops
+            ])
+            editable_itinerary = Itinerary.objects.prefetch_related('stops').get(id=editable_itinerary.id)
+            editable_payload = serialize_editable_itinerary(editable_itinerary)
+            replacement_options = [
+                {
+                    'day': stop.day_number,
+                    'type': stop.activity_type,
+                    'time_start': stop.start_time.strftime('%H:%M') if stop.start_time else '',
+                    'title': stop.place_name,
+                    'description': stop.description,
+                    'estimated_cost': int(stop.estimated_cost or 0),
+                }
+                for stop in itinerary.stops.all()
+            ]
+
         daily_plan = []
         total_cost = 0
         for day_number in range(1, days + 1):
@@ -345,7 +424,65 @@ class ItineraryBuilderAPIView(TemplateView):
             'over_budget': bool(budget and total_cost > budget),
             'budget_gap': max(total_cost - budget, 0) if budget else 0,
             'daily_plan': daily_plan,
+            'editable_itinerary': editable_payload,
+            'replacement_options': replacement_options,
         })
+
+
+@login_required
+@require_http_methods(["GET", "PATCH"])
+def editable_itinerary_api(request, itinerary_id):
+    itinerary = get_object_or_404(
+        Itinerary.objects.select_related('city').prefetch_related('stops'),
+        id=itinerary_id,
+    )
+    if itinerary.created_by_id and itinerary.created_by_id != request.user.id:
+        return JsonResponse({'ok': False, 'message': 'Bạn không có quyền sửa lịch trình này.'}, status=403)
+    if not itinerary.created_by_id and not request.user.is_staff:
+        return JsonResponse({'ok': False, 'message': 'Chỉ admin được sửa lịch trình mẫu.'}, status=403)
+
+    if request.method == "GET":
+        return JsonResponse({'ok': True, 'itinerary': serialize_editable_itinerary(itinerary)})
+
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'ok': False, 'message': 'Payload không hợp lệ.'}, status=400)
+
+    days = payload.get('days', [])
+    if not isinstance(days, list) or not days:
+        return JsonResponse({'ok': False, 'message': 'Cần ít nhất một ngày trong lịch trình.'}, status=400)
+
+    with transaction.atomic():
+        itinerary.days = len(days)
+        itinerary.save(update_fields=['days'])
+        itinerary.stops.all().delete()
+        valid_types = {choice[0] for choice in ItineraryStop.ACTIVITY_TYPES}
+        new_stops = []
+        for day_index, day in enumerate(days, start=1):
+            for order, activity in enumerate(day.get('activities', []), start=1):
+                activity_type = activity.get('type') if activity.get('type') in valid_types else 'attraction'
+                new_stops.append(ItineraryStop(
+                    itinerary=itinerary,
+                    day_number=day_index,
+                    activity_type=activity_type,
+                    session='morning',
+                    start_time=parse_time(activity.get('time_start') or '') or None,
+                    place_name=(activity.get('title') or 'Hoạt động mới')[:200],
+                    description=activity.get('description') or '',
+                    duration_hours=Decimal('1.0'),
+                    estimated_cost=Decimal(str(activity.get('estimated_cost') or 0)),
+                    currency='VND',
+                    order=order,
+                ))
+        ItineraryStop.objects.bulk_create(new_stops)
+
+    itinerary = Itinerary.objects.prefetch_related('stops').get(id=itinerary.id)
+    return JsonResponse({
+        'ok': True,
+        'message': 'Đã lưu',
+        'itinerary': serialize_editable_itinerary(itinerary),
+    })
 
 
 @login_required

@@ -1,0 +1,295 @@
+{% if editable_itinerary %}
+<section class="itinerary-editor panel mb-4" data-itinerary-editor data-itinerary-id="{{ editable_itinerary.id }}">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <p class="text-primary fw-semibold mb-1">Tạo lịch trình du lịch</p>
+            <h2 class="h5 mb-0">{{ editable_itinerary.title }}</h2>
+        </div>
+        <span class="small text-muted" data-save-status>Đã lưu</span>
+    </div>
+
+    <div class="itinerary-editor-layout">
+        <aside class="itinerary-days">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Ngày</strong>
+                <button class="btn btn-sm btn-outline-primary" type="button" data-add-day>+</button>
+            </div>
+            <div class="itinerary-day-list" data-day-list></div>
+        </aside>
+
+        <main class="itinerary-activities">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h6 mb-0" data-active-day-title>Day 1</h3>
+                <button class="btn btn-sm btn-outline-danger" type="button" data-delete-day>Xóa ngày</button>
+            </div>
+            <div data-activity-list></div>
+            <div class="dropdown mt-3">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Thêm hoạt động
+                </button>
+                <ul class="dropdown-menu">
+                    <li><button class="dropdown-item" type="button" data-add-activity="attraction">🏛 Attraction</button></li>
+                    <li><button class="dropdown-item" type="button" data-add-activity="transport">🚗 Transport</button></li>
+                    <li><button class="dropdown-item" type="button" data-add-activity="accommodation">🏨 Accommodation</button></li>
+                    <li><button class="dropdown-item" type="button" data-add-activity="food">🍜 Food</button></li>
+                </ul>
+            </div>
+        </main>
+    </div>
+</section>
+
+<style>
+.itinerary-editor-layout {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 180px minmax(0, 1fr);
+}
+.itinerary-days {
+    border-right: 1px solid #edf0ef;
+    padding-right: 14px;
+}
+.itinerary-day-button {
+    align-items: center;
+    border: 1px solid #edf0ef;
+    border-radius: 8px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 10px;
+    width: 100%;
+}
+.itinerary-day-button.active {
+    border-color: #13795b;
+    color: #13795b;
+    font-weight: 700;
+}
+.activity-card {
+    border: 1px solid #edf0ef;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 12px;
+}
+.activity-card.dragging {
+    opacity: .55;
+}
+.activity-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 36px 48px 120px minmax(0, 1fr) 160px 36px;
+}
+.drag-handle {
+    cursor: grab;
+    text-align: center;
+}
+.activity-card textarea {
+    min-height: 42px;
+    resize: none;
+}
+@media (max-width: 768px) {
+    .itinerary-editor-layout {
+        grid-template-columns: 1fr;
+    }
+    .itinerary-days {
+        border-right: 0;
+        border-bottom: 1px solid #edf0ef;
+        padding-bottom: 12px;
+        padding-right: 0;
+    }
+    .activity-grid {
+        grid-template-columns: 32px 42px 1fr;
+    }
+    .activity-grid .activity-title,
+    .activity-grid .activity-description,
+    .activity-grid .activity-cost,
+    .activity-grid .activity-delete {
+        grid-column: 3;
+    }
+}
+</style>
+
+{{ editable_itinerary_payload|json_script:"editable-itinerary-payload" }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-itinerary-editor]').forEach(function(editor) {
+        const state = JSON.parse(document.getElementById('editable-itinerary-payload').textContent);
+        const itineraryId = editor.dataset.itineraryId;
+        const dayList = editor.querySelector('[data-day-list]');
+        const activityList = editor.querySelector('[data-activity-list]');
+        const activeDayTitle = editor.querySelector('[data-active-day-title]');
+        const saveStatus = editor.querySelector('[data-save-status]');
+        let activeDayIndex = 0;
+        let saveTimer = null;
+        let draggedIndex = null;
+
+        const icons = {
+            attraction: '🏛',
+            transport: '🚗',
+            accommodation: '🏨',
+            food: '🍜'
+        };
+
+        function csrfToken() {
+            const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
+            return match ? decodeURIComponent(match[1]) : '';
+        }
+
+        function render() {
+            dayList.innerHTML = '';
+            state.days.forEach(function(day, index) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `itinerary-day-button ${index === activeDayIndex ? 'active' : ''}`;
+                button.innerHTML = `<span>Day ${index + 1}</span><span class="text-muted small">${day.activities.length}</span>`;
+                button.addEventListener('click', function() {
+                    activeDayIndex = index;
+                    render();
+                });
+                dayList.appendChild(button);
+            });
+
+            const day = state.days[activeDayIndex];
+            activeDayTitle.textContent = `Day ${activeDayIndex + 1}`;
+            activityList.innerHTML = '';
+            day.activities.forEach(function(activity, index) {
+                activityList.appendChild(renderActivity(activity, index));
+            });
+        }
+
+        function renderActivity(activity, index) {
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            card.draggable = true;
+            card.dataset.index = index;
+            card.innerHTML = `
+                <div class="activity-grid align-items-start">
+                    <div class="drag-handle" title="Kéo để sắp xếp">☰</div>
+                    <div class="fs-4">${icons[activity.type] || icons.attraction}</div>
+                    <input class="form-control form-control-sm" type="time" value="${activity.time_start || ''}" data-field="time_start">
+                    <input class="form-control form-control-sm activity-title" type="text" value="${escapeHtml(activity.title || '')}" placeholder="Tên hoạt động" data-field="title">
+                    <input class="form-control form-control-sm activity-cost" type="number" min="0" step="10000" value="${activity.estimated_cost || 0}" data-field="estimated_cost">
+                    <button class="btn btn-sm btn-outline-danger activity-delete" type="button" title="Xóa">×</button>
+                    <div></div>
+                    <div></div>
+                    <textarea class="form-control form-control-sm activity-description" placeholder="Mô tả" data-field="description">${escapeHtml(activity.description || '')}</textarea>
+                    <div class="small text-muted activity-cost">${formatVnd(activity.estimated_cost || 0)}</div>
+                    <div></div>
+                </div>
+            `;
+            card.querySelectorAll('[data-field]').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    activity[input.dataset.field] = input.dataset.field === 'estimated_cost'
+                        ? Number(input.value || 0)
+                        : input.value;
+                    if (input.tagName === 'TEXTAREA') autosize(input);
+                    scheduleSave();
+                });
+                if (input.tagName === 'TEXTAREA') autosize(input);
+            });
+            card.querySelector('.activity-delete').addEventListener('click', function() {
+                state.days[activeDayIndex].activities.splice(index, 1);
+                render();
+                scheduleSave();
+            });
+            card.addEventListener('dragstart', function() {
+                draggedIndex = index;
+                card.classList.add('dragging');
+            });
+            card.addEventListener('dragend', function() {
+                draggedIndex = null;
+                card.classList.remove('dragging');
+            });
+            card.addEventListener('dragover', function(event) {
+                event.preventDefault();
+            });
+            card.addEventListener('drop', function(event) {
+                event.preventDefault();
+                if (draggedIndex === null || draggedIndex === index) return;
+                const activities = state.days[activeDayIndex].activities;
+                const moved = activities.splice(draggedIndex, 1)[0];
+                activities.splice(index, 0, moved);
+                render();
+                scheduleSave();
+            });
+            return card;
+        }
+
+        function scheduleSave() {
+            saveStatus.textContent = 'Đang lưu...';
+            window.clearTimeout(saveTimer);
+            saveTimer = window.setTimeout(save, 1000);
+        }
+
+        function save() {
+            fetch(`/api/itineraries/${itineraryId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({days: state.days})
+            })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('save failed');
+                    return response.json();
+                })
+                .then(function(data) {
+                    state.days = data.itinerary.days;
+                    saveStatus.textContent = 'Đã lưu';
+                    render();
+                })
+                .catch(function() {
+                    saveStatus.textContent = 'Lỗi lưu';
+                });
+        }
+
+        function autosize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+
+        function formatVnd(value) {
+            return `${Number(value || 0).toLocaleString('vi-VN')} VND`;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, function(char) {
+                return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[char];
+            });
+        }
+
+        editor.querySelector('[data-add-day]').addEventListener('click', function() {
+            state.days.push({day: state.days.length + 1, activities: []});
+            activeDayIndex = state.days.length - 1;
+            render();
+            scheduleSave();
+        });
+
+        editor.querySelector('[data-delete-day]').addEventListener('click', function() {
+            if (state.days.length === 1) return;
+            state.days.splice(activeDayIndex, 1);
+            activeDayIndex = Math.max(0, activeDayIndex - 1);
+            render();
+            scheduleSave();
+        });
+
+        editor.querySelectorAll('[data-add-activity]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                state.days[activeDayIndex].activities.push({
+                    type: button.dataset.addActivity,
+                    time_start: '',
+                    title: 'Hoạt động mới',
+                    description: '',
+                    estimated_cost: 0
+                });
+                render();
+                scheduleSave();
+            });
+        });
+
+        render();
+    });
+});
+</script>
+{% endif %}
