@@ -48,6 +48,107 @@ def serialize_editable_itinerary(itinerary):
     }
 
 
+def default_activity_suggestions(city_name):
+    city_key = normalize_location(city_name)
+    city_data = {
+        'da nang': [
+            ('attraction', 'Cầu Rồng', 'Check-in biểu tượng Đà Nẵng, đẹp nhất vào buổi tối cuối tuần khi cầu phun lửa/phun nước.', 0),
+            ('attraction', 'Bãi biển Mỹ Khê', 'Tắm biển, đi bộ bờ cát và chụp ảnh bình minh.', 50000),
+            ('attraction', 'Ngũ Hành Sơn', 'Tham quan hang động, chùa cổ và làng đá Non Nước.', 150000),
+            ('attraction', 'Bán đảo Sơn Trà - chùa Linh Ứng', 'Ngắm biển từ bán đảo Sơn Trà và thăm tượng Quan Âm lớn.', 180000),
+            ('attraction', 'Bà Nà Hills - Cầu Vàng', 'Đi cáp treo, chụp ảnh Cầu Vàng và khu làng Pháp.', 950000),
+            ('attraction', 'Cầu Thuận Phước ngắm hoàng hôn', 'Điểm ngắm hoàng hôn và skyline thành phố ven vịnh.', 50000),
+            ('transport', 'Grab/taxi nội thành Đà Nẵng', 'Di chuyển giữa khách sạn, biển Mỹ Khê, Cầu Rồng và chợ đêm.', 180000),
+            ('transport', 'Thuê xe máy Đà Nẵng 1 ngày', 'Phù hợp lịch trình Sơn Trà, biển và ăn uống tự do.', 150000),
+            ('transport', 'Xe đưa đón sân bay Đà Nẵng', 'Đón/tiễn sân bay về khách sạn khu trung tâm hoặc Mỹ Khê.', 250000),
+            ('accommodation', 'Khách sạn trung tâm gần sông Hàn', 'Ở khu Hải Châu để tiện đi Cầu Rồng, chợ Hàn và ăn uống.', 650000),
+            ('accommodation', 'Homestay An Thượng/Mỹ Khê', 'Lựa chọn trẻ trung gần biển, tiện cafe và nightlife.', 450000),
+            ('accommodation', 'Resort ven biển Sơn Trà - Ngũ Hành Sơn', 'Nghỉ dưỡng cao cấp, hợp lịch trình thư giãn.', 1500000),
+            ('food', 'Mì Quảng Đà Nẵng', 'Ăn mì Quảng đặc sản với gà, tôm thịt hoặc ếch.', 70000),
+            ('food', 'Bánh tráng cuốn thịt heo', 'Món đặc sản dễ ăn cho nhóm, kèm rau sống và mắm nêm.', 120000),
+            ('food', 'Hải sản Mỹ Khê/Võ Nguyên Giáp', 'Ăn tối hải sản ven biển, phù hợp nhóm bạn.', 300000),
+            ('food', 'Cafe Sơn Trà hoặc An Thượng', 'Cafe/chill buổi chiều sau khi đi biển hoặc Sơn Trà.', 90000),
+            ('food', 'Chợ đêm Sơn Trà', 'Ăn vặt, hải sản và mua quà lưu niệm gần Cầu Rồng.', 180000),
+        ],
+        'ha noi': [
+            ('attraction', 'Hồ Hoàn Kiếm - đền Ngọc Sơn', 'Check-in trung tâm phố cổ, đi bộ quanh hồ và thăm đền Ngọc Sơn.', 80000),
+            ('attraction', 'Văn Miếu - Quốc Tử Giám', 'Di tích văn hóa nổi bật, phù hợp chụp ảnh và tìm hiểu lịch sử.', 100000),
+            ('attraction', 'Hoàng thành Thăng Long', 'Di sản lịch sử lớn của Hà Nội, nên đi buổi sáng hoặc đầu chiều.', 120000),
+            ('attraction', 'Hồ Tây ngắm hoàng hôn', 'Điểm chill cuối ngày, kết hợp chùa Trấn Quốc và cafe ven hồ.', 80000),
+            ('attraction', 'Bảo tàng Dân tộc học Việt Nam', 'Bảo tàng dễ đi, nhiều không gian ngoài trời và nhà truyền thống.', 120000),
+            ('transport', 'Grab/taxi phố cổ - Hồ Tây', 'Di chuyển giữa phố cổ, Hồ Tây, Văn Miếu và khu Ba Đình.', 180000),
+            ('transport', 'Thuê xe máy Hà Nội 1 ngày', 'Phù hợp đi Hồ Tây, bảo tàng và các điểm ngoài phố cổ.', 150000),
+            ('transport', 'Xe đưa đón sân bay Nội Bài', 'Đón/tiễn sân bay Nội Bài về khu phố cổ hoặc Tây Hồ.', 350000),
+            ('accommodation', 'Khách sạn phố cổ Hà Nội', 'Ở Hoàn Kiếm để tiện ăn uống, đi bộ và tham quan trung tâm.', 700000),
+            ('accommodation', 'Homestay Tây Hồ', 'Không gian trẻ trung, nhiều cafe và quán ăn quốc tế.', 500000),
+            ('accommodation', 'Boutique hotel khu Tràng Tiền', 'Lưu trú cao cấp hơn, tiện Nhà hát Lớn và Hồ Gươm.', 1200000),
+            ('food', 'Phở bò Hà Nội', 'Bữa sáng kinh điển, nên thử ở khu phố cổ hoặc Hoàn Kiếm.', 70000),
+            ('food', 'Bún chả Hà Nội', 'Bữa trưa đặc sản với thịt nướng, nước chấm và rau sống.', 90000),
+            ('food', 'Cafe trứng phố cổ', 'Cafe/chill buổi chiều, hợp nghỉ chân giữa lịch trình.', 80000),
+            ('food', 'Ẩm thực Tạ Hiện/phố cổ', 'Ăn tối, ăn vặt và cảm nhận không khí phố đêm.', 180000),
+        ],
+    }
+    raw_items = city_data.get(city_key) or city_data.get('da nang')
+    return [
+        {
+            'type': activity_type,
+            'title': title,
+            'description': description,
+            'estimated_cost': cost,
+        }
+        for activity_type, title, description, cost in raw_items
+    ]
+
+
+def infer_activity_type(title):
+    title_key = normalize_location(title)
+    if any(keyword in title_key for keyword in ['pho', 'bun', 'mi quang', 'hai san', 'am thuc', 'cho dem', 'cafe', 'an toi', 'mon']):
+        return 'food'
+    if any(keyword in title_key for keyword in ['khach san', 'homestay', 'resort', 'check-in khach san']):
+        return 'accommodation'
+    if any(keyword in title_key for keyword in ['grab', 'taxi', 'xe', 'san bay', 'thue']):
+        return 'transport'
+    return 'attraction'
+
+
+def default_time_for_activity(activity_type, day_number, sequence):
+    if activity_type == 'transport':
+        return '08:00' if sequence == 1 else '13:30'
+    if activity_type == 'food':
+        return '12:00' if sequence <= 4 else '19:00'
+    if activity_type == 'accommodation':
+        return '15:00' if day_number == 1 else '21:00'
+    return '09:00' if sequence <= 2 else '16:30'
+
+
+def session_for_time(time_value):
+    if not time_value:
+        return 'morning'
+    hour = int(time_value.split(':', 1)[0])
+    if hour < 12:
+        return 'morning'
+    if hour < 18:
+        return 'afternoon'
+    return 'evening'
+
+
+def option_to_stop(editable_itinerary, option, day_number, order, time_value):
+    return ItineraryStop(
+        itinerary=editable_itinerary,
+        day_number=day_number,
+        activity_type=option['type'],
+        session=session_for_time(time_value),
+        start_time=parse_time(time_value),
+        place_name=option['title'],
+        description=option['description'],
+        duration_hours=Decimal('1.0'),
+        estimated_cost=Decimal(str(option['estimated_cost'])),
+        currency='VND',
+        cost_note='Gợi ý theo plan',
+        order=order,
+    )
+
+
 class HomeView(TemplateView):
     """Home page with hotel search functionality"""
     template_name = 'hotels/home.html'
@@ -335,6 +436,7 @@ class ItineraryBuilderAPIView(TemplateView):
         ]
         editable_payload = None
         replacement_options = []
+        suggestion_options = default_activity_suggestions(itinerary.city.name)
         if request.user.is_authenticated:
             editable_itinerary, _ = Itinerary.objects.update_or_create(
                 created_by=request.user,
@@ -348,11 +450,11 @@ class ItineraryBuilderAPIView(TemplateView):
                 },
             )
             editable_itinerary.stops.all().delete()
-            ItineraryStop.objects.bulk_create([
+            new_stops = [
                 ItineraryStop(
                     itinerary=editable_itinerary,
                     day_number=stop.day_number,
-                    activity_type=stop.activity_type,
+                    activity_type=infer_activity_type(stop.place_name),
                     session=stop.session,
                     start_time=stop.start_time,
                     place_name=stop.place_name,
@@ -368,7 +470,26 @@ class ItineraryBuilderAPIView(TemplateView):
                     order=stop.order,
                 )
                 for stop in stops
-            ])
+            ]
+            suggestion_by_type = {}
+            for option in suggestion_options:
+                suggestion_by_type.setdefault(option['type'], []).append(option)
+            new_stops = []
+            plan_slots = [
+                ('transport', 1), ('attraction', 0), ('food', 0),
+                ('transport', 2), ('accommodation', 1), ('attraction', 1), ('food', 1),
+            ]
+            for day_number in range(1, days + 1):
+                for order, (activity_type, option_index) in enumerate(plan_slots, start=1):
+                    if activity_type == 'accommodation' and day_number != 1:
+                        continue
+                    options = suggestion_by_type.get(activity_type) or []
+                    if not options:
+                        continue
+                    option = options[(option_index + day_number - 1) % len(options)]
+                    time_value = default_time_for_activity(activity_type, day_number, order)
+                    new_stops.append(option_to_stop(editable_itinerary, option, day_number, order, time_value))
+            ItineraryStop.objects.bulk_create(new_stops)
             editable_itinerary = Itinerary.objects.prefetch_related('stops').get(id=editable_itinerary.id)
             editable_payload = serialize_editable_itinerary(editable_itinerary)
             replacement_options = [
@@ -426,6 +547,7 @@ class ItineraryBuilderAPIView(TemplateView):
             'daily_plan': daily_plan,
             'editable_itinerary': editable_payload,
             'replacement_options': replacement_options,
+            'suggestion_options': suggestion_options,
         })
 
 

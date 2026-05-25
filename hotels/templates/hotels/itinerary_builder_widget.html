@@ -37,74 +37,20 @@
 </section>
 
 <style>
-.trip-builder-editor {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: 180px minmax(0, 1fr);
-}
-.trip-builder-days {
-    border-right: 1px solid #edf0ef;
-    padding-right: 14px;
-}
-.trip-builder-day-btn {
-    align-items: center;
-    background: #fff;
-    border: 1px solid #edf0ef;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    padding: 10px;
-    width: 100%;
-}
-.trip-builder-day-btn.active {
-    border-color: #13795b;
-    color: #13795b;
-    font-weight: 700;
-}
-.trip-activity-card {
-    border: 1px solid #edf0ef;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    padding: 12px;
-}
-.trip-activity-card.dragging {
-    opacity: .55;
-}
-.trip-activity-grid {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: 36px 48px 120px minmax(0, 1fr) 160px 92px 36px;
-}
-.trip-drag-handle {
-    cursor: grab;
-    text-align: center;
-}
-.trip-activity-card textarea {
-    min-height: 42px;
-    resize: none;
-}
+.trip-builder-editor { display: grid; gap: 16px; grid-template-columns: 180px minmax(0, 1fr); }
+.trip-builder-days { border-right: 1px solid #edf0ef; padding-right: 14px; }
+.trip-builder-day-btn { align-items: center; background: #fff; border: 1px solid #edf0ef; border-radius: 8px; display: flex; justify-content: space-between; margin-bottom: 8px; padding: 10px; width: 100%; }
+.trip-builder-day-btn.active { border-color: #13795b; color: #13795b; font-weight: 700; }
+.trip-activity-card { border: 1px solid #edf0ef; border-radius: 8px; margin-bottom: 12px; padding: 12px; }
+.trip-activity-card.dragging { opacity: .55; }
+.trip-activity-grid { display: grid; gap: 10px; grid-template-columns: 36px 48px 120px minmax(0, 1fr) 160px 92px 36px; }
+.trip-drag-handle { cursor: grab; text-align: center; }
+.trip-activity-card textarea { min-height: 42px; resize: none; }
 @media (max-width: 768px) {
-    .trip-builder-editor {
-        grid-template-columns: 1fr;
-    }
-    .trip-builder-days {
-        border-bottom: 1px solid #edf0ef;
-        border-right: 0;
-        padding-bottom: 12px;
-        padding-right: 0;
-    }
-    .trip-activity-grid {
-        grid-template-columns: 32px 42px 1fr;
-    }
-    .trip-activity-grid .activity-title,
-    .trip-activity-grid .activity-description,
-    .trip-activity-grid .activity-cost,
-    .trip-activity-grid .activity-replace,
-    .trip-activity-grid .activity-delete,
-    .trip-activity-grid .cost-preview {
-        grid-column: 3;
-    }
+    .trip-builder-editor { grid-template-columns: 1fr; }
+    .trip-builder-days { border-bottom: 1px solid #edf0ef; border-right: 0; padding-bottom: 12px; padding-right: 0; }
+    .trip-activity-grid { grid-template-columns: 32px 42px 1fr; }
+    .activity-title, .activity-description, .activity-cost, .activity-replace, .activity-delete, .cost-preview { grid-column: 3; }
 }
 </style>
 
@@ -116,12 +62,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const saveStatus = widget.querySelector('[data-save-status]');
         const endpoint = "{% url 'hotels:itinerary_builder_api' %}";
         const icons = {attraction: '🏛', transport: '🚗', accommodation: '🏨', food: '🍜'};
+        const typeLabels = {attraction: 'Attraction', transport: 'Transport', accommodation: 'Accommodation', food: 'Food'};
+        const typeOrder = ['attraction', 'transport', 'accommodation', 'food'];
         let state = null;
         let itineraryId = null;
         let activeDayIndex = 0;
         let draggedIndex = null;
         let saveTimer = null;
         let replacementOptions = [];
+        let suggestionOptions = [];
         let travelers = 1;
         let requestedBudget = 0;
 
@@ -147,6 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     state = plan.editable_itinerary;
                     replacementOptions = plan.replacement_options || [];
+                    suggestionOptions = plan.suggestion_options || [];
                     travelers = Number(plan.travelers || 1);
                     requestedBudget = Number(plan.requested_budget || 0);
                     itineraryId = state.id;
@@ -161,9 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         function renderEditor(plan) {
-            const budget = plan.requested_budget
-                ? ` / Ngân sách nhóm: ${Number(plan.requested_budget).toLocaleString('vi-VN')} VND`
-                : '';
+            const budget = plan.requested_budget ? ` / Ngân sách nhóm: ${Number(plan.requested_budget).toLocaleString('vi-VN')} VND` : '';
             result.innerHTML = `
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                     <div>
@@ -190,11 +138,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="dropdown mt-3">
                             <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">Thêm hoạt động</button>
                             <ul class="dropdown-menu">
-                                <li><button class="dropdown-item" type="button" data-add-activity="attraction">🏛 Attraction</button></li>
-                                <li><button class="dropdown-item" type="button" data-add-activity="transport">🚗 Transport</button></li>
-                                <li><button class="dropdown-item" type="button" data-add-activity="accommodation">🏨 Accommodation</button></li>
-                                <li><button class="dropdown-item" type="button" data-add-activity="food">🍜 Food</button></li>
+                                <li><button class="dropdown-item" type="button" data-open-add-type="attraction">🏛 Attraction</button></li>
+                                <li><button class="dropdown-item" type="button" data-open-add-type="transport">🚗 Transport</button></li>
+                                <li><button class="dropdown-item" type="button" data-open-add-type="accommodation">🏨 Accommodation</button></li>
+                                <li><button class="dropdown-item" type="button" data-open-add-type="food">🍜 Food</button></li>
                             </ul>
+                        </div>
+                        <div class="mt-3 d-none" data-specific-options-wrap>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong data-specific-options-title>Chọn hoạt động</strong>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-close-specific-options>Đóng</button>
+                            </div>
+                            <div class="row g-2" data-specific-options></div>
                         </div>
                     </main>
                 </div>
@@ -218,19 +173,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderDaysAndActivities();
                 scheduleSave();
             });
-            result.querySelectorAll('[data-add-activity]').forEach(function(button) {
+            result.querySelectorAll('[data-open-add-type]').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    state.days[activeDayIndex].activities.push({
-                        type: button.dataset.addActivity,
-                        time_start: '',
-                        title: 'Hoạt động mới',
-                        description: '',
-                        estimated_cost: 0
-                    });
-                    renderDaysAndActivities();
-                    scheduleSave();
+                    renderSpecificOptions(button.dataset.openAddType);
                 });
             });
+            result.querySelector('[data-close-specific-options]').addEventListener('click', function() {
+                result.querySelector('[data-specific-options-wrap]').classList.add('d-none');
+            });
+        }
+
+        function renderSpecificOptions(type) {
+            const wrap = result.querySelector('[data-specific-options-wrap]');
+            const title = result.querySelector('[data-specific-options-title]');
+            const list = result.querySelector('[data-specific-options]');
+            title.textContent = `${icons[type]} ${typeLabels[type]}`;
+            list.innerHTML = '';
+            suggestionOptions.filter(option => option.type === type).forEach(function(option) {
+                const col = document.createElement('div');
+                col.className = 'col-md-6';
+                col.innerHTML = `
+                    <button class="btn btn-outline-secondary text-start w-100 h-100" type="button">
+                        <span class="fw-semibold">${escapeHtml(option.title)}</span>
+                        <span class="d-block small text-muted">${escapeHtml(option.description)}</span>
+                        <span class="d-block small">${formatVnd(option.estimated_cost)}</span>
+                    </button>
+                `;
+                col.querySelector('button').addEventListener('click', function() {
+                        state.days[activeDayIndex].activities.push(activityFromOption(option));
+                        renderDaysAndActivities();
+                        wrap.classList.add('d-none');
+                        scheduleSave();
+                    });
+                list.appendChild(col);
+            });
+            wrap.classList.remove('d-none');
         }
 
         function renderDaysAndActivities() {
@@ -297,17 +274,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderDaysAndActivities();
                 scheduleSave();
             });
-            card.addEventListener('dragstart', function() {
-                draggedIndex = index;
-                card.classList.add('dragging');
-            });
-            card.addEventListener('dragend', function() {
-                draggedIndex = null;
-                card.classList.remove('dragging');
-            });
-            card.addEventListener('dragover', function(event) {
-                event.preventDefault();
-            });
+            card.addEventListener('dragstart', function() { draggedIndex = index; card.classList.add('dragging'); });
+            card.addEventListener('dragend', function() { draggedIndex = null; card.classList.remove('dragging'); });
+            card.addEventListener('dragover', function(event) { event.preventDefault(); });
             card.addEventListener('drop', function(event) {
                 event.preventDefault();
                 if (draggedIndex === null || draggedIndex === index) return;
@@ -322,27 +291,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function bindReplacementMenu(card, activity) {
             const replacementMenu = card.querySelector('.replacement-menu');
-            const dayOptions = replacementOptions.filter(function(option) {
-                return Number(option.day) === activeDayIndex + 1;
-            });
-            if (!dayOptions.length) {
+            const dayOptions = replacementOptions.filter(option => Number(option.day) === activeDayIndex + 1);
+            const options = dayOptions.concat(suggestionOptions);
+            if (!options.length) {
                 replacementMenu.innerHTML = '<li><span class="dropdown-item-text text-muted small">Không có lựa chọn</span></li>';
                 return;
             }
-            dayOptions.forEach(function(option) {
+            options.forEach(function(option, index) {
+                if (index === dayOptions.length && suggestionOptions.length) {
+                    const divider = document.createElement('li');
+                    divider.innerHTML = '<hr class="dropdown-divider"><h6 class="dropdown-header">Gợi ý thêm</h6>';
+                    replacementMenu.appendChild(divider);
+                }
                 const item = document.createElement('li');
                 item.innerHTML = `<button class="dropdown-item" type="button">${icons[option.type] || icons.attraction} ${escapeHtml(option.title)}<br><span class="small text-muted">${formatVnd(option.estimated_cost)}</span></button>`;
                 item.querySelector('button').addEventListener('click', function() {
-                    activity.type = option.type;
-                    activity.time_start = option.time_start;
-                    activity.title = option.title;
-                    activity.description = option.description;
-                    activity.estimated_cost = option.estimated_cost;
+                    Object.assign(activity, activityFromOption(option));
                     renderDaysAndActivities();
                     scheduleSave();
                 });
                 replacementMenu.appendChild(item);
             });
+        }
+
+        function activityFromOption(option) {
+            return {
+                type: option.type || 'attraction',
+                time_start: option.time_start || '',
+                title: option.title || 'Hoạt động mới',
+                description: option.description || '',
+                estimated_cost: Number(option.estimated_cost || 0)
+            };
         }
 
         function scheduleSave() {
@@ -354,11 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function save() {
             fetch(`/api/itineraries/${itineraryId}/`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken(),
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken(), 'X-Requested-With': 'XMLHttpRequest'},
                 body: JSON.stringify({days: state.days})
             })
                 .then(function(response) {
@@ -370,26 +345,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     setSaveStatus('Đã lưu', 'success');
                     renderDaysAndActivities();
                 })
-                .catch(function() {
-                    setSaveStatus('Lỗi lưu', 'danger');
-                });
+                .catch(function() { setSaveStatus('Lỗi lưu', 'danger'); });
         }
 
         function updateCostSummary() {
             if (!state) return;
-            const costPerPerson = state.days.reduce(function(total, day) {
-                return total + day.activities.reduce(function(dayTotal, activity) {
-                    return dayTotal + Number(activity.estimated_cost || 0);
-                }, 0);
-            }, 0);
+            const costPerPerson = state.days.reduce((total, day) => total + day.activities.reduce((dayTotal, activity) => dayTotal + Number(activity.estimated_cost || 0), 0), 0);
             const groupCost = costPerPerson * travelers;
             const summary = result.querySelector('[data-cost-summary]');
             const alertBox = result.querySelector('[data-budget-alert]');
             if (summary) {
-                summary.innerHTML = `
-                    <strong>${groupCost.toLocaleString('vi-VN')} VND</strong>
-                    <div class="small text-muted">${costPerPerson.toLocaleString('vi-VN')} VND/người</div>
-                `;
+                summary.innerHTML = `<strong>${groupCost.toLocaleString('vi-VN')} VND</strong><div class="small text-muted">${costPerPerson.toLocaleString('vi-VN')} VND/người</div>`;
             }
             if (!alertBox) return;
             if (requestedBudget && groupCost > requestedBudget) {
@@ -401,27 +367,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        function setSaveStatus(text, variant) {
-            saveStatus.textContent = text;
-            saveStatus.className = `badge text-bg-${variant}`;
-        }
-
-        function csrfToken() {
-            const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
-            return match ? decodeURIComponent(match[1]) : '';
-        }
-        function autosize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = `${textarea.scrollHeight}px`;
-        }
-        function formatVnd(value) {
-            return `${Number(value || 0).toLocaleString('vi-VN')} VND`;
-        }
-        function escapeHtml(value) {
-            return String(value).replace(/[&<>"']/g, function(char) {
-                return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[char];
-            });
-        }
+        function setSaveStatus(text, variant) { saveStatus.textContent = text; saveStatus.className = `badge text-bg-${variant}`; }
+        function csrfToken() { const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/); return match ? decodeURIComponent(match[1]) : ''; }
+        function autosize(textarea) { textarea.style.height = 'auto'; textarea.style.height = `${textarea.scrollHeight}px`; }
+        function formatVnd(value) { return `${Number(value || 0).toLocaleString('vi-VN')} VND`; }
+        function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[char])); }
     });
 });
 </script>
