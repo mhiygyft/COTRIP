@@ -8,14 +8,14 @@
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <h1 class="h3 mb-3">Ho so khach hang</h1>
-                    <p class="text-muted">Thong tin nay duoc gan voi booking va hien cho admin khi can ho tro don dat cho.</p>
+                    <h1 class="h3 mb-3">Hồ sơ khách hàng</h1>
+                    <p class="text-muted">Thông tin này được gắn với booking và hiển thị cho admin khi cần hỗ trợ đơn đặt chỗ.</p>
                     <form method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <div class="d-flex gap-2">
-                            <button class="btn btn-primary" type="submit">Luu thong tin</button>
-                            <a class="btn btn-outline-secondary" href="{% url 'customer_dashboard' %}">Quay lai dashboard</a>
+                            <button class="btn btn-primary" type="submit">Lưu thông tin</button>
+                            <a class="btn btn-outline-secondary" href="{% url 'customer_dashboard' %}">Quay lại dashboard</a>
                         </div>
                     </form>
                 </div>

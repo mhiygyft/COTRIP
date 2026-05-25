@@ -20,20 +20,20 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <p><strong>{{ package.base_price_per_person }} USD</strong> moi nguoi</p>
+        <p><strong>{{ package.base_price_per_person }} USD</strong> mỗi người</p>
         <p class="text-success">Con {{ package.max_participants }} suat moi dot khoi hanh</p>
         <form method="post" action="{% url 'packages:book' package.id %}" class="row g-3 border rounded p-3 mt-3">
             {% csrf_token %}
             <div class="col-md-4">
-                <label class="form-label" for="departure_date">Ngay khoi hanh</label>
+                <label class="form-label" for="departure_date">Ngày khởi hành</label>
                 <input class="form-control" id="departure_date" name="departure_date" type="date" value="{% now 'Y-m-d' %}">
             </div>
             <div class="col-md-2">
-                <label class="form-label" for="adults">Nguoi lon</label>
+                <label class="form-label" for="adults">Người lớn</label>
                 <input class="form-control" id="adults" name="adults" type="number" min="1" value="1">
             </div>
             <div class="col-md-2">
-                <label class="form-label" for="children">Tre em</label>
+                <label class="form-label" for="children">Trẻ em</label>
                 <input class="form-control" id="children" name="children" type="number" min="0" value="0">
             </div>
             <div class="col-md-2">
@@ -41,11 +41,11 @@
                 <input class="form-control" id="infants" name="infants" type="number" min="0" value="0">
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-primary w-100" type="submit">Dat tour</button>
+                <button class="btn btn-primary w-100" type="submit">Đặt tour</button>
             </div>
         </form>
     {% else %}
-        <h1 class="h3">Khong tim thay tour</h1>
+        <h1 class="h3">Không tìm thấy tour</h1>
     {% endif %}
 </div>
 {% endblock %}

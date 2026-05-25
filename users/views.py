@@ -1,3 +1,5 @@
+﻿import unicodedata
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
@@ -6,27 +8,35 @@ from django.urls import reverse
 from activities.models import ActivityBooking
 from bookings.models import Booking
 from flights.models import FlightSearch, SavedFlight
-from hotels.models import HotelReservation
+from hotels.models import HotelReservation, Itinerary
 from packages.models import PackageBooking
 
 from .forms import UserProfileForm
 
 
+def normalize_location(value):
+    value = (value or "").replace("Đ", "D").replace("đ", "d").lower()
+    return "".join(
+        char for char in unicodedata.normalize("NFD", value)
+        if unicodedata.category(char) != "Mn"
+    )
+
+
 def customer_status_label(status, payment_status):
     if payment_status == "pending":
-        return "Cho thanh toan"
+        return "Chờ thanh toán"
     if payment_status == "refund_pending":
-        return "Cho hoan tien"
+        return "Chờ hoàn tiền"
     if status == "pending" and payment_status in {"completed", "skipped"}:
-        return "Cho admin xac nhan"
+        return "Chờ admin xác nhận"
     if status == "cancelled":
-        return "Da bi huy"
+        return "Đã bị hủy"
     if status == "refunded":
-        return "Da hoan tien"
+        return "Đã hoàn tiền"
     if status == "confirmed":
-        return "Da xac nhan"
+        return "Đã xác nhận"
     if status == "completed":
-        return "Hoan tat"
+        return "Hoàn tất"
     return status
 
 
@@ -145,6 +155,24 @@ def dashboard(request):
         + sum(package_bookings.filter(payment_status="completed").values_list("total_price", flat=True))
         + sum(activity_bookings.filter(payment_status="completed").values_list("total_price", flat=True))
     )
+    itinerary_location = request.GET.get("itinerary_location", "").strip()
+    suggested_itineraries = Itinerary.objects.filter(is_active=True).select_related(
+        "city", "city__country"
+    ).prefetch_related("stops")
+    if itinerary_location:
+        location_key = normalize_location(itinerary_location)
+        suggested_itineraries = [
+            itinerary for itinerary in suggested_itineraries
+            if location_key in normalize_location(itinerary.city.name)
+            or location_key in normalize_location(itinerary.city.country.name)
+        ]
+    elif request.user.city:
+        user_city_key = normalize_location(request.user.city)
+        city_itineraries = [
+            itinerary for itinerary in suggested_itineraries
+            if user_city_key in normalize_location(itinerary.city.name)
+        ]
+        suggested_itineraries = city_itineraries or suggested_itineraries
 
     context = {
         "flight_bookings": flight_bookings,
@@ -161,6 +189,8 @@ def dashboard(request):
         "total_spent": total_spent,
         "saved_flights": SavedFlight.objects.filter(user=request.user).select_related("flight")[:5],
         "saved_searches": FlightSearch.objects.filter(user=request.user).order_by("-created_at")[:5],
+        "itinerary_location": itinerary_location,
+        "suggested_itineraries": suggested_itineraries[:4],
         "page_title": "Customer Dashboard",
     }
     return render(request, "users/dashboard.html", context)
@@ -178,3 +208,4 @@ def saved_flights(request):
         "page_title": "Saved Flights",
     }
     return render(request, "users/saved_flights.html", context)
+

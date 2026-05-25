@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Khach san tai {{ city.name }}, {{ city.country.name }} - Vietnam Travel{% endblock %}
+{% block title %}Khách sạn tại {{ city.name }}, {{ city.country.name }} - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <!-- City Header -->
@@ -11,7 +11,7 @@
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb text-white-50">
                         <li class="breadcrumb-item">
-                            <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a>
+                            <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Trang chủ</a>
                         </li>
                         <li class="breadcrumb-item">
                             <span class="text-white-50">{{ city.country.name }}</span>
@@ -20,7 +20,7 @@
                     </ol>
                 </nav>
                 
-                <h1 class="display-5 fw-bold">Khach san tai {{ city.name }}</h1>
+                <h1 class="display-5 fw-bold">Khách sạn tại {{ city.name }}</h1>
                 <p class="lead mb-0">{{ city.country.name }}</p>
                 <p class="mb-0">{{ hotels|length }} hotels available</p>
             </div>
@@ -47,22 +47,22 @@
         <form action="{% url 'hotels:search' %}" method="GET" class="row g-2 align-items-end">
             <input type="hidden" name="location" value="{{ city.name }}">
             <div class="col-md-3">
-                <label class="form-label small">Check-in</label>
+                <label class="form-label small">Nhận phòng</label>
                 <input type="date" class="form-control" name="checkin" required>
             </div>
             <div class="col-md-3">
-                <label class="form-label small">Check-out</label>
+                <label class="form-label small">Trả phòng</label>
                 <input type="date" class="form-control" name="checkout" required>
             </div>
             <div class="col-md-3">
-                <label class="form-label small">Guests</label>
+                <label class="form-label small">Khách</label>
                 <select class="form-select" name="guests" required>
-                    <option value="1">1 Guest</option>
-                    <option value="2" selected>2 Guests</option>
-                    <option value="3">3 Guests</option>
-                    <option value="4">4 Guests</option>
-                    <option value="5">5 Guests</option>
-                    <option value="6">6+ Guests</option>
+                    <option value="1">1 khách</option>
+                    <option value="2" selected>2 khách</option>
+                    <option value="3">3 khách</option>
+                    <option value="4">4 khách</option>
+                    <option value="5">5 khách</option>
+                    <option value="6">6+ khách</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -73,6 +73,8 @@
         </form>
     </div>
 </div>
+
+{% include "hotels/itinerary_section.html" with itineraries=itineraries %}
 
 <!-- Hotels Listing -->
 <div class="container my-5">
@@ -88,11 +90,11 @@
                             Sort by: Recommended
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Recommended</a></li>
-                            <li><a class="dropdown-item" href="#">Price: Low to High</a></li>
-                            <li><a class="dropdown-item" href="#">Price: High to Low</a></li>
-                            <li><a class="dropdown-item" href="#">Guest Rating</a></li>
-                            <li><a class="dropdown-item" href="#">Star Rating</a></li>
+                            <li><a class="dropdown-item" href="#">Gợi ý</a></li>
+                            <li><a class="dropdown-item" href="#">Giá: thấp đến cao</a></li>
+                            <li><a class="dropdown-item" href="#">Giá: cao đến thấp</a></li>
+                            <li><a class="dropdown-item" href="#">Đánh giá khách</a></li>
+                            <li><a class="dropdown-item" href="#">Hạng sao</a></li>
                         </ul>
                     </div>
                 </div>
@@ -120,7 +122,7 @@
                                     {% endfor %}
                                 </div>
                                 {% if hotel.is_featured %}
-                                    <span class="badge bg-warning text-dark">Featured</span>
+                                    <span class="badge bg-warning text-dark">Nổi bật</span>
                                 {% endif %}
                             </div>
                             
@@ -152,7 +154,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <span class="fw-bold text-primary">{{ hotel.average_rating }}/10</span>
-                                    <span class="text-muted small">({{ hotel.total_reviews }} reviews)</span>
+                                    <span class="text-muted small">({{ hotel.total_reviews }} đánh giá)</span>
                                 </div>
                             </div>
                         </div>
@@ -161,8 +163,8 @@
                             <!-- Price and Action -->
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="text-muted small">From</span>
-                                    <div class="fw-bold text-primary fs-5">${{ hotel.price_from }}<small>/night</small></div>
+                                    <span class="text-muted small">Từ</span>
+                                    <div class="fw-bold text-primary fs-5">${{ hotel.price_from }}<small>/đêm</small></div>
                                 </div>
                                 <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary btn-sm">
                                     View Details
@@ -175,7 +177,7 @@
                 <div class="col-12 text-center py-5">
                     <i class="bi bi-building fs-1 text-muted mb-3"></i>
                     <h4>No hotels found in {{ city.name }}</h4>
-                    <p class="text-muted">Try searching in nearby cities or check back later.</p>
+                    <p class="text-muted">Thử tìm ở các thành phố gần đó hoặc quay lại sau.</p>
                     <a href="{% url 'home' %}" class="btn btn-primary">
                         <i class="bi bi-arrow-left"></i> Back to Search
                     </a>

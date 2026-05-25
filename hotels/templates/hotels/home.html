@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Vietnam Travel - Dat khach san, chuyen bay va tour Viet Nam{% endblock %}
+{% block title %}Du lịch Việt Nam - Đặt khách sạn, chuyến bay và tour Việt Nam{% endblock %}
 
 {% block content %}
 <!-- Hero Section with Search -->
@@ -8,52 +8,52 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h1 class="display-4 fw-bold mb-3">Kham pha Viet Nam theo cach rieng cua ban</h1>
-                <p class="lead mb-5">Dat khach san, chuyen bay noi dia, tour tron goi va trai nghiem ban dia tren khap Viet Nam</p>
+                <h1 class="display-4 fw-bold mb-3">Khám phá Việt Nam theo cách riêng của bạn</h1>
+                <p class="lead mb-5">Đặt khách sạn, chuyến bay nội địa, tour trọn gói và trải nghiệm bản địa trên khắp Việt Nam</p>
                 
                 <!-- Hotel Search Form -->
                 <div class="search-form mx-auto" style="max-width: 700px;">
                     <form action="{% url 'hotels:search' %}" method="GET" class="row g-3">
                         <div class="col-md-6">
-                            <label for="location" class="form-label text-dark">Ban muon den dau?</label>
+                            <label for="location" class="form-label text-dark">Bạn muốn đến đâu?</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                                 <input type="text" class="form-control" id="location" name="location" 
-                                       placeholder="Da Nang, Ha Noi, Hoi An, Phu Quoc..." required>
+                                       placeholder="Đà Nẵng, Hà Nội, Hội An, Phú Quốc..." required>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label for="checkin" class="form-label text-dark">Nhan phong</label>
+                            <label for="checkin" class="form-label text-dark">Nhận phòng</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar"></i></span>
                                 <input type="date" class="form-control" id="checkin" name="checkin" required>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label for="checkout" class="form-label text-dark">Tra phong</label>
+                            <label for="checkout" class="form-label text-dark">Trả phòng</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar"></i></span>
                                 <input type="date" class="form-control" id="checkout" name="checkout" required>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="guests" class="form-label text-dark">Khach</label>
+                            <label for="guests" class="form-label text-dark">Khách</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-people"></i></span>
                                 <select class="form-select" id="guests" name="guests" required>
-                                    <option value="1">1 khach</option>
-                                    <option value="2" selected>2 khach</option>
-                                    <option value="3">3 khach</option>
-                                    <option value="4">4 khach</option>
-                                    <option value="5">5 khach</option>
-                                    <option value="6">6+ khach</option>
+                                    <option value="1">1 khách</option>
+                                    <option value="2" selected>2 khách</option>
+                                    <option value="3">3 khách</option>
+                                    <option value="4">4 khách</option>
+                                    <option value="5">5 khách</option>
+                                    <option value="6">6+ khách</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-dark">&nbsp;</label>
                             <button type="submit" class="btn btn-primary w-100 py-3">
-                                <i class="bi bi-search"></i> Tim khach san
+                                <i class="bi bi-search"></i> Tìm khách sạn
                             </button>
                         </div>
                     </form>
@@ -67,8 +67,8 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-12 text-center mb-5">
-            <h2>Diem den noi bat tai Viet Nam</h2>
-            <p class="text-muted">Tu pho co, vinh bien, mien nui den cac thanh pho nang dong</p>
+            <h2>Điểm đến nổi bật tại Việt Nam</h2>
+            <p class="text-muted">Từ phố cổ, vịnh biển, miền núi đến các thành phố năng động</p>
         </div>
     </div>
     
@@ -80,10 +80,10 @@
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ city.name }}</h5>
                     <p class="text-muted">{{ city.country.name }}</p>
-                    <p class="text-muted small">{{ city.hotel_count }} khach san kha dung</p>
+                    <p class="text-muted small">{{ city.hotel_count }} khách sạn khả dụng</p>
                     <a href="{% url 'hotels:city_hotels' city.country.code city.id %}" 
                        class="btn btn-outline-primary">
-                        Xem khach san
+                        Xem khách sạn
                     </a>
                 </div>
             </div>
@@ -91,10 +91,10 @@
         {% empty %}
         <div class="col-12 text-center">
             <div class="row g-3 text-start">
-                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Ha Noi</strong><p class="text-muted mb-0 small">Pho co, am thuc via he, di san van hoa.</p></div></div>
-                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Da Nang</strong><p class="text-muted mb-0 small">Bien My Khe, Ba Na Hills, Son Tra.</p></div></div>
-                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Hoi An</strong><p class="text-muted mb-0 small">Pho den long, nha co, lang nghe.</p></div></div>
-                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Phu Quoc</strong><p class="text-muted mb-0 small">Bai bien, resort, dao va san ho.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Hà Nội</strong><p class="text-muted mb-0 small">Phố cổ, ẩm thực vỉa hè, di sản văn hóa.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Đà Nẵng</strong><p class="text-muted mb-0 small">Biển Mỹ Khê, Bà Nà Hills, Sơn Trà.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Hội An</strong><p class="text-muted mb-0 small">Phố đèn lồng, nhà cổ, làng nghề.</p></div></div>
+                <div class="col-md-3 col-sm-6"><div class="p-3 border rounded h-100"><strong>Phú Quốc</strong><p class="text-muted mb-0 small">Bãi biển, resort, đảo và san hô.</p></div></div>
             </div>
         </div>
         {% endfor %}
@@ -106,8 +106,8 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center mb-5">
-                <h2>Khach san goi y</h2>
-                <p class="text-muted">Lua chon luu tru phu hop cho hanh trinh Viet Nam</p>
+                <h2>Khách sạn gợi ý</h2>
+                <p class="text-muted">Lựa chọn lưu trú phù hợp cho hành trình Việt Nam</p>
             </div>
         </div>
         
@@ -125,7 +125,7 @@
                                     <i class="bi bi-star-fill star-rating"></i>
                                 {% endfor %}
                             </div>
-                            <span class="badge bg-primary">Goi y</span>
+                            <span class="badge bg-primary">Gợi ý</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -148,18 +148,18 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <span class="fw-bold text-primary">{{ hotel.average_rating }}/10</span>
-                                <span class="text-muted small">({{ hotel.total_reviews }} reviews)</span>
+                                <span class="text-muted small">({{ hotel.total_reviews }} đánh giá)</span>
                             </div>
                         </div>
                         
                         <!-- Price -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="text-muted small">Tu</span>
-                                <div class="fw-bold text-primary fs-5">{{ hotel.price_from }} {{ hotel.currency }}<small>/dem</small></div>
+                                <span class="text-muted small">Từ</span>
+                                <div class="fw-bold text-primary fs-5">{{ hotel.price_from }} {{ hotel.currency }}<small>/đêm</small></div>
                             </div>
                             <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary">
-                                Xem chi tiet
+                                Xem chi tiết
                             </a>
                         </div>
                     </div>
@@ -167,7 +167,7 @@
             </div>
             {% empty %}
             <div class="col-12 text-center">
-                <p class="text-muted">Chua co khach san goi y. Hay thu tim Ha Noi, Da Nang, Hoi An hoac Phu Quoc.</p>
+                <p class="text-muted">Chưa có khách sạn gợi ý. Hãy thử tìm Hà Nội, Đà Nẵng, Hội An hoặc Phú Quốc.</p>
             </div>
             {% endfor %}
         </div>
@@ -178,8 +178,8 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-12 text-center mb-5">
-            <h2>Vi sao chon Vietnam Travel?</h2>
-            <p class="text-muted">Tap trung vao hanh trinh Viet Nam voi goi y thuc te va de dat</p>
+            <h2>Vì sao chọn Du lịch Việt Nam?</h2>
+            <p class="text-muted">Tập trung vào hành trình Việt Nam với gợi ý thực tế và dễ đặt</p>
         </div>
     </div>
     
@@ -188,29 +188,29 @@
             <div class="feature-icon mb-3">
                 <i class="bi bi-shield-check fs-1 text-primary"></i>
             </div>
-            <h5>Gia ro rang</h5>
-            <p class="text-muted">So sanh luu tru, chuyen bay va tour theo ngan sach cua ban.</p>
+            <h5>Giá rõ ràng</h5>
+            <p class="text-muted">So sánh lưu trú, chuyến bay và tour theo ngân sách của bạn.</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4 text-center">
             <div class="feature-icon mb-3">
                 <i class="bi bi-calendar-x fs-1 text-primary"></i>
             </div>
-            <h5>Linh hoat lich trinh</h5>
-            <p class="text-muted">De dang dieu chinh ke hoach khi thoi tiet hoac lich trinh thay doi.</p>
+            <h5>Linh hoạt lịch trình</h5>
+            <p class="text-muted">Dễ dàng điều chỉnh kế hoạch khi thời tiết hoặc lịch trình thay đổi.</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4 text-center">
             <div class="feature-icon mb-3">
                 <i class="bi bi-headset fs-1 text-primary"></i>
             </div>
-            <h5>Ho tro dia phuong</h5>
-            <p class="text-muted">Thong tin phu hop voi du lich noi dia va khach quoc te den Viet Nam.</p>
+            <h5>Hỗ trợ địa phương</h5>
+            <p class="text-muted">Thông tin phù hợp với du lịch nội địa và khách quốc tế đến Việt Nam.</p>
         </div>
         <div class="col-lg-3 col-md-6 mb-4 text-center">
             <div class="feature-icon mb-3">
                 <i class="bi bi-star-fill fs-1 text-primary"></i>
             </div>
-            <h5>Trai nghiem chon loc</h5>
-            <p class="text-muted">Uu tien diem den, am thuc va hoat dong mang ban sac Viet Nam.</p>
+            <h5>Trải nghiệm chọn lọc</h5>
+            <p class="text-muted">Ưu tiên điểm đến, ẩm thực và hoạt động mang bản sắc Việt Nam.</p>
         </div>
     </div>
 </div>

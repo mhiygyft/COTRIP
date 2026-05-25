@@ -7,15 +7,14 @@
 </head>
 <body>
     <main>
-        <h1>Saved Flights</h1>
+        <h1>Chuyến bay đã lưu</h1>
         <ul>
             {% for saved in saved_flights %}
                 <li>{{ saved.flight.flight_code }} - {{ saved.flight.origin }} to {{ saved.flight.destination }}</li>
             {% empty %}
-                <li>No saved flights yet.</li>
+                <li>Chưa lưu chuyến bay nào.</li>
             {% endfor %}
         </ul>
     </main>
 </body>
 </html>
-

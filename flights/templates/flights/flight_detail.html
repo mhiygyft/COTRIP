@@ -274,7 +274,7 @@
                                         <i class="far fa-star text-warning"></i>
                                     {% endif %}
                                 {% endfor %}
-                                <small class="text-muted ms-2">({{ flight.airline.total_reviews }} reviews)</small>
+                                <small class="text-muted ms-2">({{ flight.airline.total_reviews }} đánh giá)</small>
                             </div>
                         </div>
                     </div>
@@ -316,7 +316,7 @@
                             <div class="text-muted small">Stops</div>
                             <div class="fw-bold">
                                 {% if flight.stops == 0 %}
-                                    Direct
+                                    Bay thẳng
                                 {% elif flight.stops == 1 %}
                                     1 stop
                                 {% else %}
@@ -446,7 +446,7 @@
                         <div class="class-price">${{ flight.economy_price }}</div>
                         <div class="seats-available">{{ flight.economy_available }} seats left</div>
                         <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=economy">
-                            Dat ve Economy
+                            Đặt vé Economy
                         </a>
                     </div>
                     {% endif %}
@@ -457,7 +457,7 @@
                         <div class="class-price">${{ flight.premium_economy_price }}</div>
                         <div class="seats-available">{{ flight.premium_economy_available }} seats left</div>
                         <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=premium_economy">
-                            Dat ve Premium
+                            Đặt vé Premium
                         </a>
                     </div>
                     {% endif %}
@@ -468,7 +468,7 @@
                         <div class="class-price">${{ flight.business_price }}</div>
                         <div class="seats-available">{{ flight.business_available }} seats left</div>
                         <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=business">
-                            Dat ve Business
+                            Đặt vé Business
                         </a>
                     </div>
                     {% endif %}
@@ -479,7 +479,7 @@
                         <div class="class-price">${{ flight.first_class_price }}</div>
                         <div class="seats-available">{{ flight.first_class_available }} seats left</div>
                         <a class="btn btn-success btn-sm mt-3" href="{% url 'bookings:start_booking' flight.id %}?cabin_class=first_class">
-                            Dat ve First Class
+                            Đặt vé First Class
                         </a>
                     </div>
                     {% endif %}

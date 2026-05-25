@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Khach san tai {{ country.name }} - Vietnam Travel{% endblock %}
+{% block title %}Khách sạn tại {{ country.name }} - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <h1 class="h3 mb-4">Khach san tai {{ country.name }}</h1>
+    <h1 class="h3 mb-4">Khách sạn tại {{ country.name }}</h1>
     <div class="row g-3">
         {% for hotel in hotels %}
             <div class="col-md-6 col-lg-4">
@@ -16,12 +16,12 @@
                         <h2 class="h5">{{ hotel.name }}</h2>
                         <p class="text-muted">{{ hotel.city.name }}</p>
                         <p class="mb-2">{{ hotel.description|truncatewords:20 }}</p>
-                        <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary btn-sm">Xem khach san</a>
+                        <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary btn-sm">Xem khách sạn</a>
                     </div>
                 </div>
             </div>
         {% empty %}
-            <p class="text-muted">Chua co khach san cho khu vuc nay.</p>
+            <p class="text-muted">Chưa có khách sạn cho khu vực này.</p>
         {% endfor %}
     </div>
 </div>

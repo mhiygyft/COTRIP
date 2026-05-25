@@ -200,8 +200,8 @@
 {% block content %}
 <div class="payment-header">
     <div class="container">
-        <h1 class="h3 mb-1">Secure Payment</h1>
-        <p class="mb-0">Complete your booking for {{ flight.flight_code }}</p>
+        <h1 class="h3 mb-1">Thanh toán an toàn</h1>
+        <p class="mb-0">Hoàn tất đặt chỗ cho {{ flight.flight_code }}</p>
     </div>
 </div>
 
@@ -212,7 +212,7 @@
             <div class="step-number">
                 <i class="fas fa-check"></i>
             </div>
-            <span>Flight Selected</span>
+            <span>Đã chọn chuyến bay</span>
         </div>
         <div class="step-connector"></div>
         
@@ -220,19 +220,19 @@
             <div class="step-number">
                 <i class="fas fa-check"></i>
             </div>
-            <span>Passenger Details</span>
+            <span>Thông tin hành khách</span>
         </div>
         <div class="step-connector"></div>
         
         <div class="step active">
             <div class="step-number">3</div>
-            <span>Payment</span>
+            <span>Thanh toán</span>
         </div>
         <div class="step-connector"></div>
         
         <div class="step">
             <div class="step-number">4</div>
-            <span>Confirmation</span>
+            <span>Xác nhận</span>
         </div>
     </div>
 
@@ -244,7 +244,7 @@
                         {% csrf_token %}
                         
                         <h5 class="card-title mb-4">
-                            <i class="fas fa-credit-card me-2"></i>Payment Method
+                            <i class="fas fa-credit-card me-2"></i>Phương thức thanh toán
                         </h5>
                         
                         <!-- Payment Method Selection -->
@@ -255,8 +255,8 @@
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-credit-card me-3 fs-4"></i>
                                         <div>
-                                            <strong>The tin dung / ghi no</strong>
-                                            <div class="small text-muted">Visa, MasterCard, American Express - thong tin the khong bat buoc</div>
+                                            <strong>Thẻ tín dụng / ghi nợ</strong>
+                                            <div class="small text-muted">Visa, MasterCard, American Express - thông tin thẻ không bắt buộc</div>
                                         </div>
                                     </div>
                                 </label>
@@ -271,7 +271,7 @@
                                         <i class="fab fa-paypal me-3 fs-4 text-primary"></i>
                                         <div>
                                             <strong>PayPal</strong>
-                                            <div class="small text-muted">Thanh toan demo bang tai khoan PayPal</div>
+                                            <div class="small text-muted">Thanh toán demo bằng tài khoản PayPal</div>
                                         </div>
                                     </div>
                                 </label>
@@ -285,8 +285,8 @@
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-university me-3 fs-4"></i>
                                         <div>
-                                            <strong>Chuyen khoan ngan hang</strong>
-                                            <div class="small text-muted">Thanh toan demo bang chuyen khoan</div>
+                                            <strong>Chuyển khoản ngân hàng</strong>
+                                            <div class="small text-muted">Thanh toán demo bằng chuyển khoản</div>
                                         </div>
                                     </div>
                                 </label>
@@ -300,8 +300,8 @@
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-forward me-3 fs-4 text-warning"></i>
                                         <div>
-                                            <strong>Thanh toan demo / bo qua thanh toan</strong>
-                                            <div class="small text-muted">Danh cho kiem thu, khong can thanh toan that</div>
+                                            <strong>Thanh toán demo / bỏ qua thanh toán</strong>
+                                            <div class="small text-muted">Dành cho kiểm thử, không cần thanh toán thật</div>
                                         </div>
                                     </div>
                                 </label>
@@ -313,8 +313,8 @@
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-exclamation-triangle text-warning me-2"></i>
                                 <div>
-                                    <strong>Testing Mode</strong>
-                                    <p class="mb-0">You've selected to skip payment. This option is available for testing purposes while the payment system is being finalized. Your booking will be confirmed without actual payment.</p>
+                                    <strong>Chế độ kiểm thử</strong>
+                                    <p class="mb-0">Bạn đã chọn bỏ qua thanh toán thật. Tùy chọn này dùng cho chế độ demo; booking sẽ được hoàn tất mà không xử lý giao dịch thật.</p>
                                 </div>
                             </div>
                         </div>
@@ -325,11 +325,11 @@
 
                         <!-- Credit Card Fields (optional demo inputs) -->
                         <div class="card-fields" id="card-fields">
-                            <h6 class="mb-3">Card Information <span class="text-muted small">(optional demo)</span></h6>
+                            <h6 class="mb-3">Thông tin thẻ <span class="text-muted small">(demo, không bắt buộc)</span></h6>
 
                             <div class="row">
                                 <div class="col-12 mb-3">
-                                    <label for="{{ payment_form.card_number.id_for_label }}" class="form-label">Card Number</label>
+                                    <label for="{{ payment_form.card_number.id_for_label }}" class="form-label">Số thẻ</label>
                                     {{ payment_form.card_number }}
                                     {% if payment_form.card_number.errors %}
                                         <div class="text-danger small">{{ payment_form.card_number.errors }}</div>
@@ -337,7 +337,7 @@
                                 </div>
 
                                 <div class="col-12 mb-3">
-                                    <label for="{{ payment_form.card_name.id_for_label }}" class="form-label">Name on Card</label>
+                                    <label for="{{ payment_form.card_name.id_for_label }}" class="form-label">Tên trên thẻ</label>
                                     {{ payment_form.card_name }}
                                     {% if payment_form.card_name.errors %}
                                         <div class="text-danger small">{{ payment_form.card_name.errors }}</div>
@@ -345,7 +345,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Expiry Date</label>
+                                    <label class="form-label">Ngày hết hạn</label>
                                     <div class="row g-2">
                                         <div class="col-6">
                                             {{ payment_form.card_expiry_month }}
@@ -365,7 +365,7 @@
                                 </div>
                             </div>
 
-                            <h6 class="mb-3 mt-4">Billing Address <span class="text-muted small">(optional)</span></h6>
+                            <h6 class="mb-3 mt-4">Địa chỉ thanh toán <span class="text-muted small">(không bắt buộc)</span></h6>
                             <div class="row">
                                 <div class="col-12 mb-3">
                                     {{ payment_form.billing_address }}
@@ -386,7 +386,7 @@
                         <div class="form-check mt-4">
                             {{ payment_form.accept_terms }}
                             <label class="form-check-label" for="{{ payment_form.accept_terms.id_for_label }}">
-                                I accept the <a href="#" target="_blank">Terms and Conditions</a> and <a href="#" target="_blank">Privacy Policy</a>
+                                Tôi đồng ý với <a href="#" target="_blank">Điều khoản sử dụng</a> và <a href="#" target="_blank">Chính sách bảo mật</a>
                             </label>
                             {% if payment_form.accept_terms.errors %}
                                 <div class="text-danger small">{{ payment_form.accept_terms.errors }}</div>
@@ -395,12 +395,12 @@
                         
                         <!-- Submit Button -->
                         <button type="submit" class="complete-booking-btn mt-4" id="complete-booking-btn" disabled>
-                            <i class="fas fa-lock me-2"></i>Complete Booking
+                            <i class="fas fa-lock me-2"></i>Hoàn tất đặt chỗ
                         </button>
                         
                         <!-- Security Badges -->
                         <div class="security-badges">
-                            <i class="fas fa-shield-alt fs-5" title="Secure Payment"></i>
+                            <i class="fas fa-shield-alt fs-5" title="Thanh toán an toàn"></i>
                             <i class="fas fa-lock fs-5" title="SSL Encrypted"></i>
                             <i class="fas fa-award fs-5" title="PCI Compliant"></i>
                         </div>
@@ -440,7 +440,7 @@
                             {% if flight.stops > 0 %}
                                 <div class="small text-muted">{{ flight.stops }} stop{{ flight.stops|pluralize }}</div>
                             {% else %}
-                                <div class="small text-success">Direct</div>
+                                <div class="small text-success">Bay thẳng</div>
                             {% endif %}
                         </div>
                         <div class="col">
@@ -454,14 +454,14 @@
                         <i class="fas fa-calendar me-1"></i>{{ flight.departure_time|date:"F d, Y" }}
                     </div>
                     <div class="small text-muted">
-                        <i class="fas fa-chair me-1"></i>{{ cabin_class|capfirst }} Class
+                            <i class="fas fa-chair me-1"></i>Hạng {{ cabin_class|capfirst }}
                     </div>
                 </div>
                 
                 <!-- Passenger Information -->
                 <div class="mb-4">
                     <h6 class="fw-bold mb-3">
-                        <i class="fas fa-user me-2"></i>Passenger
+                        <i class="fas fa-user me-2"></i>Hành khách
                     </h6>
                     <div class="border rounded p-2">
                         <div class="fw-bold">
@@ -474,21 +474,21 @@
                 <!-- Price Breakdown -->
                 <div class="price-breakdown">
                     <h6 class="fw-bold mb-3">
-                        <i class="fas fa-receipt me-2"></i>Price Breakdown
+                        <i class="fas fa-receipt me-2"></i>Chi tiết giá
                     </h6>
                     
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Base fare (1 passenger)</span>
+                        <span>Giá vé cơ bản (1 hành khách)</span>
                         <span>${{ base_price }}</span>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Taxes & fees</span>
+                        <span>Thuế và phí</span>
                         <span>${{ taxes_and_fees }}</span>
                     </div>
                     
                     <div class="d-flex justify-content-between total-price">
-                        <span><strong>Total</strong></span>
+                        <span><strong>Tổng</strong></span>
                         <span><strong>${{ total_price }}</strong></span>
                     </div>
                 </div>
@@ -496,7 +496,7 @@
                 <div class="text-center mt-3">
                     <small class="text-muted">
                         <i class="fas fa-info-circle me-1"></i>
-                        Prices include all taxes and fees
+                        Giá đã bao gồm thuế và phí
                     </small>
                 </div>
             </div>
@@ -570,11 +570,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update button text based on payment method
         if (selectedPaymentMethod === 'skip') {
-            completeBookingBtn.innerHTML = '<i class="fas fa-forward me-2"></i>Complete Booking (Skip Payment)';
+            completeBookingBtn.innerHTML = '<i class="fas fa-forward me-2"></i>Hoàn tất đặt chỗ (bỏ qua thanh toán)';
         } else if (selectedPaymentMethod) {
-            completeBookingBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Complete Booking & Pay';
+            completeBookingBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Hoàn tất đặt chỗ và thanh toán';
         } else {
-            completeBookingBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Complete Booking';
+            completeBookingBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Hoàn tất đặt chỗ';
         }
     }
     
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Form submission handling
     document.getElementById('payment-form').addEventListener('submit', function(e) {
-        completeBookingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        completeBookingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
         completeBookingBtn.disabled = true;
     });
 });

@@ -7,15 +7,14 @@
 </head>
 <body>
     <main>
-        <h1>Payment History</h1>
+        <h1>Lịch sử thanh toán</h1>
         <ul>
             {% for transaction in transactions %}
                 <li>{{ transaction.amount }} {{ transaction.currency }} - {{ transaction.status }}</li>
             {% empty %}
-                <li>No payment transactions yet.</li>
+                <li>Chưa có giao dịch thanh toán.</li>
             {% endfor %}
         </ul>
     </main>
 </body>
 </html>
-

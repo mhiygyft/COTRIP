@@ -1,0 +1,46 @@
+<div class="itinerary-stop-card card border-0 shadow-sm overflow-hidden">
+    {% if stop.image_url %}
+    <img src="{{ stop.image_url }}" class="itinerary-stop-image" alt="{{ stop.place_name }}">
+    {% endif %}
+    <div class="card-body">
+        <div class="d-flex justify-content-between gap-2 mb-2">
+            <h5 class="h6 card-title mb-0">{{ stop.place_name }}</h5>
+            {% if stop.start_time %}
+                <span class="badge text-bg-primary">{{ stop.start_time|time:"H:i" }}</span>
+            {% endif %}
+        </div>
+        <p class="card-text small text-muted">{{ stop.description }}</p>
+        <div class="itinerary-stop-meta small mb-3">
+            <span><i class="bi bi-clock me-1"></i>{{ stop.duration_hours }} giờ</span>
+            <span><i class="bi bi-cash-coin me-1"></i>{{ stop.estimated_cost|floatformat:0 }} {{ stop.currency }}</span>
+            {% if stop.cost_note %}
+                <span class="text-muted">{{ stop.cost_note }}</span>
+            {% endif %}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            {% if stop.google_maps_url %}
+            <a href="{{ stop.google_maps_url }}" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener">
+                <i class="bi bi-geo-alt"></i> Google Maps
+            </a>
+            {% endif %}
+            <button type="button" class="btn btn-outline-primary btn-sm"
+                    data-add-itinerary-stop
+                    data-itinerary-id="{{ itinerary.id }}"
+                    data-itinerary-title="{{ itinerary.title }}"
+                    data-stop-id="{{ stop.id }}"
+                    data-day-number="{{ stop.day_number }}"
+                    data-session="{{ stop.get_session_display }}"
+                    data-place-name="{{ stop.place_name }}"
+                    data-description="{{ stop.description|truncatewords:24 }}"
+                    data-start-time="{% if stop.start_time %}{{ stop.start_time|time:'H:i' }}{% endif %}"
+                    data-duration-hours="{{ stop.duration_hours }}"
+                    data-estimated-cost="{{ stop.estimated_cost }}"
+                    data-currency="{{ stop.currency }}"
+                    data-cost-note="{{ stop.cost_note }}"
+                    data-image-url="{{ stop.image_url }}"
+                    data-google-maps-url="{{ stop.google_maps_url }}">
+                <i class="bi bi-plus-lg"></i> Thêm vào kế hoạch của tôi
+            </button>
+        </div>
+    </div>
+</div>

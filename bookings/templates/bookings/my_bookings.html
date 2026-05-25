@@ -70,8 +70,8 @@
 {% block content %}
 <div class="bookings-header">
     <div class="container">
-        <h1 class="h3 mb-1">My Bookings</h1>
-        <p class="mb-0">Manage your flight reservations</p>
+        <h1 class="h3 mb-1">Booking của tôi</h1>
+        <p class="mb-0">Quản lý các đặt chỗ chuyến bay của bạn</p>
     </div>
 </div>
 
@@ -159,8 +159,8 @@
     {% else %}
         <div class="no-bookings">
             <i class="fas fa-ticket-alt fa-4x mb-3"></i>
-            <h4>No bookings yet</h4>
-            <p class="text-muted mb-4">You haven't made any flight bookings yet. Start exploring flights to book your next adventure!</p>
+            <h4>Chưa có booking</h4>
+            <p class="text-muted mb-4">Bạn chưa đặt chuyến bay nào. Hãy bắt đầu tìm chuyến bay cho hành trình tiếp theo.</p>
             <a href="{% url 'flights:search' %}" class="btn btn-primary">
                 <i class="fas fa-search me-2"></i>Search Flights
             </a>

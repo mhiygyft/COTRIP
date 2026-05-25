@@ -7,10 +7,10 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <p class="mb-1 text-white-50">Chi tiet booking ve bay</p>
+                <p class="mb-1 text-white-50">Chi tiết booking vé bay</p>
                 <h1 class="h3 mb-0">{{ booking.booking_reference }}</h1>
             </div>
-            <a class="btn btn-light" href="{% url 'bookings:my_bookings' %}">Tat ca booking</a>
+            <a class="btn btn-light" href="{% url 'bookings:my_bookings' %}">Tất cả booking</a>
         </div>
     </div>
 </div>
@@ -46,14 +46,14 @@
                 </div>
 
                 <div class="row g-3 mt-4">
-                    <div class="col-md-4"><span class="label">Ngay bay</span><strong>{{ booking.flight.departure_time|date:"d/m/Y" }}</strong></div>
-                    <div class="col-md-4"><span class="label">Hang ghe</span><strong>{{ booking.get_cabin_class_display }}</strong></div>
-                    <div class="col-md-4"><span class="label">Thanh toan</span><strong>{{ booking.payment_status }}</strong></div>
+                    <div class="col-md-4"><span class="label">Ngày bay</span><strong>{{ booking.flight.departure_time|date:"d/m/Y" }}</strong></div>
+                    <div class="col-md-4"><span class="label">Hạng ghế</span><strong>{{ booking.get_cabin_class_display }}</strong></div>
+                    <div class="col-md-4"><span class="label">Thanh toán</span><strong>{{ booking.payment_status }}</strong></div>
                 </div>
             </div>
 
             <div class="panel">
-                <h2 class="h5 mb-3">Hanh khach</h2>
+                <h2 class="h5 mb-3">Hành khách</h2>
                 {% for passenger in passengers %}
                     <div class="passenger-row">
                         <div>
@@ -65,32 +65,32 @@
                         <span class="badge text-bg-light">{{ passenger.get_passenger_type_display }}</span>
                     </div>
                 {% empty %}
-                    <p class="text-muted mb-0">Chua co thong tin hanh khach.</p>
+                    <p class="text-muted mb-0">Chưa có thông tin hành khách.</p>
                 {% endfor %}
             </div>
         </div>
 
         <div class="col-lg-4">
             <div class="panel mb-4">
-                <h2 class="h5 mb-3">Tong quan</h2>
-                <div class="summary-row"><span>Ma booking</span><strong>{{ booking.booking_reference }}</strong></div>
-                <div class="summary-row"><span>Ngay dat</span><strong>{{ booking.created_at|date:"d/m/Y H:i" }}</strong></div>
+                <h2 class="h5 mb-3">Tổng quan</h2>
+                <div class="summary-row"><span>Mã booking</span><strong>{{ booking.booking_reference }}</strong></div>
+                <div class="summary-row"><span>Ngày đặt</span><strong>{{ booking.created_at|date:"d/m/Y H:i" }}</strong></div>
                 <div class="summary-row"><span>Email</span><strong>{{ booking.contact_email }}</strong></div>
-                <div class="summary-row"><span>Dien thoai</span><strong>{{ booking.contact_phone|default:"Chua cap nhat" }}</strong></div>
-                <div class="summary-row total"><span>Tong tien</span><strong>${{ booking.total_price }}</strong></div>
+                <div class="summary-row"><span>Điện thoại</span><strong>{{ booking.contact_phone|default:"Chưa cập nhật" }}</strong></div>
+                <div class="summary-row total"><span>Tổng tiền</span><strong>${{ booking.total_price }}</strong></div>
             </div>
 
             <div class="d-grid gap-2">
                 {% if booking.status == "pending" and booking.payment_status == "pending" %}
-                    <a class="btn btn-primary" href="{% url 'payments:checkout' 'flight' booking.id %}">Tiep tuc thanh toan</a>
+                    <a class="btn btn-primary" href="{% url 'payments:checkout' 'flight' booking.id %}">Tiếp tục thanh toán</a>
                     <form method="post" action="{% url 'payments:cancel_pending' 'flight' booking.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-outline-danger w-100" type="submit">Huy booking</button>
+                        <button class="btn btn-outline-danger w-100" type="submit">Hủy booking</button>
                     </form>
                 {% elif booking.is_cancellable %}
-                    <a class="btn btn-outline-danger" href="{% url 'bookings:cancel_booking' booking.booking_reference %}">Huy booking</a>
+                    <a class="btn btn-outline-danger" href="{% url 'bookings:cancel_booking' booking.booking_reference %}">Hủy booking</a>
                 {% endif %}
-                <a class="btn btn-outline-secondary" href="{% url 'flights:search' %}">Dat ve khac</a>
+                <a class="btn btn-outline-secondary" href="{% url 'flights:search' %}">Đặt vé khác</a>
             </div>
         </div>
     </div>

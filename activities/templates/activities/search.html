@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Trai nghiem Viet Nam - Vietnam Travel{% endblock %}
+{% block title %}Trải nghiệm Việt Nam - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <h1 class="h3 mb-4">Trai nghiem ban dia tai Viet Nam</h1>
+    <h1 class="h3 mb-4">Trải nghiệm bản địa tại Việt Nam</h1>
     <form method="get" class="row g-3 mb-4">
         <div class="col-md-5">
-            <label class="form-label" for="location">Dia diem</label>
-            <input class="form-control" id="location" name="location" value="{{ location }}" placeholder="Ha Noi, Hue, Da Lat, Can Tho...">
+            <label class="form-label" for="location">Địa điểm</label>
+            <input class="form-control" id="location" name="location" value="{{ location }}" placeholder="Hà Nội, Huế, Đà Lạt, Cần Thơ...">
         </div>
         <div class="col-md-5">
-            <label class="form-label" for="category">Loai trai nghiem</label>
+            <label class="form-label" for="category">Loại trải nghiệm</label>
             <select class="form-select" id="category" name="category">
-                <option value="">Tat ca</option>
+                <option value="">Tất cả</option>
                 {% for item in categories %}
                     <option value="{{ item.id }}" {% if category == item.id|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-primary w-100" type="submit">Tim trai nghiem</button>
+            <button class="btn btn-primary w-100" type="submit">Tìm trải nghiệm</button>
         </div>
     </form>
 
@@ -37,7 +37,7 @@
                         <p>{{ activity.short_description }}</p>
                         <strong>{{ activity.price_adult }} USD</strong>
                         <div class="mt-3">
-                            <a class="btn btn-primary btn-sm" href="{% url 'activities:detail' activity.id %}">Xem va dat</a>
+                            <a class="btn btn-primary btn-sm" href="{% url 'activities:detail' activity.id %}">Xem và đặt</a>
                         </div>
                     </div>
                 </div>
@@ -45,9 +45,9 @@
         {% empty %}
             <div class="col-12">
                 <div class="row g-3">
-                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Lop nau an Hoi An</h2><p class="text-muted mb-0">Di cho, nau mon Viet va thuong thuc cung nguoi ban dia.</p></div></div>
-                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Trekking Sapa</h2><p class="text-muted mb-0">Ban lang, ruong bac thang va van hoa Tay Bac.</p></div></div>
-                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Thuyen Mekong</h2><p class="text-muted mb-0">Cho noi, vuon trai cay va song nuoc mien Tay.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Lớp nấu ăn Hội An</h2><p class="text-muted mb-0">Đi chợ, nấu món Việt và thưởng thức cùng người bản địa.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Trekking Sapa</h2><p class="text-muted mb-0">Bản làng, ruộng bậc thang và văn hóa Tây Bắc.</p></div></div>
+                    <div class="col-md-4"><div class="p-3 border rounded h-100"><h2 class="h5">Thuyền Mekong</h2><p class="text-muted mb-0">Chợ nổi, vườn trái cây và sông nước miền Tây.</p></div></div>
                 </div>
             </div>
         {% endfor %}

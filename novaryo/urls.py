@@ -25,7 +25,7 @@ from .swagger_settings import schema_view
 
 admin.site.site_header = "Vietnam Travel Administration"
 admin.site.site_title = "Vietnam Travel Admin"
-admin.site.index_title = "Quan tri he thong du lich Viet Nam"
+admin.site.index_title = "Quản trị hệ thống du lịch Việt Nam"
 
 urlpatterns = [
     # Admin

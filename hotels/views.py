@@ -1,3 +1,4 @@
+import unicodedata
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -7,7 +8,15 @@ from django.http import JsonResponse
 from django.db.models import Q
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType
+from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType, Itinerary
+
+
+def normalize_location(value):
+    value = (value or "").replace("Đ", "D").replace("đ", "d").lower()
+    return "".join(
+        char for char in unicodedata.normalize("NFD", value)
+        if unicodedata.category(char) != "Mn"
+    )
 
 
 class HomeView(TemplateView):
@@ -189,6 +198,9 @@ class CityHotelsView(ListView):
         context.update({
             'city': city,
             'other_popular_cities': other_popular_cities,
+            'itineraries': Itinerary.objects.filter(
+                city=city, is_active=True
+            ).prefetch_related('stops'),
         })
         return context
 
@@ -246,6 +258,96 @@ class HotelAvailabilityView(TemplateView):
         })
 
 
+class ItineraryBuilderAPIView(TemplateView):
+    """Compact embeddable itinerary planner API."""
+
+    def get(self, request, *args, **kwargs):
+        destination = request.GET.get('destination', '').strip()
+        try:
+            days = max(1, min(int(request.GET.get('days', 3)), 7))
+        except (TypeError, ValueError):
+            days = 3
+        try:
+            budget = int(request.GET.get('budget') or 0)
+        except (TypeError, ValueError):
+            budget = 0
+        try:
+            travelers = max(1, min(int(request.GET.get('travelers', 1)), 20))
+        except (TypeError, ValueError):
+            travelers = 1
+
+        if not destination:
+            return JsonResponse({
+                'ok': False,
+                'message': 'Vui lòng nhập địa điểm bạn muốn đi.',
+            }, status=400)
+
+        destination_key = normalize_location(destination)
+        itineraries = list(
+            Itinerary.objects.filter(is_active=True)
+            .select_related('city', 'city__country')
+            .prefetch_related('stops')
+        )
+        matches = [
+            itinerary for itinerary in itineraries
+            if destination_key in normalize_location(itinerary.city.name)
+            or destination_key in normalize_location(itinerary.city.country.name)
+        ]
+        if not matches:
+            return JsonResponse({
+                'ok': False,
+                'message': f'Chưa có dữ liệu lịch trình cho "{destination}".',
+            }, status=404)
+
+        itinerary = sorted(matches, key=lambda item: (abs(item.days - days), item.order, item.days))[0]
+        stops = [
+            stop for stop in itinerary.stops.all()
+            if stop.day_number <= days
+        ]
+        daily_plan = []
+        total_cost = 0
+        for day_number in range(1, days + 1):
+            day_stops = [stop for stop in stops if stop.day_number == day_number]
+            day_cost_per_person = sum(int(stop.estimated_cost or 0) for stop in day_stops)
+            day_cost = day_cost_per_person * travelers
+            total_cost += day_cost
+            daily_plan.append({
+                'day': day_number,
+                'estimated_cost_per_person': day_cost_per_person,
+                'estimated_cost': day_cost,
+                'stops': [
+                    {
+                        'id': stop.id,
+                        'time': stop.start_time.strftime('%H:%M') if stop.start_time else '',
+                        'session': stop.get_session_display(),
+                        'place_name': stop.place_name,
+                        'description': stop.description,
+                        'duration_hours': float(stop.duration_hours),
+                        'estimated_cost_per_person': int(stop.estimated_cost or 0),
+                        'estimated_cost': int(stop.estimated_cost or 0) * travelers,
+                        'currency': stop.currency,
+                        'cost_note': stop.cost_note,
+                        'google_maps_url': stop.google_maps_url,
+                    }
+                    for stop in day_stops
+                ],
+            })
+
+        return JsonResponse({
+            'ok': True,
+            'destination': itinerary.city.name,
+            'title': itinerary.title,
+            'days': days,
+            'travelers': travelers,
+            'requested_budget': budget,
+            'estimated_cost_per_person': total_cost // travelers,
+            'estimated_cost': total_cost,
+            'over_budget': bool(budget and total_cost > budget),
+            'budget_gap': max(total_cost - budget, 0) if budget else 0,
+            'daily_plan': daily_plan,
+        })
+
+
 @login_required
 def reserve_room(request, room_type_id):
     room_type = get_object_or_404(RoomType.objects.select_related('hotel'), id=room_type_id, is_active=True)
@@ -259,7 +361,7 @@ def reserve_room(request, room_type_id):
         stay_date = timezone.localdate()
 
     if stay_date < timezone.localdate():
-        messages.error(request, 'Ngay nhan phong khong duoc o qua khu.')
+        messages.error(request, 'Ngày nhận phòng không được ở quá khứ.')
         return redirect('hotels:hotel_detail', slug=room_type.hotel.slug)
 
     with transaction.atomic():
@@ -272,7 +374,7 @@ def reserve_room(request, room_type_id):
             },
         )
         if availability.available_rooms <= 0:
-            messages.error(request, 'Phong nay da het cho ngay ban chon.')
+            messages.error(request, 'Phòng này đã hết chỗ cho ngày bạn chọn.')
             return redirect('hotels:hotel_detail', slug=room_type.hotel.slug)
 
         availability.available_rooms -= 1
@@ -289,7 +391,7 @@ def reserve_room(request, room_type_id):
             payment_status='pending',
         )
 
-    messages.info(request, f'Da giu 1 phong {room_type.name}. Vui long thanh toan de gui admin xac nhan.')
+    messages.info(request, f'Đã giữ 1 phòng {room_type.name}. Vui lòng thanh toán để gửi admin xác nhận.')
     return redirect('payments:checkout', booking_type='hotel', object_id=reservation.id)
 
 

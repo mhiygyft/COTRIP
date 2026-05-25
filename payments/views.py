@@ -45,7 +45,7 @@ def payment_history(request):
     transactions = PaymentTransaction.objects.filter(user=request.user).select_related("booking")
     return render(request, "payments/history.html", {
         "transactions": transactions,
-        "page_title": "Payment History",
+        "page_title": "Lịch sử thanh toán",
     })
 
 
@@ -53,10 +53,10 @@ def payment_history(request):
 def checkout(request, booking_type, object_id):
     booking = _get_customer_booking_or_404(request.user, booking_type, object_id)
     if booking.status == "cancelled" or booking.payment_status in {"completed", "cancelled", "refunded", "refund_pending"}:
-        messages.info(request, "Booking nay da duoc xu ly thanh toan.")
+        messages.info(request, "Booking này đã được xử lý thanh toán.")
         return redirect("customer_dashboard")
     if booking.status != "pending" or booking.payment_status != "pending":
-        messages.error(request, "Booking nay khong o trang thai cho thanh toan.")
+        messages.error(request, "Booking này không ở trạng thái chờ thanh toán.")
         return redirect("customer_dashboard")
 
     if request.method == "POST":
@@ -78,7 +78,7 @@ def checkout(request, booking_type, object_id):
         booking.payment_status = "completed"
         booking.status = "pending"
         booking.save(update_fields=["payment_status", "status", "updated_at"])
-        messages.success(request, "Thanh toan thanh cong. Booking cua ban dang cho admin xac nhan.")
+        messages.success(request, "Thanh toán thành công. Booking của bạn đang chờ admin xác nhận.")
         return redirect("customer_dashboard")
 
     return render(request, "payments/checkout.html", {
@@ -86,7 +86,7 @@ def checkout(request, booking_type, object_id):
         "booking_type": booking_type,
         "booking_label": _booking_label(booking_type, booking),
         "amount": booking.total_price,
-        "page_title": "Thanh toan",
+        "page_title": "Thanh toán",
     })
 
 
@@ -97,7 +97,7 @@ def cancel_pending_booking(request, booking_type, object_id):
         return redirect("customer_dashboard")
 
     if booking.status != "pending" or booking.payment_status != "pending":
-        messages.error(request, "Chi booking dang cho thanh toan moi co the huy tu tai khoan khach hang.")
+        messages.error(request, "Chỉ booking đang chờ thanh toán mới có thể hủy từ tài khoản khách hàng.")
         return redirect("customer_dashboard")
 
     with transaction.atomic():
@@ -118,5 +118,5 @@ def cancel_pending_booking(request, booking_type, object_id):
             availability.available_rooms += booking.rooms
             availability.save(update_fields=["available_rooms", "updated_at"])
 
-    messages.success(request, f"Da huy {_booking_label(booking_type, booking)}.")
+    messages.success(request, f"Đã hủy {_booking_label(booking_type, booking)}.")
     return redirect("customer_dashboard")

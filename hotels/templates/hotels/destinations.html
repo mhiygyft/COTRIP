@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Diem den Viet Nam - Vietnam Travel{% endblock %}
+{% block title %}Điểm đến Việt Nam - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <h1 class="h3 mb-4">Diem den noi bat tai Viet Nam</h1>
+    <h1 class="h3 mb-4">Điểm đến nổi bật tại Việt Nam</h1>
     <div class="row g-3">
         {% for city in cities %}
             <div class="col-md-6 col-lg-4">
@@ -16,7 +16,7 @@
                 </a>
             </div>
         {% empty %}
-            <p class="text-muted">Chua co diem den trong du lieu. Ban co the bat dau voi Ha Noi, Da Nang, Hoi An hoac Phu Quoc.</p>
+            <p class="text-muted">Chưa có điểm đến trong dữ liệu. Bạn có thể bắt đầu với Hà Nội, Đà Nẵng, Hội An hoặc Phú Quốc.</p>
         {% endfor %}
     </div>
 </div>

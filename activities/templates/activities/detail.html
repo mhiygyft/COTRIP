@@ -20,28 +20,28 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <p><strong>{{ activity.price_adult }} USD</strong> moi nguoi lon</p>
+        <p><strong>{{ activity.price_adult }} USD</strong> mỗi người lớn</p>
         <p class="text-success">{{ activity.max_participants }} suat moi ngay</p>
         <form method="post" action="{% url 'activities:book' activity.id %}" class="row g-3 border rounded p-3 mt-3">
             {% csrf_token %}
             <div class="col-md-4">
-                <label class="form-label" for="booking_date">Ngay di</label>
+                <label class="form-label" for="booking_date">Ngày đi</label>
                 <input class="form-control" id="booking_date" name="booking_date" type="date" value="{% now 'Y-m-d' %}">
             </div>
             <div class="col-md-3">
-                <label class="form-label" for="adults">Nguoi lon</label>
+                <label class="form-label" for="adults">Người lớn</label>
                 <input class="form-control" id="adults" name="adults" type="number" min="1" value="1">
             </div>
             <div class="col-md-3">
-                <label class="form-label" for="children">Tre em</label>
+                <label class="form-label" for="children">Trẻ em</label>
                 <input class="form-control" id="children" name="children" type="number" min="0" value="0">
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-primary w-100" type="submit">Dat ngay</button>
+                <button class="btn btn-primary w-100" type="submit">Đặt ngay</button>
             </div>
         </form>
     {% else %}
-        <h1 class="h3">Khong tim thay trai nghiem</h1>
+        <h1 class="h3">Không tìm thấy trải nghiệm</h1>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,156 @@
+<section class="trip-builder-widget panel mb-4" data-trip-builder>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <p class="text-primary fw-semibold mb-1">Tạo lịch trình du lịch</p>
+            <h2 class="h5 mb-0">Nhập điểm đến, số ngày và ngân sách</h2>
+        </div>
+        <span class="badge text-bg-light">Planner nhanh</span>
+    </div>
+
+    <form class="row g-2 align-items-end" data-trip-builder-form>
+        <div class="col-md-4">
+            <label class="form-label small">Điểm đến</label>
+            <input class="form-control" name="destination" type="text" placeholder="Ví dụ: Đà Nẵng" required>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small">Số ngày</label>
+            <input class="form-control" name="days" type="number" min="1" max="7" value="3">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small">Số người</label>
+            <input class="form-control" name="travelers" type="number" min="1" max="20" value="2">
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small">Ngân sách</label>
+            <input class="form-control" name="budget" type="number" min="0" step="50000" placeholder="VND">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100" type="submit">Tạo plan</button>
+        </div>
+    </form>
+
+    <div class="small text-muted mt-2">
+        Module này dùng dữ liệu lịch trình hiện có, không tạo auth mới và có thể nhúng vào trang khác bằng include template.
+    </div>
+
+    <div class="trip-builder-result mt-4 d-none" data-trip-builder-result></div>
+</section>
+
+<style>
+.trip-builder-widget .trip-day {
+    border: 1px solid #edf0ef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.trip-builder-widget .trip-day + .trip-day {
+    margin-top: 12px;
+}
+.trip-builder-widget .trip-day-header {
+    background: #f8faf9;
+    border-bottom: 1px solid #edf0ef;
+    padding: 10px 12px;
+}
+.trip-builder-widget .trip-stop {
+    border-bottom: 1px solid #edf0ef;
+    padding: 12px;
+}
+.trip-builder-widget .trip-stop:last-child {
+    border-bottom: 0;
+}
+.trip-builder-widget .trip-time {
+    color: #13795b;
+    font-weight: 700;
+    min-width: 54px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-trip-builder]').forEach(function(widget) {
+        const form = widget.querySelector('[data-trip-builder-form]');
+        const result = widget.querySelector('[data-trip-builder-result]');
+        const endpoint = "{% url 'hotels:itinerary_builder_api' %}";
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const params = new URLSearchParams(new FormData(form));
+            result.classList.remove('d-none');
+            result.innerHTML = '<div class="text-muted">Đang tạo lịch trình...</div>';
+
+            fetch(`${endpoint}?${params.toString()}`, {
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+                .then(function(response) {
+                    return response.json().then(function(data) {
+                        if (!response.ok) throw data;
+                        return data;
+                    });
+                })
+                .then(renderPlan)
+                .catch(function(error) {
+                    result.innerHTML = `<div class="alert alert-warning mb-0">${error.message || 'Không tạo được lịch trình.'}</div>`;
+                });
+        });
+
+        function renderPlan(plan) {
+            const budgetText = plan.requested_budget
+                ? ` / Ngân sách nhóm: ${Number(plan.requested_budget).toLocaleString('vi-VN')} VND`
+                : '';
+            const budgetWarning = plan.over_budget
+                ? `<div class="alert alert-warning py-2 mt-2 mb-0">Vượt ngân sách khoảng ${Number(plan.budget_gap).toLocaleString('vi-VN')} VND.</div>`
+                : '';
+
+            result.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                        <h3 class="h6 mb-1">${plan.title}</h3>
+                        <div class="small text-muted">${plan.destination} - ${plan.days} ngày - ${plan.travelers} người${budgetText}</div>
+                    </div>
+                    <div class="text-end">
+                        <strong>${Number(plan.estimated_cost).toLocaleString('vi-VN')} VND</strong>
+                        <div class="small text-muted">${Number(plan.estimated_cost_per_person).toLocaleString('vi-VN')} VND/người</div>
+                    </div>
+                </div>
+                ${budgetWarning}
+                <div class="mt-3">
+                    ${plan.daily_plan.map(renderDay).join('')}
+                </div>
+            `;
+        }
+
+        function renderDay(day) {
+            return `
+                <div class="trip-day">
+                    <div class="trip-day-header d-flex justify-content-between">
+                        <strong>Ngày ${day.day}</strong>
+                        <span class="small text-muted">${Number(day.estimated_cost).toLocaleString('vi-VN')} VND nhóm</span>
+                    </div>
+                    ${day.stops.length ? day.stops.map(renderStop).join('') : '<div class="trip-stop text-muted small">Chưa có điểm dừng cho ngày này.</div>'}
+                </div>
+            `;
+        }
+
+        function renderStop(stop) {
+            return `
+                <div class="trip-stop">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="d-flex gap-3">
+                            <div class="trip-time">${stop.time || '--:--'}</div>
+                            <div>
+                                <div class="fw-semibold">${stop.place_name}</div>
+                                <div class="small text-muted">${stop.session} - ${stop.duration_hours} giờ</div>
+                                <div class="small">
+                                    ${Number(stop.estimated_cost_per_person).toLocaleString('vi-VN')} ${stop.currency}/người
+                                    <span class="text-muted">(${Number(stop.estimated_cost).toLocaleString('vi-VN')} ${stop.currency} nhóm)</span>
+                                    ${stop.cost_note ? ` - ${stop.cost_note}` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${stop.google_maps_url ? `<a class="btn btn-sm btn-outline-primary align-self-start" target="_blank" rel="noopener" href="${stop.google_maps_url}">Bản đồ</a>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    });
+});
+</script>

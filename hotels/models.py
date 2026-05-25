@@ -460,6 +460,56 @@ class HotelFacility(models.Model):
         return f"{self.hotel.name} - {self.name}"
 
 
+class Itinerary(models.Model):
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='itineraries')
+    title = models.CharField(max_length=200)
+    days = models.PositiveIntegerField()
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'days']
+
+    def __str__(self):
+        return f"{self.city.name} - {self.title}"
+
+    @property
+    def total_estimated_cost(self):
+        return sum(stop.estimated_cost or 0 for stop in self.stops.all())
+
+
+class ItineraryStop(models.Model):
+    DAY_SESSION = [
+        ('morning', 'Buổi sáng'),
+        ('afternoon', 'Buổi chiều'),
+        ('evening', 'Buổi tối'),
+    ]
+
+    itinerary = models.ForeignKey(Itinerary, on_delete=models.CASCADE, related_name='stops')
+    day_number = models.PositiveIntegerField()
+    session = models.CharField(max_length=20, choices=DAY_SESSION, default='morning')
+    place_name = models.CharField(max_length=200)
+    description = models.TextField()
+    start_time = models.TimeField(blank=True, null=True)
+    duration_hours = models.DecimalField(max_digits=4, decimal_places=1, default=1.0)
+    estimated_cost = models.DecimalField(max_digits=12, decimal_places=0, default=0)
+    currency = models.CharField(max_length=3, default='VND')
+    cost_note = models.CharField(max_length=200, blank=True)
+    image_url = models.URLField(blank=True)
+    google_maps_url = models.URLField(blank=True)
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['day_number', 'order']
+
+    def __str__(self):
+        return f"Ngày {self.day_number} {self.get_session_display()} - {self.place_name}"
+
+
 class Review(models.Model):
     """Hotel review model"""
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reviews')

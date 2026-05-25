@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Thanh toan - Vietnam Travel{% endblock %}
+{% block title %}Thanh toán - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -8,20 +8,20 @@
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <p class="text-muted mb-1">Thanh toan booking</p>
+                    <p class="text-muted mb-1">Thanh toán booking</p>
                     <h1 class="h3 mb-3">{{ booking_label }}</h1>
                     <div class="payment-total mb-4">
-                        <span>So tien can thanh toan</span>
+                        <span>Số tiền cần thanh toán</span>
                         <strong>${{ amount|floatformat:2 }}</strong>
                     </div>
 
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label class="form-label">Phuong thuc thanh toan</label>
+                            <label class="form-label">Phương thức thanh toán</label>
                             <div class="payment-option">
                                 <input class="form-check-input" type="radio" name="payment_method" id="pay_card" value="card" checked>
-                                <label for="pay_card">The tin dung / ghi no</label>
+                                <label for="pay_card">Thẻ tín dụng / ghi nợ</label>
                             </div>
                             <div class="payment-option">
                                 <input class="form-check-input" type="radio" name="payment_method" id="pay_paypal" value="paypal">
@@ -29,32 +29,32 @@
                             </div>
                             <div class="payment-option">
                                 <input class="form-check-input" type="radio" name="payment_method" id="pay_bank" value="bank_transfer">
-                                <label for="pay_bank">Chuyen khoan ngan hang</label>
+                                <label for="pay_bank">Chuyển khoản ngân hàng</label>
                             </div>
                             <div class="payment-option">
                                 <input class="form-check-input" type="radio" name="payment_method" id="pay_manual" value="manual">
-                                <label for="pay_manual">Thanh toan thu cong tai quay</label>
+                                <label for="pay_manual">Thanh toán thủ công tại quầy</label>
                             </div>
                         </div>
 
                         <div class="alert alert-info small">
-                            Day la thanh toan demo: ban chi can chon phuong thuc, khong can nhap so the, CVV hay thong tin ngan hang. Khi bam thanh toan, giao dich se duoc danh dau thanh cong va booking chuyen sang trang thai cho admin xac nhan.
+                            Đây là thanh toán demo: bạn chỉ cần chọn phương thức, không cần nhập số thẻ, CVV hay thông tin ngân hàng. Khi bấm thanh toán, giao dịch sẽ được đánh dấu thành công và booking chuyển sang trạng thái chờ admin xác nhận.
                         </div>
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-8">
-                                <label class="form-label" for="card_number">So the <span class="text-muted small">(khong bat buoc)</span></label>
+                                <label class="form-label" for="card_number">Số thẻ <span class="text-muted small">(không bắt buộc)</span></label>
                                 <input class="form-control" id="card_number" placeholder="4242 4242 4242 4242">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label" for="card_cvv">CVV <span class="text-muted small">(khong bat buoc)</span></label>
+                                <label class="form-label" for="card_cvv">CVV <span class="text-muted small">(không bắt buộc)</span></label>
                                 <input class="form-control" id="card_cvv" placeholder="123">
                             </div>
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button class="btn btn-primary" type="submit">Thanh toan</button>
-                            <a class="btn btn-outline-secondary" href="{% url 'customer_dashboard' %}">De sau</a>
+                            <button class="btn btn-primary" type="submit">Thanh toán</button>
+                            <a class="btn btn-outline-secondary" href="{% url 'customer_dashboard' %}">Để sau</a>
                         </div>
                     </form>
                 </div>

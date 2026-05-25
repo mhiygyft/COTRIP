@@ -103,8 +103,8 @@
 {% block content %}
 <div class="passenger-header">
     <div class="container">
-        <h1 class="h3 mb-1">Passenger Details</h1>
-        <p class="mb-0">Please provide passenger information for your flight</p>
+        <h1 class="h3 mb-1">Thông tin hành khách</h1>
+        <p class="mb-0">Vui lòng cung cấp thông tin hành khách cho chuyến bay</p>
     </div>
 </div>
 
@@ -115,25 +115,25 @@
             <div class="step-number">
                 <i class="fas fa-check"></i>
             </div>
-            <span>Flight Selected</span>
+            <span>Đã chọn chuyến bay</span>
         </div>
         <div class="step-connector"></div>
         
         <div class="step active">
             <div class="step-number">2</div>
-            <span>Passenger Details</span>
+            <span>Thông tin hành khách</span>
         </div>
         <div class="step-connector"></div>
         
         <div class="step">
             <div class="step-number">3</div>
-            <span>Payment</span>
+            <span>Thanh toán</span>
         </div>
         <div class="step-connector"></div>
         
         <div class="step">
             <div class="step-number">4</div>
-            <span>Confirmation</span>
+            <span>Xác nhận</span>
         </div>
     </div>
 
@@ -145,38 +145,38 @@
                         {% csrf_token %}
                         
                         <h5 class="card-title mb-4">
-                            <i class="fas fa-user me-2"></i>Passenger Information
+                            <i class="fas fa-user me-2"></i>Thông tin hành khách
                         </h5>
                         
                         <!-- Personal Information -->
                         <div class="row">
                             <div class="col-md-3 mb-3">
-                                <label for="{{ passenger_form.title.id_for_label }}" class="form-label">Title</label>
+                                <label for="{{ passenger_form.title.id_for_label }}" class="form-label">Danh xưng</label>
                                 {{ passenger_form.title }}
                                 {% if passenger_form.title.errors %}
                                     <div class="text-danger small">{{ passenger_form.title.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-5 mb-3">
-                                <label for="{{ passenger_form.first_name.id_for_label }}" class="form-label">First Name *</label>
+                                <label for="{{ passenger_form.first_name.id_for_label }}" class="form-label">Tên *</label>
                                 {{ passenger_form.first_name }}
                                 {% if passenger_form.first_name.errors %}
                                     <div class="text-danger small">{{ passenger_form.first_name.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="{{ passenger_form.middle_name.id_for_label }}" class="form-label">Middle Name</label>
+                                <label for="{{ passenger_form.middle_name.id_for_label }}" class="form-label">Tên đệm</label>
                                 {{ passenger_form.middle_name }}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.last_name.id_for_label }}" class="form-label">Last Name *</label>
+                                <label for="{{ passenger_form.last_name.id_for_label }}" class="form-label">Họ *</label>
                                 {{ passenger_form.last_name }}
                                 {% if passenger_form.last_name.errors %}
                                     <div class="text-danger small">{{ passenger_form.last_name.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                                <label for="{{ passenger_form.date_of_birth.id_for_label }}" class="form-label">Ngày sinh</label>
                                 {{ passenger_form.date_of_birth }}
                                 {% if passenger_form.date_of_birth.errors %}
                                     <div class="text-danger small">{{ passenger_form.date_of_birth.errors }}</div>
@@ -185,24 +185,24 @@
                         </div>
                         
                         <!-- Travel Documents -->
-                        <h6 class="mt-4 mb-3">Travel Documents</h6>
+                        <h6 class="mt-4 mb-3">Giấy tờ đi lại</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.passport_number.id_for_label }}" class="form-label">Passport Number</label>
+                                <label for="{{ passenger_form.passport_number.id_for_label }}" class="form-label">Số hộ chiếu</label>
                                 {{ passenger_form.passport_number }}
                                 {% if passenger_form.passport_number.errors %}
                                     <div class="text-danger small">{{ passenger_form.passport_number.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label for="{{ passenger_form.passport_country.id_for_label }}" class="form-label">Country</label>
+                                <label for="{{ passenger_form.passport_country.id_for_label }}" class="form-label">Quốc gia</label>
                                 {{ passenger_form.passport_country }}
                                 {% if passenger_form.passport_country.errors %}
                                     <div class="text-danger small">{{ passenger_form.passport_country.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-3 mb-3">
-                                <label for="{{ passenger_form.passport_expiry.id_for_label }}" class="form-label">Expiry Date</label>
+                                <label for="{{ passenger_form.passport_expiry.id_for_label }}" class="form-label">Ngày hết hạn</label>
                                 {{ passenger_form.passport_expiry }}
                                 {% if passenger_form.passport_expiry.errors %}
                                     <div class="text-danger small">{{ passenger_form.passport_expiry.errors }}</div>
@@ -211,7 +211,7 @@
                         </div>
                         
                         <!-- Contact Information -->
-                        <h6 class="mt-4 mb-3">Contact Information</h6>
+                        <h6 class="mt-4 mb-3">Thông tin liên hệ</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ passenger_form.email.id_for_label }}" class="form-label">Email *</label>
@@ -221,7 +221,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.phone.id_for_label }}" class="form-label">Phone *</label>
+                                <label for="{{ passenger_form.phone.id_for_label }}" class="form-label">Số điện thoại *</label>
                                 {{ passenger_form.phone }}
                                 {% if passenger_form.phone.errors %}
                                     <div class="text-danger small">{{ passenger_form.phone.errors }}</div>
@@ -230,50 +230,50 @@
                         </div>
                         
                         <!-- Preferences -->
-                        <h6 class="mt-4 mb-3">Preferences</h6>
+                        <h6 class="mt-4 mb-3">Tùy chọn</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.meal_preference.id_for_label }}" class="form-label">Meal Preference</label>
+                                <label for="{{ passenger_form.meal_preference.id_for_label }}" class="form-label">Suất ăn mong muốn</label>
                                 {{ passenger_form.meal_preference }}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ passenger_form.seat_preference.id_for_label }}" class="form-label">Seat Preference</label>
+                                <label for="{{ passenger_form.seat_preference.id_for_label }}" class="form-label">Ghế mong muốn</label>
                                 {{ passenger_form.seat_preference }}
                             </div>
                             <div class="col-12 mb-3">
-                                <label for="{{ passenger_form.special_assistance.id_for_label }}" class="form-label">Special Assistance</label>
+                                <label for="{{ passenger_form.special_assistance.id_for_label }}" class="form-label">Hỗ trợ đặc biệt</label>
                                 {{ passenger_form.special_assistance }}
                             </div>
                         </div>
                         
                         <!-- Booking Contact -->
                         <h5 class="mt-5 mb-4">
-                            <i class="fas fa-envelope me-2"></i>Booking Contact
+                            <i class="fas fa-envelope me-2"></i>Liên hệ đặt chỗ
                         </h5>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ contact_form.contact_email.id_for_label }}" class="form-label">Contact Email *</label>
+                                <label for="{{ contact_form.contact_email.id_for_label }}" class="form-label">Email liên hệ *</label>
                                 {{ contact_form.contact_email }}
                                 {% if contact_form.contact_email.errors %}
                                     <div class="text-danger small">{{ contact_form.contact_email.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ contact_form.contact_phone.id_for_label }}" class="form-label">Contact Phone *</label>
+                                <label for="{{ contact_form.contact_phone.id_for_label }}" class="form-label">Số điện thoại liên hệ *</label>
                                 {{ contact_form.contact_phone }}
                                 {% if contact_form.contact_phone.errors %}
                                     <div class="text-danger small">{{ contact_form.contact_phone.errors }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-12 mb-3">
-                                <label for="{{ contact_form.special_requests.id_for_label }}" class="form-label">Special Requests</label>
+                                <label for="{{ contact_form.special_requests.id_for_label }}" class="form-label">Yêu cầu đặc biệt</label>
                                 {{ contact_form.special_requests }}
                             </div>
                         </div>
                         
                         <button type="submit" class="continue-btn mt-4">
-                            <i class="fas fa-arrow-right me-2"></i>Continue to Payment
+                            <i class="fas fa-arrow-right me-2"></i>Tiếp tục thanh toán
                         </button>
                     </form>
                 </div>
@@ -284,7 +284,7 @@
         <div class="col-lg-4">
             <div class="flight-summary">
                 <h6 class="fw-bold mb-3">
-                    <i class="fas fa-plane me-2"></i>Flight Summary
+                    <i class="fas fa-plane me-2"></i>Tóm tắt chuyến bay
                 </h6>
                 
                 <div class="d-flex align-items-center mb-2">
@@ -307,9 +307,9 @@
                         <div class="small text-muted">{{ flight.duration_minutes|floatformat:0 }}m</div>
                         <i class="fas fa-arrow-right text-primary"></i>
                         {% if flight.stops > 0 %}
-                            <div class="small text-muted">{{ flight.stops }} stop{{ flight.stops|pluralize }}</div>
+                            <div class="small text-muted">{{ flight.stops }} điểm dừng</div>
                         {% else %}
-                            <div class="small text-success">Direct</div>
+                            <div class="small text-success">Bay thẳng</div>
                         {% endif %}
                     </div>
                     <div class="col">
@@ -321,11 +321,11 @@
                 
                 <div class="border-top pt-3">
                     <div class="d-flex justify-content-between">
-                        <span>Class:</span>
+                        <span>Hạng ghế:</span>
                         <span class="fw-bold">{{ cabin_class|capfirst }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span>Price:</span>
+                        <span>Giá:</span>
                         <span class="fw-bold text-success">${{ price }}</span>
                     </div>
                 </div>

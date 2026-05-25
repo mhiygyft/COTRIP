@@ -12,7 +12,7 @@
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb text-white-50">
                         <li class="breadcrumb-item">
-                            <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a>
+                            <a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Trang chủ</a>
                         </li>
                         <li class="breadcrumb-item">
                             <a href="{% url 'hotels:city_hotels' hotel.city.country.code hotel.city.id %}" 
@@ -32,7 +32,7 @@
                             {% for star in hotel.star_range %}
                                 <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
                             {% endfor %}
-                            <span class="ms-2">{{ hotel.star_rating }}-Star Hotel</span>
+                            <span class="ms-2">Khách sạn {{ hotel.star_rating }} sao</span>
                         </div>
                         
                         <!-- Location -->
@@ -44,20 +44,20 @@
                         <!-- Rating and Reviews -->
                         <div class="d-flex align-items-center mb-3">
                             <span class="badge bg-light text-dark me-2 fs-6">{{ hotel.average_rating }}/10</span>
-                            <span>({{ hotel.total_reviews }} reviews)</span>
+                            <span>({{ hotel.total_reviews }} đánh giá)</span>
                             {% if hotel.is_verified %}
-                                <span class="badge bg-success ms-2">Verified</span>
+                                <span class="badge bg-success ms-2">Đã xác minh</span>
                             {% endif %}
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="price-display mb-3">
-                            <span class="text-white-50">Starting from</span>
+                            <span class="text-white-50">Giá từ</span>
                             <div class="display-5 fw-bold">${{ hotel.price_from }}</div>
-                            <small>per night</small>
+                            <small>mỗi đêm</small>
                         </div>
                         <button class="btn btn-warning btn-lg" onclick="scrollToRooms()">
-                            <i class="bi bi-calendar-check"></i> Check Availability
+                            <i class="bi bi-calendar-check"></i> Kiểm tra phòng trống
                         </button>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
             {% else %}
                 <div class="hotel-main-image bg-light d-flex align-items-center justify-content-center">
                     <i class="bi bi-building fs-1 text-muted"></i>
-                    <small class="position-absolute bottom-0 end-0 bg-dark text-white p-1 m-2 rounded">Main Image</small>
+                    <small class="position-absolute bottom-0 end-0 bg-dark text-white p-1 m-2 rounded">Ảnh chính</small>
                 </div>
             {% endif %}
         </div>
@@ -119,13 +119,13 @@
         <div class="col-lg-8">
             <!-- Hotel Description -->
             <section class="mb-5">
-                <h2 class="mb-3">About {{ hotel.name }}</h2>
+                <h2 class="mb-3">Giới thiệu {{ hotel.name }}</h2>
                 <p class="lead">{{ hotel.description }}</p>
             </section>
             
             <!-- Hotel Amenities -->
             <section class="mb-5">
-                <h2 class="mb-3">Hotel Amenities</h2>
+                <h2 class="mb-3">Tiện nghi khách sạn</h2>
                 <div class="row">
                     {% for amenity in hotel.amenities.all %}
                     <div class="col-md-6 col-lg-4 mb-3">
@@ -140,7 +140,7 @@
             
             <!-- Room Types Section -->
             <section id="rooms" class="mb-5">
-                <h2 class="mb-4">Available Rooms</h2>
+                <h2 class="mb-4">Phòng còn trống</h2>
                 
                 {% for room_type in room_types %}
                 <div class="card mb-4 border shadow-sm">
@@ -167,7 +167,7 @@
                                 <!-- Room Details -->
                                 <div class="room-details mb-3">
                                     <small class="text-muted d-block">
-                                        <i class="bi bi-people"></i> Max {{ room_type.max_occupancy }} guests
+                                        <i class="bi bi-people"></i> Tối đa {{ room_type.max_occupancy }} khách
                                     </small>
                                     {% if room_type.size_sqm %}
                                         <small class="text-muted d-block">
@@ -195,11 +195,11 @@
                                 <div class="mb-2">
                                     {% if room_type.is_refundable %}
                                         <small class="text-success">
-                                            <i class="bi bi-check-circle"></i> Free Cancellation
+                                            <i class="bi bi-check-circle"></i> Hủy miễn phí
                                         </small>
                                     {% else %}
                                         <small class="text-warning">
-                                            <i class="bi bi-x-circle"></i> Non-Refundable
+                                            <i class="bi bi-x-circle"></i> Không hoàn tiền
                                         </small>
                                     {% endif %}
                                 </div>
@@ -208,16 +208,16 @@
                                 <div class="price-section">
                                     <div class="price mb-2">
                                         <div class="fw-bold fs-4 text-primary">${{ room_type.base_price }}</div>
-                                        <small class="text-muted">per night</small>
+                                        <small class="text-muted">mỗi đêm</small>
                                     </div>
                                     <div class="small text-success mb-2">
-                                        {{ room_type.total_rooms }} rooms in inventory
+                                        {{ room_type.total_rooms }} phòng trong kho
                                     </div>
                                     
                                     <form class="d-grid gap-2" method="post" action="{% url 'hotels:reserve_room' room_type.id %}">
                                         {% csrf_token %}
                                         <input class="form-control form-control-sm" type="date" name="stay_date" value="{{ default_stay_date|date:'Y-m-d' }}">
-                                        <button class="btn btn-primary" type="submit">Reserve Now</button>
+                                        <button class="btn btn-primary" type="submit">Đặt phòng ngay</button>
                                     </form>
                                 </div>
                             </div>
@@ -227,37 +227,37 @@
                 {% empty %}
                 <div class="text-center py-4">
                     <i class="bi bi-door-closed fs-1 text-muted mb-3"></i>
-                    <h5>No rooms available</h5>
-                    <p class="text-muted">Please check back later or contact the hotel directly.</p>
+                    <h5>Chưa có phòng khả dụng</h5>
+                    <p class="text-muted">Vui lòng quay lại sau hoặc liên hệ trực tiếp với khách sạn.</p>
                 </div>
                 {% endfor %}
             </section>
             
             <!-- Hotel Policies -->
             <section class="mb-5">
-                <h2 class="mb-3">Hotel Policies</h2>
+                <h2 class="mb-3">Chính sách khách sạn</h2>
                 <div class="row">
                     <div class="col-md-6">
-                        <h6>Check-in/Check-out</h6>
+                        <h6>Nhận phòng/Trả phòng</h6>
                         <p>
                             <i class="bi bi-clock"></i> 
-                            Check-in: {{ hotel.check_in_time|time:"H:i" }} | 
-                            Check-out: {{ hotel.check_out_time|time:"H:i" }}
+                            Nhận phòng: {{ hotel.check_in_time|time:"H:i" }} | 
+                            Trả phòng: {{ hotel.check_out_time|time:"H:i" }}
                         </p>
                         
                         {% if hotel.cancellation_policy %}
-                        <h6>Cancellation Policy</h6>
+                        <h6>Chính sách hủy</h6>
                         <p>{{ hotel.cancellation_policy|truncatewords:30 }}</p>
                         {% endif %}
                     </div>
                     <div class="col-md-6">
                         {% if hotel.child_policy %}
-                        <h6>Children Policy</h6>
+                        <h6>Chính sách trẻ em</h6>
                         <p>{{ hotel.child_policy|truncatewords:20 }}</p>
                         {% endif %}
                         
                         {% if hotel.pet_policy %}
-                        <h6>Pet Policy</h6>
+                        <h6>Chính sách thú cưng</h6>
                         <p>{{ hotel.pet_policy|truncatewords:20 }}</p>
                         {% endif %}
                     </div>
@@ -270,14 +270,14 @@
             <!-- Contact Information -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Contact Information</h5>
+                    <h5 class="card-title">Thông tin liên hệ</h5>
                     
                     <p class="mb-2">
                         <i class="bi bi-telephone"></i>
                         {% if hotel.phone_number %}
                             {{ hotel.phone_number }}
                         {% else %}
-                            <span class="text-muted">Chua cap nhat so dien thoai</span>
+                            <span class="text-muted">Chưa cập nhật số điện thoại</span>
                         {% endif %}
                     </p>
 
@@ -286,7 +286,7 @@
                         {% if hotel.email %}
                             {{ hotel.email }}
                         {% else %}
-                            <span class="text-muted">Chua cap nhat email</span>
+                            <span class="text-muted">Chưa cập nhật email</span>
                         {% endif %}
                     </p>
 
@@ -294,10 +294,10 @@
                         <i class="bi bi-globe"></i> 
                         {% if hotel.website %}
                             <a href="{{ hotel.website }}" target="_blank" class="text-decoration-none">
-                                Visit Website
+                                Truy cập website
                             </a>
                         {% else %}
-                            <span class="text-muted">Chua cap nhat website</span>
+                            <span class="text-muted">Chưa cập nhật website</span>
                         {% endif %}
                     </p>
                     
@@ -305,7 +305,7 @@
                     <div class="map-placeholder bg-light d-flex align-items-center justify-content-center mt-3" style="height: 200px;">
                         <div class="text-center">
                             <i class="bi bi-geo-alt fs-1 text-muted mb-2"></i>
-                            <div class="small text-muted">Interactive Map</div>
+                            <div class="small text-muted">Bản đồ tương tác</div>
                             <div class="small text-muted">{{ hotel.city.name }}, {{ hotel.city.country.name }}</div>
                         </div>
                     </div>
@@ -316,7 +316,7 @@
             {% if nearby_hotels %}
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Other Hotels in {{ hotel.city.name }}</h5>
+                    <h5 class="card-title">Khách sạn khác tại {{ hotel.city.name }}</h5>
                     
                     {% for nearby_hotel in nearby_hotels %}
                     <div class="d-flex mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
@@ -339,7 +339,7 @@
                                     <i class="bi bi-star-fill" style="color: #fbbf24; font-size: 0.8rem;"></i>
                                 {% endfor %}
                             </div>
-                            <div class="fw-bold text-primary small">From ${{ nearby_hotel.price_from }}/night</div>
+                            <div class="fw-bold text-primary small">Từ ${{ nearby_hotel.price_from }}/đêm</div>
                         </div>
                     </div>
                     {% endfor %}

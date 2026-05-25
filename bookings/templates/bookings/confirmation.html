@@ -191,8 +191,8 @@
         <div class="success-icon">
             <i class="fas fa-check"></i>
         </div>
-        <h1 class="display-4 fw-bold mb-2">Booking Confirmed!</h1>
-        <p class="lead">Your flight has been successfully booked</p>
+        <h1 class="display-4 fw-bold mb-2">Booking đã được xác nhận!</h1>
+        <p class="lead">Chuyến bay của bạn đã được đặt thành công</p>
     </div>
 </div>
 
@@ -202,9 +202,9 @@
             <!-- Booking Reference -->
             <div class="booking-details-card">
                 <div class="booking-reference">
-                    <h4>Your Booking Reference</h4>
+                    <h4>Mã booking của bạn</h4>
                     <div class="reference-code">{{ booking.booking_reference }}</div>
-                    <p class="mb-0">Please save this reference for your records</p>
+                    <p class="mb-0">Vui lòng lưu mã này để tra cứu khi cần</p>
                 </div>
                 
                 <div class="flight-info-section">
@@ -240,7 +240,7 @@
                             {% if booking.flight.stops > 0 %}
                                 <small class="text-muted">{{ booking.flight.stops }} stop{{ booking.flight.stops|pluralize }}</small>
                             {% else %}
-                                <small class="text-success">Direct</small>
+                                <small class="text-success">Bay thẳng</small>
                             {% endif %}
                         </div>
                         
@@ -255,11 +255,11 @@
                     <!-- Flight Details -->
                     <div class="row">
                         <div class="col-md-6">
-                            <h6><i class="fas fa-calendar me-2"></i>Travel Date</h6>
+                            <h6><i class="fas fa-calendar me-2"></i>Ngày bay</h6>
                             <p>{{ booking.flight.departure_time|date:"l, F d, Y" }}</p>
                         </div>
                         <div class="col-md-6">
-                            <h6><i class="fas fa-chair me-2"></i>Class</h6>
+                            <h6><i class="fas fa-chair me-2"></i>Hạng ghế</h6>
                             <p>{{ booking.get_cabin_class_display }}</p>
                         </div>
                     </div>
@@ -270,7 +270,7 @@
             <div class="booking-details-card">
                 <div class="flight-info-section">
                     <h5 class="mb-4">
-                        <i class="fas fa-users me-2"></i>Passenger Information
+                        <i class="fas fa-users me-2"></i>Thông tin hành khách
                     </h5>
                     
                     {% for passenger in passengers %}
@@ -293,7 +293,7 @@
                                 {% if passenger.assigned_seat %}
                                 <div class="fw-bold">Seat {{ passenger.assigned_seat }}</div>
                                 {% else %}
-                                <div class="text-muted">Seat: To be assigned</div>
+                                <div class="text-muted">Ghế: Sẽ được chỉ định</div>
                                 {% endif %}
                             </div>
                         </div>
@@ -304,13 +304,13 @@
             
             <!-- Important Information -->
             <div class="important-info">
-                <h6><i class="fas fa-info-circle me-2"></i>Important Information</h6>
+                <h6><i class="fas fa-info-circle me-2"></i>Thông tin quan trọng</h6>
                 <ul class="mb-0">
-                    <li>Please arrive at the airport at least 2 hours before domestic flights and 3 hours before international flights</li>
-                    <li>Ensure your travel documents are valid and up to date</li>
-                    <li>Check-in online 24 hours before departure to save time</li>
+                    <li>Vui lòng có mặt tại sân bay trước giờ bay ít nhất 2 tiếng với chuyến nội địa và 3 tiếng với chuyến quốc tế</li>
+                    <li>Đảm bảo giấy tờ đi lại còn hiệu lực và được cập nhật đầy đủ</li>
+                    <li>Làm thủ tục trực tuyến 24 giờ trước giờ khởi hành để tiết kiệm thời gian</li>
                     {% if booking.payment_method == 'skipped' %}
-                    <li><strong>Note:</strong> This booking was created in testing mode. No actual payment was processed.</li>
+                    <li><strong>Ghi chú:</strong> Booking này được tạo ở chế độ thử nghiệm. Không có thanh toán thật được xử lý.</li>
                     {% endif %}
                 </ul>
             </div>
@@ -341,20 +341,20 @@
                 
                 <div class="mb-3">
                     <div class="d-flex justify-content-between mb-1">
-                        <span>Booking Reference:</span>
+                        <span>Mã booking:</span>
                         <span class="fw-bold">{{ booking.booking_reference }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
-                        <span>Status:</span>
+                        <span>Trạng thái:</span>
                         <span class="fw-bold text-success">{{ booking.get_status_display }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-1">
-                        <span>Booked on:</span>
+                        <span>Ngày đặt:</span>
                         <span>{{ booking.created_at|date:"M d, Y H:i" }}</span>
                     </div>
                     {% if booking.confirmed_at %}
                     <div class="d-flex justify-content-between mb-1">
-                        <span>Confirmed:</span>
+                        <span>Đã xác nhận:</span>
                         <span>{{ booking.confirmed_at|date:"M d, Y H:i" }}</span>
                     </div>
                     {% endif %}
@@ -362,14 +362,14 @@
                 
                 <!-- Contact Information -->
                 <div class="border-top pt-3 mb-3">
-                    <h6>Contact Information</h6>
+                    <h6>Thông tin liên hệ</h6>
                     <div class="d-flex justify-content-between mb-1">
                         <span>Email:</span>
                         <span>{{ booking.contact_email }}</span>
                     </div>
                     {% if booking.contact_phone %}
                     <div class="d-flex justify-content-between mb-1">
-                        <span>Phone:</span>
+                        <span>Điện thoại:</span>
                         <span>{{ booking.contact_phone }}</span>
                     </div>
                     {% endif %}
@@ -378,12 +378,12 @@
                 <!-- Price Breakdown -->
                 <div class="price-breakdown">
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Base fare ({{ booking.passenger_count }} passenger{{ booking.passenger_count|pluralize }})</span>
+                        <span>Giá vé cơ bản ({{ booking.passenger_count }} hành khách)</span>
                         <span>${{ booking.base_price }}</span>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Taxes & fees</span>
+                        <span>Thuế và phí</span>
                         <span>${{ booking.taxes_and_fees }}</span>
                     </div>
                     

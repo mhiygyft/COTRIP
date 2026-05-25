@@ -6,24 +6,24 @@
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <div class="brand">Vietnam Travel Admin</div>
-        <a href="#overview"><i class="bi bi-speedometer2"></i> Tong quan</a>
+        <a href="#overview"><i class="bi bi-speedometer2"></i> Tổng quan</a>
         <a href="#bookings"><i class="bi bi-calendar-check"></i> Booking</a>
-        <a href="#services"><i class="bi bi-map"></i> Tour & dich vu</a>
-        <a href="#customers"><i class="bi bi-people"></i> Khach hang</a>
-        <a href="#finance"><i class="bi bi-cash-stack"></i> Tai chinh</a>
+        <a href="#services"><i class="bi bi-map"></i> Tour & dịch vụ</a>
+        <a href="#customers"><i class="bi bi-people"></i> Khách hàng</a>
+        <a href="#finance"><i class="bi bi-cash-stack"></i> Tài chính</a>
         <a href="#marketing"><i class="bi bi-megaphone"></i> Marketing</a>
-        <a href="#system"><i class="bi bi-shield-lock"></i> He thong</a>
+        <a href="#system"><i class="bi bi-shield-lock"></i> Hệ thống</a>
         <a href="{% url 'admin:index' %}"><i class="bi bi-tools"></i> Django Admin</a>
     </aside>
 
     <main class="admin-main">
         <section id="overview" class="admin-header">
             <div>
-                <p class="text-muted mb-1">Bang dieu khien quan tri</p>
+                <p class="text-muted mb-1">Bảng điều khiển quản trị</p>
                 <h1>Admin Dashboard</h1>
             </div>
             <div class="text-end">
-                <span class="badge text-bg-success">Staff access</span>
+                <span class="badge text-bg-success">Quyền staff</span>
                 <div class="small text-muted mt-1">{{ request.user.email }}</div>
             </div>
         </section>
@@ -33,33 +33,33 @@
                 <div class="kpi-icon"><i class="bi bi-currency-dollar"></i></div>
                 <span>Doanh thu</span>
                 <strong>${{ kpis.revenue|floatformat:2 }}</strong>
-                <small>Flight + tour + trai nghiem</small>
+                <small>Vé bay + tour + trải nghiệm</small>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
-                <span>Tong booking</span>
+                <span>Tổng booking</span>
                 <strong>{{ kpis.total_bookings }}</strong>
-                <small>Tat ca trang thai: {{ booking_counts.flight }} ve bay, {{ booking_counts.hotel }} phong, {{ booking_counts.package }} tour, {{ booking_counts.activity }} trai nghiem</small>
+                <small>Tất cả trạng thái: {{ booking_counts.flight }} vé bay, {{ booking_counts.hotel }} phòng, {{ booking_counts.package }} tour, {{ booking_counts.activity }} trải nghiệm</small>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="bi bi-person-plus"></i></div>
-                <span>Khach hang moi</span>
+                <span>Khách hàng mới</span>
                 <strong>{{ kpis.new_customers }}</strong>
                 <small>30 ngay gan nhat</small>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="bi bi-x-octagon"></i></div>
-                <span>Ty le huy</span>
+                <span>Tỷ lệ hủy</span>
                 <strong>{{ kpis.cancellation_rate }}%</strong>
-                <small>{{ booking_counts.cancelled }} booking huy/refund</small>
+                <small>{{ booking_counts.cancelled }} booking hủy/hoàn tiền</small>
             </div>
         </section>
 
         <section class="admin-grid">
             <div class="panel wide">
                 <div class="panel-title">
-                    <h2>Doanh thu 7 ngay</h2>
-                    <span>Theo ngay</span>
+                    <h2>Doanh thu 7 ngày</h2>
+                    <span>Theo ngày</span>
                 </div>
                 <div class="revenue-chart">
                     {% for item in revenue_chart %}
@@ -74,15 +74,15 @@
 
             <div id="finance" class="panel">
                 <div class="panel-title">
-                    <h2>Tai chinh</h2>
-                    <span>Thanh toan</span>
+                    <h2>Tài chính</h2>
+                    <span>Thanh toán</span>
                 </div>
                 <ul class="metric-list">
-                    <li><span>Doanh thu ve bay</span><strong>${{ finance.flight_revenue|floatformat:2 }}</strong></li>
-                    <li><span>Doanh thu khach san</span><strong>${{ finance.hotel_revenue|floatformat:2 }}</strong></li>
+                    <li><span>Doanh thu vé bay</span><strong>${{ finance.flight_revenue|floatformat:2 }}</strong></li>
+                    <li><span>Doanh thu khách sạn</span><strong>${{ finance.hotel_revenue|floatformat:2 }}</strong></li>
                     <li><span>Doanh thu tour</span><strong>${{ finance.package_revenue|floatformat:2 }}</strong></li>
-                    <li><span>Doanh thu trai nghiem</span><strong>${{ finance.activity_revenue|floatformat:2 }}</strong></li>
-                    <li><span>Thanh toan loi</span><strong>{{ finance.failed_payments }}</strong></li>
+                    <li><span>Doanh thu trải nghiệm</span><strong>${{ finance.activity_revenue|floatformat:2 }}</strong></li>
+                    <li><span>Thanh toán lỗi</span><strong>{{ finance.failed_payments }}</strong></li>
                     <li><span>Refund</span><strong>{{ finance.refunds }}</strong></li>
                 </ul>
             </div>
@@ -91,19 +91,19 @@
         <section id="bookings" class="panel">
             <div class="panel-title">
                 <h2>Quan ly booking moi</h2>
-                <span>Xac nhan / huy / hoan tien</span>
+                <span>Xác nhận / hủy / hoàn tiền</span>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
                         <tr>
                             <th>Ma</th>
-                            <th>Loai</th>
-                            <th>Khach hang</th>
-                            <th>Dich vu</th>
-                            <th>Thanh toan</th>
-                            <th>Trang thai</th>
-                            <th>Tong</th>
+                            <th>Loại</th>
+                            <th>Khách hàng</th>
+                            <th>Dịch vụ</th>
+                            <th>Thanh toán</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -121,13 +121,13 @@
                                 {% if booking.can_confirm %}
                                 <form class="action-inline" method="post" action="{% url 'admin_booking_action' booking.type booking.id 'confirm' %}">
                                     {% csrf_token %}
-                                    <button class="btn btn-sm btn-outline-success" type="submit">Xac nhan</button>
+                                    <button class="btn btn-sm btn-outline-success" type="submit">Xác nhận</button>
                                 </form>
                                 {% endif %}
                                 {% if booking.can_cancel %}
                                 <form class="action-inline" method="post" action="{% url 'admin_booking_action' booking.type booking.id 'cancel' %}">
                                     {% csrf_token %}
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Huy</button>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Hủy</button>
                                 </form>
                                 {% endif %}
                                 {% if booking.can_refund %}
@@ -137,14 +137,14 @@
                                 </form>
                                 {% endif %}
                                 {% if not booking.can_confirm and not booking.can_cancel and not booking.can_refund %}
-                                    <span class="text-muted small">Khong co thao tac</span>
+                                    <span class="text-muted small">Không có thao tác</span>
                                 {% elif booking.status == "pending" and booking.payment != "completed" %}
-                                    <span class="text-muted small">Cho khach thanh toan</span>
+                                    <span class="text-muted small">Chờ khách thanh toán</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="8" class="text-muted">Chua co booking.</td></tr>
+                        <tr><td colspan="8" class="text-muted">Chưa có booking.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -155,20 +155,20 @@
             <div class="panel">
                 <div class="panel-title">
                     <h2>Tour & dich vu</h2>
-                    <span>Dang hoat dong</span>
+                    <span>Đang hoạt động</span>
                 </div>
                 <ul class="metric-list">
-                    <li><span>Khach san</span><strong>{{ active_services.hotels }}</strong></li>
-                    <li><span>Chuyen bay</span><strong>{{ active_services.flights }}</strong></li>
-                    <li><span>Tour dang ban</span><strong>{{ active_services.tours }}</strong></li>
-                    <li><span>Trai nghiem</span><strong>{{ active_services.activities }}</strong></li>
-                    <li><span>So phong con</span><strong>{{ active_services.rooms_available|floatformat:0 }}</strong></li>
+                    <li><span>Khách sạn</span><strong>{{ active_services.hotels }}</strong></li>
+                    <li><span>Chuyến bay</span><strong>{{ active_services.flights }}</strong></li>
+                    <li><span>Tour đang bán</span><strong>{{ active_services.tours }}</strong></li>
+                    <li><span>Trải nghiệm</span><strong>{{ active_services.activities }}</strong></li>
+                    <li><span>Số phòng còn</span><strong>{{ active_services.rooms_available|floatformat:0 }}</strong></li>
                 </ul>
             </div>
             <div class="panel">
                 <div class="panel-title">
-                    <h2>Top tour ban chay</h2>
-                    <span>Gia, lich trinh, so cho</span>
+                    <h2>Top tour bán chạy</h2>
+                    <span>Giá, lịch trình, số chỗ</span>
                 </div>
                 {% for tour in top_tours %}
                     <div class="tour-row">
@@ -179,19 +179,19 @@
                         <span class="badge text-bg-success">{{ tour.sold }} booking</span>
                     </div>
                 {% empty %}
-                    <p class="text-muted">Chua co tour nao duoc dat.</p>
+                    <p class="text-muted">Chưa có tour nào được đặt.</p>
                 {% endfor %}
             </div>
         </section>
 
         <section id="customers" class="panel">
             <div class="panel-title">
-                <h2>Khach hang</h2>
-                <span>Thong tin, lich su, VIP / moi</span>
+                <h2>Khách hàng</h2>
+                <span>Thông tin, lịch sử, VIP / mới</span>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle">
-                    <thead><tr><th>Email</th><th>Ten</th><th>Ngay tham gia</th><th>Lich su dat</th><th>Nhom</th></tr></thead>
+                    <thead><tr><th>Email</th><th>Tên</th><th>Ngày tham gia</th><th>Lịch sử đặt</th><th>Nhóm</th></tr></thead>
                     <tbody>
                         {% for customer in customers %}
                         <tr>
@@ -203,12 +203,12 @@
                                 {% if customer.flight_orders|add:customer.hotel_orders|add:customer.package_orders|add:customer.activity_orders >= 3 %}
                                     <span class="badge text-bg-warning">VIP</span>
                                 {% else %}
-                                    <span class="badge text-bg-light">Khach moi</span>
+                                    <span class="badge text-bg-light">Khách mới</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="5" class="text-muted">Chua co khach hang.</td></tr>
+                        <tr><td colspan="5" class="text-muted">Chưa có khách hàng.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -222,27 +222,27 @@
                     <span>Tracking</span>
                 </div>
                 <ul class="metric-list">
-                    <li><span>Luot truy cap</span><strong>Chua cau hinh analytics</strong></li>
-                    <li><span>Hieu qua quang cao</span><strong>Chua ket noi ads</strong></li>
-                    <li><span>Ma giam gia</span><strong>Chua co module coupon</strong></li>
+                    <li><span>Lượt truy cập</span><strong>Chưa cấu hình analytics</strong></li>
+                    <li><span>Hiệu quả quảng cáo</span><strong>Chưa kết nối ads</strong></li>
+                    <li><span>Mã giảm giá</span><strong>Chưa có module coupon</strong></li>
                 </ul>
             </div>
             <div id="system" class="panel">
                 <div class="panel-title">
-                    <h2>He thong</h2>
+                    <h2>Hệ thống</h2>
                     <span>Admin, phan quyen, log</span>
                 </div>
                 <h3 class="h6">Admin users</h3>
                 {% for staff in staff_users %}
                     <div class="small-row"><span>{{ staff.email }}</span><span>{% if staff.is_superuser %}Superuser{% else %}Staff{% endif %}</span></div>
                 {% empty %}
-                    <p class="text-muted">Chua co admin.</p>
+                    <p class="text-muted">Chưa có admin.</p>
                 {% endfor %}
                 <h3 class="h6 mt-3">Log hoat dong</h3>
                 {% for log in activity_logs %}
                     <div class="small-row"><span>{{ log.action_time|date:"d/m H:i" }} · {{ log.user.email }}</span><span>{{ log.object_repr|truncatechars:24 }}</span></div>
                 {% empty %}
-                    <p class="text-muted">Chua co log Django admin.</p>
+                    <p class="text-muted">Chưa có log Django admin.</p>
                 {% endfor %}
             </div>
         </section>

@@ -5,7 +5,8 @@ from django.db.models import Count, IntegerField, OuterRef, Subquery, Sum
 from django.utils import timezone
 from .models import (
     Country, City, HotelChain, Amenity, Hotel, HotelImage, 
-    RoomType, RoomImage, RoomAvailability, HotelReservation, HotelFacility
+    RoomType, RoomImage, RoomAvailability, HotelReservation, HotelFacility,
+    Itinerary, ItineraryStop
 )
 
 
@@ -46,6 +47,8 @@ MODEL_LABELS = {
     RoomAvailability: ('lich phong', 'Lich phong'),
     HotelReservation: ('booking khach san', 'Booking khach san'),
     HotelFacility: ('co so vat chat', 'Co so vat chat'),
+    Itinerary: ('lich trinh goi y', 'Lich trinh goi y'),
+    ItineraryStop: ('diem dung lich trinh', 'Diem dung lich trinh'),
 }
 for model, (singular, plural) in MODEL_LABELS.items():
     model._meta.verbose_name = singular
@@ -121,6 +124,15 @@ class HotelFacilityInline(admin.TabularInline):
     model = HotelFacility
     extra = 1
     fields = ['name', 'category', 'is_free', 'additional_cost']
+
+
+class ItineraryStopInline(admin.TabularInline):
+    model = ItineraryStop
+    extra = 1
+    fields = [
+        'day_number', 'session', 'start_time', 'place_name', 'duration_hours',
+        'estimated_cost', 'currency', 'cost_note', 'image_url', 'google_maps_url', 'order'
+    ]
 
 
 @admin.register(Hotel)
@@ -316,6 +328,29 @@ class HotelFacilityAdmin(admin.ModelAdmin):
     list_filter = ['category', 'is_free', 'is_24_hours']
     search_fields = ['name', 'hotel__name']
     list_editable = ['is_free', 'additional_cost']
+
+
+@admin.register(Itinerary)
+class ItineraryAdmin(admin.ModelAdmin):
+    list_display = ['title', 'city', 'days', 'total_cost_display', 'is_active', 'order', 'created_at']
+    list_filter = ['is_active', 'days', 'city__country']
+    search_fields = ['title', 'city__name', 'description']
+    list_editable = ['is_active', 'order']
+    autocomplete_fields = ['city']
+    inlines = [ItineraryStopInline]
+
+    def total_cost_display(self, obj):
+        return f"{obj.total_estimated_cost:,.0f} VND"
+    total_cost_display.short_description = 'Chi phi du kien'
+
+
+@admin.register(ItineraryStop)
+class ItineraryStopAdmin(admin.ModelAdmin):
+    list_display = ['place_name', 'itinerary', 'day_number', 'session', 'start_time', 'duration_hours', 'estimated_cost', 'order']
+    list_filter = ['session', 'day_number', 'itinerary__city']
+    search_fields = ['place_name', 'description', 'itinerary__title']
+    list_editable = ['day_number', 'session', 'order']
+    autocomplete_fields = ['itinerary']
 
 
 # Custom admin site configuration

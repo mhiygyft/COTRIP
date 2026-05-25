@@ -20,4 +20,5 @@ urlpatterns = [
     path('api/search-suggestions/', views.SearchSuggestionsView.as_view(), name='search_suggestions'),
     path('api/hotel/<int:hotel_id>/availability/', views.HotelAvailabilityView.as_view(), name='hotel_availability'),
     path('api/filters/', views.FilterOptionsView.as_view(), name='filter_options'),
+    path('api/itinerary-builder/', views.ItineraryBuilderAPIView.as_view(), name='itinerary_builder_api'),
 ]

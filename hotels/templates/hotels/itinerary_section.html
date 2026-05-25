@@ -1,0 +1,174 @@
+{% if itineraries %}
+<section class="itinerary-section bg-light py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+            <div>
+                <p class="text-primary fw-semibold mb-1">Gợi ý lịch trình</p>
+                <h2 class="h3 mb-0">Khám phá theo ngày</h2>
+            </div>
+            <span class="text-muted small">Lưu điểm đến yêu thích vào kế hoạch cá nhân</span>
+        </div>
+
+        {% if itineraries|length > 1 %}
+        <ul class="nav nav-pills gap-2 mb-4" id="itineraryTabs" role="tablist">
+            {% for itinerary in itineraries %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if forloop.first %}active{% endif %}" id="itinerary-{{ itinerary.id }}-tab"
+                        data-bs-toggle="pill" data-bs-target="#itinerary-{{ itinerary.id }}" type="button"
+                        role="tab" aria-controls="itinerary-{{ itinerary.id }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                    {{ itinerary.title }}
+                </button>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="tab-content" id="itineraryTabsContent">
+            {% for itinerary in itineraries %}
+            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="itinerary-{{ itinerary.id }}"
+                 role="tabpanel" aria-labelledby="itinerary-{{ itinerary.id }}-tab" tabindex="0">
+                <div class="bg-white border rounded-3 p-3 p-lg-4 shadow-sm">
+                    <div class="d-flex justify-content-between flex-wrap gap-3 mb-4">
+                        <div>
+                            <h3 class="h4 mb-1">{{ itinerary.title }}</h3>
+                            {% if itinerary.description %}
+                            <p class="text-muted mb-0">{{ itinerary.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex flex-column align-items-start align-items-lg-end gap-2">
+                            <span class="badge bg-primary-subtle text-primary">{{ itinerary.days }} ngày</span>
+                            <span class="badge text-bg-light">Budget: {{ itinerary.total_estimated_cost|floatformat:0 }} VND</span>
+                        </div>
+                    </div>
+
+                    {% regroup itinerary.stops.all by day_number as day_groups %}
+                    <ul class="nav nav-tabs mb-4" id="itinerary-{{ itinerary.id }}-day-tabs" role="tablist">
+                        {% for day in day_groups %}
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {% if forloop.first %}active{% endif %}"
+                                    id="itinerary-{{ itinerary.id }}-day-{{ day.grouper }}-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#itinerary-{{ itinerary.id }}-day-{{ day.grouper }}"
+                                    type="button" role="tab"
+                                    aria-controls="itinerary-{{ itinerary.id }}-day-{{ day.grouper }}"
+                                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                                Ngày {{ day.grouper }}
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="tab-content">
+                        {% for day in day_groups %}
+                        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+                             id="itinerary-{{ itinerary.id }}-day-{{ day.grouper }}"
+                             role="tabpanel"
+                             aria-labelledby="itinerary-{{ itinerary.id }}-day-{{ day.grouper }}-tab"
+                             tabindex="0">
+                            <div class="row g-3">
+                                <div class="col-lg-4">
+                                    <div class="itinerary-session h-100">
+                                        <h4 class="h6 text-uppercase text-muted mb-3">Buổi sáng</h4>
+                                        {% for stop in day.list %}
+                                            {% if stop.session == 'morning' %}
+                                                {% include "hotels/itinerary_stop_card.html" with stop=stop itinerary=itinerary %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="itinerary-session h-100">
+                                        <h4 class="h6 text-uppercase text-muted mb-3">Buổi chiều</h4>
+                                        {% for stop in day.list %}
+                                            {% if stop.session == 'afternoon' %}
+                                                {% include "hotels/itinerary_stop_card.html" with stop=stop itinerary=itinerary %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="itinerary-session h-100">
+                                        <h4 class="h6 text-uppercase text-muted mb-3">Buổi tối</h4>
+                                        {% for stop in day.list %}
+                                            {% if stop.session == 'evening' %}
+                                                {% include "hotels/itinerary_stop_card.html" with stop=stop itinerary=itinerary %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-muted">Lịch trình này chưa có điểm dừng.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+.itinerary-session {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.itinerary-stop-card + .itinerary-stop-card {
+    margin-top: 1rem;
+}
+
+.itinerary-stop-image {
+    height: 120px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.itinerary-stop-meta {
+    display: grid;
+    gap: .35rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-add-itinerary-stop]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const stop = {
+                itineraryId: this.dataset.itineraryId,
+                itineraryTitle: this.dataset.itineraryTitle,
+                stopId: this.dataset.stopId,
+                dayNumber: this.dataset.dayNumber,
+                session: this.dataset.session,
+                placeName: this.dataset.placeName,
+                description: this.dataset.description,
+                startTime: this.dataset.startTime,
+                durationHours: this.dataset.durationHours,
+                estimatedCost: this.dataset.estimatedCost,
+                currency: this.dataset.currency,
+                costNote: this.dataset.costNote,
+                imageUrl: this.dataset.imageUrl,
+                googleMapsUrl: this.dataset.googleMapsUrl
+            };
+            const storageKey = 'novaryo_trip_plan';
+            const currentPlan = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const exists = currentPlan.some(function(item) {
+                return item.stopId === stop.stopId;
+            });
+
+            if (!exists) {
+                currentPlan.push(stop);
+                localStorage.setItem(storageKey, JSON.stringify(currentPlan));
+            }
+
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-success');
+            this.innerHTML = '<i class="bi bi-check2"></i> Đã thêm';
+        });
+    });
+});
+</script>
+{% endif %}

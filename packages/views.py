@@ -83,5 +83,5 @@ def book_package(request, package_id):
         status='pending',
         payment_status='pending',
     )
-    messages.info(request, 'Vui long hoan tat thanh toan de gui booking toi admin xac nhan.')
+    messages.info(request, 'Vui lòng hoàn tất thanh toán để gửi booking tới admin xác nhận.')
     return redirect('payments:checkout', booking_type='package', object_id=booking.id)

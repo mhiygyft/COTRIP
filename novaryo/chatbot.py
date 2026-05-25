@@ -64,11 +64,11 @@ def _hotel_recommendations(request, message):
         if score or len(items) < 4:
             items.append(
                 {
-                    "type": "Khach san",
+                    "type": "Khách sạn",
                     "title": hotel.name,
                     "subtitle": f"{hotel.city.name}, {hotel.city.country.name} - {hotel.star_rating} sao",
                     "description": hotel.description[:220],
-                    "price": f"Tu {_money(hotel.price_from, hotel.currency)}/dem",
+                    "price": f"Từ {_money(hotel.price_from, hotel.currency)}/đêm",
                     "image": hotel.primary_image_url,
                     "url": _absolute_url(request, hotel.get_absolute_url()),
                     "score": score + (2 if hotel.is_featured else 0),
@@ -95,9 +95,9 @@ def _package_recommendations(request, message):
                 {
                     "type": "Tour",
                     "title": package.title,
-                    "subtitle": f"{package.destination_city}, {package.destination_country} - {package.duration_days} ngay {package.duration_nights} dem",
+                    "subtitle": f"{package.destination_city}, {package.destination_country} - {package.duration_days} ngày {package.duration_nights} đêm",
                     "description": package.short_description or package.description[:220],
-                    "price": f"Tu {_money(package.base_price_per_person)}/khach",
+                    "price": f"Từ {_money(package.base_price_per_person)}/khách",
                     "image": package.primary_image_url,
                     "url": _absolute_url(request, reverse("packages:detail", kwargs={"package_id": package.id})),
                     "score": score + (2 if package.featured else 0),
@@ -127,11 +127,11 @@ def _activity_recommendations(request, message):
         if score or len(items) < 4:
             items.append(
                 {
-                    "type": "Trai nghiem",
+                    "type": "Trải nghiệm",
                     "title": activity.title,
-                    "subtitle": f"{activity.city}, {activity.country} - {activity.duration_hours} gio",
+                    "subtitle": f"{activity.city}, {activity.country} - {activity.duration_hours} giờ",
                     "description": activity.short_description or activity.description[:220],
-                    "price": f"Tu {_money(activity.price_adult)}/nguoi lon",
+                    "price": f"Từ {_money(activity.price_adult)}/người lớn",
                     "image": activity.primary_image_url,
                     "url": _absolute_url(request, reverse("activities:detail", kwargs={"activity_id": activity.id})),
                     "score": score + (2 if activity.featured else 0),
@@ -141,7 +141,7 @@ def _activity_recommendations(request, message):
 
 
 def _flight_recommendations(request, message):
-    flight_words = {"bay", "ve", "may", "flight", "airport", "san", "chuyen"}
+    flight_words = {"bay", "vé", "ve", "máy", "may", "flight", "airport", "sân", "san", "chuyến", "chuyen"}
     query_tokens = set(_normalize(message).split())
     query_has_flight_intent = bool(query_tokens & flight_words)
     flights = (
@@ -174,11 +174,11 @@ def _flight_recommendations(request, message):
         if score or query_has_flight_intent:
             items.append(
                 {
-                    "type": "Chuyen bay",
+                    "type": "Chuyến bay",
                     "title": f"{flight.flight_code}: {flight.origin.city} -> {flight.destination.city}",
                     "subtitle": f"{flight.airline.name} - {flight.departure_time:%d/%m/%Y %H:%M}",
-                    "description": f"Bay {flight.duration_display}, {'bay thang' if flight.is_direct else str(flight.stops) + ' diem dung'}.",
-                    "price": f"Tu {_money(flight.economy_price)}/khach",
+                    "description": f"Bay {flight.duration_display}, {'bay thẳng' if flight.is_direct else str(flight.stops) + ' điểm dừng'}.",
+                    "price": f"Từ {_money(flight.economy_price)}/khách",
                     "image": "",
                     "url": _absolute_url(request, reverse("flights:detail", kwargs={"flight_id": flight.id})),
                     "score": score,
@@ -200,14 +200,14 @@ def _collect_recommendations(request, message):
 def _fallback_answer(message, recommendations):
     if not recommendations:
         return (
-            "Hien tai minh chua tim thay lua chon that su khop voi yeu cau nay. "
-            "Ban co the noi ro diem den, ngan sach, so ngay di hoac kieu chuyen di mong muon."
+            "Hiện tại mình chưa tìm thấy lựa chọn thật sự khớp với yêu cầu này. "
+            "Bạn có thể nói rõ điểm đến, ngân sách, số ngày đi hoặc kiểu chuyến đi mong muốn."
         )
 
     names = ", ".join(item["title"] for item in recommendations[:3])
     return (
-        f"Dua tren yeu cau cua ban, minh goi y cac lua chon dang co san tren website: {names}. "
-        "Ban co the bam vao tung the de xem chi tiet va dat phong, dat tour hoac dat ve."
+        f"Dựa trên yêu cầu của bạn, mình gợi ý các lựa chọn đang có sẵn trên website: {names}. "
+        "Bạn có thể bấm vào từng thẻ để xem chi tiết và đặt phòng, đặt tour hoặc đặt vé."
     )
 
 
@@ -231,10 +231,10 @@ def _ask_openai(message, recommendations):
 
     inventory = json.dumps(recommendations, ensure_ascii=False)
     system_prompt = (
-        "Ban la chatbot tu van du lich cho website Vietnam Travel. "
-        "Tra loi bang tieng Viet khong dau hoac co dau deu duoc, than thien va ngan gon. "
-        "Chi de xuat cac khach san, tour, trai nghiem hoac chuyen bay co trong INVENTORY. "
-        "Neu du lieu chua du, hay hoi them 1 cau hoi ngan ve diem den, ngan sach hoac thoi gian."
+        "Bạn là chatbot tư vấn du lịch cho website Du lịch Việt Nam. "
+        "Trả lời bằng tiếng Việt có dấu, thân thiện và ngắn gọn. "
+        "Chỉ đề xuất các khách sạn, tour, trải nghiệm hoặc chuyến bay có trong INVENTORY. "
+        "Nếu dữ liệu chưa đủ, hãy hỏi thêm 1 câu hỏi ngắn về điểm đến, ngân sách hoặc thời gian."
     )
     payload = {
         "model": getattr(settings, "OPENAI_MODEL", "gpt-4o-mini"),
@@ -242,7 +242,7 @@ def _ask_openai(message, recommendations):
             {"role": "system", "content": system_prompt},
             {
                 "role": "user",
-                "content": f"Yeu cau khach hang: {message}\n\nINVENTORY:\n{inventory}",
+                "content": f"Yêu cầu khách hàng: {message}\n\nINVENTORY:\n{inventory}",
             },
         ],
         "max_output_tokens": 450,
@@ -271,11 +271,11 @@ def chatbot_api(request):
     try:
         data = json.loads(request.body.decode("utf-8") or "{}")
     except json.JSONDecodeError:
-        return JsonResponse({"error": "Noi dung gui len khong hop le."}, status=400)
+        return JsonResponse({"error": "Nội dung gửi lên không hợp lệ."}, status=400)
 
     message = str(data.get("message", "")).strip()
     if not message:
-        return JsonResponse({"error": "Vui long nhap noi dung can tu van."}, status=400)
+        return JsonResponse({"error": "Vui lòng nhập nội dung cần tư vấn."}, status=400)
 
     recommendations = _collect_recommendations(request, message)
     ai_answer = _ask_openai(message, recommendations)

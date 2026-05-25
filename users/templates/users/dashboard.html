@@ -1,16 +1,16 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
-{% block title %}Dashboard khach hang - Vietnam Travel{% endblock %}
+{% block title %}Dashboard khách hàng - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <div class="customer-header">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <p class="mb-1 text-white-50">Tai khoan khach hang</p>
-                <h1 class="h3 mb-0">Xin chao, {{ request.user.full_name }}</h1>
+                <p class="mb-1 text-white-50">Tài khoản khách hàng</p>
+                <h1 class="h3 mb-0">Xin chào, {{ request.user.full_name }}</h1>
             </div>
-            <a class="btn btn-light" href="{% url 'account_profile' %}">Cap nhat ho so</a>
+            <a class="btn btn-light" href="{% url 'account_profile' %}">Cập nhật hồ sơ</a>
         </div>
     </div>
 </div>
@@ -19,52 +19,65 @@
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="summary-card">
-                <span>Tong booking</span>
+                <span>Tổng booking</span>
                 <strong>{{ booking_total }}</strong>
             </div>
         </div>
         <div class="col-md-3">
             <div class="summary-card">
-                <span>Ve may bay</span>
+                <span>Vé máy bay</span>
                 <strong>{{ flight_bookings.count }}</strong>
             </div>
         </div>
         <div class="col-md-3">
             <div class="summary-card">
-                <span>Phong khach san</span>
+                <span>Phòng khách sạn</span>
                 <strong>{{ hotel_reservations.count }}</strong>
             </div>
         </div>
         <div class="col-md-3">
             <div class="summary-card">
-                <span>Da thanh toan</span>
+                <span>Đã thanh toán</span>
                 <strong>${{ total_spent|floatformat:2 }}</strong>
             </div>
         </div>
     </div>
 
+    {% include "hotels/itinerary_builder_widget.html" %}
+
     <div class="row g-4">
         <div class="col-lg-8">
+            <div class="panel mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h5 mb-0">Kế hoạch của tôi</h2>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" id="clearTripPlan">Xóa</button>
+                </div>
+                <div id="tripPlanList" class="trip-plan-list"></div>
+                <p id="tripPlanEmpty" class="text-muted small mb-0">
+                    Bạn chưa thêm điểm dừng nào. Mở một lịch trình gợi ý và bấm "Thêm vào kế hoạch của tôi".
+                </p>
+            </div>
+
             <div class="panel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 mb-0">Booking cua ban</h2>
+                    <h2 class="h5 mb-0">Booking của bạn</h2>
                     <div class="btn-group btn-group-sm">
-                        <a class="btn btn-outline-primary" href="{% url 'hotels:search' %}">Dat phong</a>
-                        <a class="btn btn-outline-primary" href="{% url 'flights:search' %}">Dat ve bay</a>
-                        <a class="btn btn-outline-primary" href="{% url 'packages:search' %}">Dat tour</a>
+                        <a class="btn btn-outline-primary" href="{% url 'hotels:search' %}">Đặt phòng</a>
+                        <a class="btn btn-outline-primary" href="{% url 'flights:search' %}">Đặt vé bay</a>
+                        <a class="btn btn-outline-primary" href="{% url 'packages:search' %}">Đặt tour</a>
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <thead>
                             <tr>
-                                <th>Ma</th>
-                                <th>Loai</th>
-                                <th>Dich vu</th>
-                                <th>Ngay</th>
-                                <th>Thanh toan</th>
-                                <th>Trang thai</th>
-                                <th>Tong</th>
+                                <th>Mã</th>
+                                <th>Loại</th>
+                                <th>Dịch vụ</th>
+                                <th>Ngày</th>
+                                <th>Thanh toán</th>
+                                <th>Trạng thái</th>
+                                <th>Tổng</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -87,16 +100,16 @@
                                 <td>${{ item.total|floatformat:2 }}</td>
                                 <td class="text-end">
                                     {% if item.can_pay %}
-                                        <a class="btn btn-sm btn-primary" href="{{ item.payment_url }}">Thanh toan</a>
+                                        <a class="btn btn-sm btn-primary" href="{{ item.payment_url }}">Thanh toán</a>
                                     {% endif %}
                                     {% if item.can_cancel %}
                                         {% if item.payment_status == "pending" %}
                                             <form class="d-inline" method="post" action="{{ item.cancel_url }}">
                                                 {% csrf_token %}
-                                                <button class="btn btn-sm btn-outline-danger" type="submit">Huy</button>
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Hủy</button>
                                             </form>
                                         {% elif item.cancel_url %}
-                                            <a class="btn btn-sm btn-outline-danger" href="{{ item.cancel_url }}">Huy</a>
+                                            <a class="btn btn-sm btn-outline-danger" href="{{ item.cancel_url }}">Hủy</a>
                                         {% endif %}
                                     {% endif %}
                                 </td>
@@ -104,7 +117,7 @@
                             {% empty %}
                             <tr>
                                 <td colspan="8" class="text-center text-muted py-4">
-                                    Ban chua co booking nao. Hay bat dau voi khach san, chuyen bay hoac tour Viet Nam.
+                                    Bạn chưa có booking nào. Hãy bắt đầu với khách sạn, chuyến bay hoặc tour Việt Nam.
                                 </td>
                             </tr>
                             {% endfor %}
@@ -116,26 +129,26 @@
 
         <div class="col-lg-4">
             <div class="panel mb-4">
-                <h2 class="h5">Thong tin khach hang</h2>
+                <h2 class="h5">Thông tin khách hàng</h2>
                 <div class="info-row"><span>Email</span><strong>{{ request.user.email }}</strong></div>
-                <div class="info-row"><span>Ho ten</span><strong>{{ request.user.full_name }}</strong></div>
-                <div class="info-row"><span>Dien thoai</span><strong>{{ request.user.phone_number|default:"Chua cap nhat" }}</strong></div>
-                <div class="info-row"><span>Thanh pho</span><strong>{{ request.user.city|default:"Chua cap nhat" }}</strong></div>
+                <div class="info-row"><span>Họ tên</span><strong>{{ request.user.full_name }}</strong></div>
+                <div class="info-row"><span>Điện thoại</span><strong>{{ request.user.phone_number|default:"Chưa cập nhật" }}</strong></div>
+                <div class="info-row"><span>Thành phố</span><strong>{{ request.user.city|default:"Chưa cập nhật" }}</strong></div>
             </div>
 
             <div class="panel">
-                <h2 class="h5">Da luu</h2>
-                <h3 class="h6 mt-3">Chuyen bay da luu</h3>
+                <h2 class="h5">Đã lưu</h2>
+                <h3 class="h6 mt-3">Chuyến bay đã lưu</h3>
                 {% for saved in saved_flights %}
                     <div class="saved-item">{{ saved.flight.flight_code }} - {{ saved.cabin_class }}</div>
                 {% empty %}
-                    <p class="text-muted small">Chua luu chuyen bay nao.</p>
+                    <p class="text-muted small">Chưa lưu chuyến bay nào.</p>
                 {% endfor %}
-                <h3 class="h6 mt-3">Tim kiem da luu</h3>
+                <h3 class="h6 mt-3">Tìm kiếm đã lưu</h3>
                 {% for search in saved_searches %}
                     <div class="saved-item">{{ search.origin.iata_code }} - {{ search.destination.iata_code }}</div>
                 {% empty %}
-                    <p class="text-muted small">Chua co tim kiem da luu.</p>
+                    <p class="text-muted small">Chưa có tìm kiếm đã lưu.</p>
                 {% endfor %}
             </div>
         </div>
@@ -209,5 +222,107 @@
     object-fit: cover;
     width: 72px;
 }
+.trip-plan-item {
+    border-bottom: 1px solid #edf0ef;
+    padding: 10px 0;
+}
+.trip-plan-item:last-child {
+    border-bottom: 0;
+}
+.trip-plan-day {
+    border: 1px solid #edf0ef;
+    border-radius: 8px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+.trip-plan-day-header {
+    background: #f8faf9;
+    border-bottom: 1px solid #edf0ef;
+    padding: 10px 12px;
+}
+.trip-plan-time {
+    color: #13795b;
+    font-weight: 700;
+    min-width: 54px;
+}
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const storageKey = 'novaryo_trip_plan';
+    const list = document.getElementById('tripPlanList');
+    const empty = document.getElementById('tripPlanEmpty');
+    const clearButton = document.getElementById('clearTripPlan');
+
+    function renderTripPlan() {
+        const plan = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        list.innerHTML = '';
+        empty.classList.toggle('d-none', plan.length > 0);
+        clearButton.classList.toggle('d-none', plan.length === 0);
+
+        const grouped = plan.reduce(function(days, item) {
+            const day = item.dayNumber || '1';
+            days[day] = days[day] || [];
+            days[day].push(item);
+            return days;
+        }, {});
+        let totalCost = 0;
+
+        Object.keys(grouped).sort(function(a, b) { return Number(a) - Number(b); }).forEach(function(day) {
+            const items = grouped[day].sort(function(a, b) {
+                return String(a.startTime || '').localeCompare(String(b.startTime || ''));
+            });
+            const dayCost = items.reduce(function(sum, item) {
+                return sum + Number(item.estimatedCost || 0);
+            }, 0);
+            totalCost += dayCost;
+
+            const dayEl = document.createElement('div');
+            dayEl.className = 'trip-plan-day';
+            dayEl.innerHTML = `
+                <div class="trip-plan-day-header d-flex justify-content-between">
+                    <strong>Ngày ${day}</strong>
+                    <span class="text-muted small">${dayCost.toLocaleString('vi-VN')} VND</span>
+                </div>
+            `;
+
+            items.forEach(function(item) {
+                const row = document.createElement('div');
+                row.className = 'trip-plan-item px-3';
+                row.innerHTML = `
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="d-flex gap-3">
+                            <div class="trip-plan-time">${item.startTime || '--:--'}</div>
+                            <div>
+                                <div class="fw-semibold">${item.placeName || 'Điểm dừng'}</div>
+                                <div class="small text-muted">${item.itineraryTitle || ''} - ${item.session || ''} - ${item.durationHours || ''} giờ</div>
+                                <div class="small">${Number(item.estimatedCost || 0).toLocaleString('vi-VN')} ${item.currency || 'VND'}${item.costNote ? ` - ${item.costNote}` : ''}</div>
+                            </div>
+                        </div>
+                        ${item.googleMapsUrl ? `<a class="btn btn-sm btn-outline-primary align-self-start" target="_blank" rel="noopener" href="${item.googleMapsUrl}">Bản đồ</a>` : ''}
+                    </div>
+                `;
+                dayEl.appendChild(row);
+            });
+            list.appendChild(dayEl);
+        });
+
+        if (plan.length) {
+            const total = document.createElement('div');
+            total.className = 'mt-3 fw-semibold text-end';
+            total.textContent = `Tổng chi phí dự kiến: ${totalCost.toLocaleString('vi-VN')} VND`;
+            list.appendChild(total);
+        }
+    }
+
+    clearButton.addEventListener('click', function() {
+        localStorage.removeItem(storageKey);
+        renderTripPlan();
+    });
+
+    renderTripPlan();
+});
+</script>
 {% endblock %}
