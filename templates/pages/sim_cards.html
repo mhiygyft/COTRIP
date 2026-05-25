@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}SIM du lịch cho người nước ngoài - Du lịch Việt Nam{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <p class="text-white-50 mb-2">Dành cho khách quốc tế đến Việt Nam</p>
+                <h1 class="display-6 fw-bold">Mua SIM du lịch nhanh, có data ngay khi hạ cánh</h1>
+                <p class="lead mb-0">Chọn gói data phù hợp, nhận SIM tại sân bay/khách sạn và được hỗ trợ kích hoạt.</p>
+            </div>
+            <div class="col-lg-5">
+                <div class="bg-white text-dark rounded-3 p-4 shadow-sm">
+                    <h2 class="h5">Cần chuẩn bị</h2>
+                    <ul class="mb-0">
+                        <li>Hộ chiếu hoặc ảnh hộ chiếu</li>
+                        <li>Ngày đến Việt Nam và giờ hạ cánh</li>
+                        <li>Sân bay/khách sạn/điểm hẹn nhận SIM</li>
+                        <li>Điện thoại mở khóa mạng để dùng SIM quốc tế</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+        <div>
+            <p class="text-primary fw-semibold mb-1">Gói SIM phổ biến</p>
+            <h2 class="h3 mb-0">Chọn theo thời gian lưu trú</h2>
+        </div>
+        <span class="text-muted small">Giá mẫu để khách chọn nhanh, admin có thể cập nhật sau.</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <span class="badge text-bg-light mb-3">7 ngày</span>
+                    <h3 class="h5">Traveler 7GB</h3>
+                    <p class="text-muted">Phù hợp chuyến ngắn, dùng bản đồ, chat và mạng xã hội cơ bản.</p>
+                    <div class="display-6 fw-bold text-primary">180.000đ</div>
+                    <ul class="small text-muted mt-3">
+                        <li>7GB data tốc độ cao</li>
+                        <li>Nhận tại sân bay</li>
+                        <li>Hỗ trợ kích hoạt</li>
+                    </ul>
+                    <a class="btn btn-primary w-100" href="#sim-order-form">Chọn gói này</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 border-primary">
+                <div class="card-body">
+                    <span class="badge bg-primary mb-3">Phổ biến</span>
+                    <h3 class="h5">Explorer 15GB</h3>
+                    <p class="text-muted">Dành cho khách đi nhiều thành phố, cần data ổn định để di chuyển.</p>
+                    <div class="display-6 fw-bold text-primary">280.000đ</div>
+                    <ul class="small text-muted mt-3">
+                        <li>15GB data tốc độ cao</li>
+                        <li>Nhận sân bay hoặc khách sạn</li>
+                        <li>Hỗ trợ WhatsApp/Zalo</li>
+                    </ul>
+                    <a class="btn btn-primary w-100" href="#sim-order-form">Chọn gói này</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <span class="badge text-bg-light mb-3">30 ngày</span>
+                    <h3 class="h5">Nomad 30GB</h3>
+                    <p class="text-muted">Phù hợp lưu trú dài ngày, làm việc từ xa hoặc đi xuyên Việt.</p>
+                    <div class="display-6 fw-bold text-primary">450.000đ</div>
+                    <ul class="small text-muted mt-3">
+                        <li>30GB data tốc độ cao</li>
+                        <li>Hotspot cá nhân</li>
+                        <li>Tư vấn nhà mạng phù hợp</li>
+                    </ul>
+                    <a class="btn btn-primary w-100" href="#sim-order-form">Chọn gói này</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <p class="text-primary fw-semibold mb-1">Quy trình đầy đủ</p>
+                <h2 class="h4 mb-4">Từ chọn gói đến kích hoạt SIM</h2>
+
+                <div class="timeline-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3 class="h6">Chọn gói</h3>
+                            <p class="text-muted mb-2">Chọn theo số ngày ở Việt Nam và nhu cầu data.</p>
+                            <ul class="small mb-0">
+                                <li>7 ngày: dùng bản đồ, chat, mạng xã hội cơ bản.</li>
+                                <li>15 ngày: phù hợp đi nhiều thành phố.</li>
+                                <li>30 ngày: phù hợp lưu trú dài ngày hoặc làm việc từ xa.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3 class="h6">Gửi thông tin</h3>
+                            <p class="text-muted mb-2">Cung cấp thông tin cần thiết để giữ SIM và chuẩn bị kích hoạt.</p>
+                            <ul class="small mb-0">
+                                <li>Họ tên theo hộ chiếu.</li>
+                                <li>Quốc tịch và số hộ chiếu hoặc ảnh hộ chiếu.</li>
+                                <li>Ngày đến, giờ hạ cánh, số chuyến bay nếu nhận tại sân bay.</li>
+                                <li>Khách sạn/địa chỉ nhận SIM nếu nhận trong thành phố.</li>
+                                <li>WhatsApp/Zalo/email để nhân viên liên hệ.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3 class="h6">Xác nhận và thanh toán</h3>
+                            <p class="text-muted mb-2">Nhân viên kiểm tra gói SIM, điểm nhận và gửi xác nhận.</p>
+                            <ul class="small mb-0">
+                                <li>Xác nhận loại SIM/eSIM nếu có.</li>
+                                <li>Kiểm tra điện thoại có mở khóa mạng.</li>
+                                <li>Thanh toán trước hoặc thanh toán khi nhận tùy chính sách.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h3 class="h6">Nhận SIM</h3>
+                            <p class="text-muted mb-2">Nhận tại sân bay, khách sạn hoặc điểm hẹn.</p>
+                            <ul class="small mb-0">
+                                <li>Sân bay: nhân viên hẹn tại cổng đến hoặc quầy hỗ trợ.</li>
+                                <li>Khách sạn: giao tại lễ tân hoặc gặp trực tiếp.</li>
+                                <li>Điểm hẹn: phù hợp khi khách đã ở trung tâm thành phố.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h3 class="h6">Kích hoạt</h3>
+                            <p class="text-muted mb-2">Nhân viên hỗ trợ lắp SIM, bật data và kiểm tra trước khi rời đi.</p>
+                            <ul class="small mb-0">
+                                <li>Kiểm tra sóng, 4G/5G và dung lượng data.</li>
+                                <li>Hướng dẫn bật roaming/APN nếu cần.</li>
+                                <li>Gửi số hotline hỗ trợ trong thời gian dùng SIM.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="bg-white rounded-3 border p-4 shadow-sm sticky-lg-top" id="sim-order-form" style="top: 90px;">
+                    <h2 class="h5">Gửi yêu cầu đặt SIM</h2>
+                    <p class="text-muted small">Form này tạo email nhanh để đội hỗ trợ liên hệ lại.</p>
+
+                    <form action="mailto:support@novaryo.local" method="get" enctype="text/plain">
+                        <div class="mb-3">
+                            <label class="form-label small">Gói SIM</label>
+                            <select class="form-select" name="subject">
+                                <option value="Đặt SIM Traveler 7GB">Traveler 7GB - 180.000đ</option>
+                                <option value="Đặt SIM Explorer 15GB" selected>Explorer 15GB - 280.000đ</option>
+                                <option value="Đặt SIM Nomad 30GB">Nomad 30GB - 450.000đ</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small">Thông tin khách</label>
+                            <textarea class="form-control" name="body" rows="8" placeholder="Họ tên:
+Quốc tịch:
+Số hộ chiếu:
+Ngày đến:
+Sân bay/khách sạn nhận SIM:
+Số người cần SIM:
+WhatsApp/Zalo/Email:"></textarea>
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">Gửi yêu cầu</button>
+                    </form>
+
+                    <div class="alert alert-info small mt-3 mb-0">
+                        Lưu ý: Khách nước ngoài thường cần thông tin hộ chiếu để đăng ký SIM theo quy định nhà mạng.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline-steps {
+    display: grid;
+    gap: 14px;
+}
+.step-card {
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 42px 1fr;
+    padding: 18px;
+}
+.step-number {
+    align-items: center;
+    background: #13795b;
+    border-radius: 999px;
+    color: #fff;
+    display: flex;
+    font-weight: 700;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+}
+</style>
+{% endblock %}
