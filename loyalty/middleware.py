@@ -1,4 +1,4 @@
-"""
+﻿"""
 Custom middleware for API versioning and loyalty program features
 """
 from django.http import JsonResponse
@@ -251,7 +251,7 @@ class CORSMiddleware(MiddlewareMixin):
             allowed_origins = [
                 'http://localhost:3000',  # React dev server
                 'http://localhost:8000',  # Django dev server
-                'https://novaryo.com',    # Production domain
+                'https://cotripvn.com',    # Production domain
             ]
             
             origin = request.META.get('HTTP_ORIGIN')

@@ -1,4 +1,4 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 from django import forms
 from django.utils.html import format_html
 from django.db.models import Count, IntegerField, OuterRef, Subquery, Sum
@@ -354,6 +354,6 @@ class ItineraryStopAdmin(admin.ModelAdmin):
 
 
 # Custom admin site configuration
-admin.site.site_header = 'Vietnam Travel Administration'
-admin.site.site_title = 'Vietnam Travel Admin'
+admin.site.site_header = 'COTRIPVn Administration'
+admin.site.site_title = 'COTRIPVn Admin'
 admin.site.index_title = 'Quan tri he thong du lich Viet Nam'

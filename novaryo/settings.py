@@ -1,6 +1,6 @@
-"""
-Novaryo Travel Booking Platform - Django Settings
-"Discover Comfort. Discover Novaryo."
+﻿"""
+COTRIPVn Travel Booking Platform - Django Settings
+"Plan smarter. Travel better with COTRIPVn."
 
 A comprehensive travel platform with hotels, flights, packages, and activities.
 
@@ -105,7 +105,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.facebook",
     
-    # Novaryo apps
+    # COTRIPVn apps
     "users.apps.UsersConfig",
     "hotels.apps.HotelsConfig",
     "flights.apps.FlightsConfig",
@@ -357,7 +357,7 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = config_bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = "Novaryo <noreply@novaryo.com>"
+DEFAULT_FROM_EMAIL = "COTRIPVn <noreply@cotripvn.com>"
 
 # Django Allauth Configuration
 AUTHENTICATION_BACKENDS = [

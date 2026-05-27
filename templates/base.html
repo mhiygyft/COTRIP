@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="vi">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Du lịch Việt Nam{% endblock %}</title>
+    <title>{% block title %}COTRIPVn{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -160,7 +160,7 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% if request.user.is_authenticated and request.user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'home' %}{% endif %}">Du lịch Việt Nam</a>
+            <a class="navbar-brand fw-bold" href="{% if request.user.is_authenticated and request.user.is_staff %}{% url 'admin_dashboard' %}{% else %}{% url 'home' %}{% endif %}">COTRIPVn</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -263,7 +263,7 @@
 
     <footer class="border-top py-4 mt-5">
         <div class="container text-muted small">
-            &copy; 2026 Du lịch Việt Nam. Hành trình Việt Nam, từ núi rừng đến biển đảo.
+            &copy; 2026 COTRIPVn. Hành trình Việt Nam, từ núi rừng đến biển đảo.
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import re
 
 from django.conf import settings
@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
         self._multiline(draw, title, (125, height - 230), self.font_large, text_color, max_chars=30)
         self._multiline(draw, subtitle, (125, height - 145), self.font_medium, text_color, max_chars=48)
-        draw.text((100, 100), "Vietnam Travel", fill=text_color, font=self.font_small)
+        draw.text((100, 100), "COTRIPVn", fill=text_color, font=self.font_small)
 
         image.save(path, quality=92)
         return relative_path

@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+﻿from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
 from loyalty.models import LoyaltyTier, Reward, LoyaltyPromotion
@@ -49,7 +49,7 @@ class Command(BaseCommand):
             {
                 'name': 'Bronze',
                 'slug': 'bronze',
-                'description': 'Welcome to Novaryo loyalty! Start earning points and enjoying benefits.',
+                'description': 'Welcome to COTRIPVn loyalty! Start earning points and enjoying benefits.',
                 'color_code': '#CD7F32',
                 'icon': 'fas fa-medal',
                 'order': 0,
@@ -213,7 +213,7 @@ class Command(BaseCommand):
                 'name': 'Airport Lounge Access',
                 'slug': 'lounge-access',
                 'category': 'service',
-                'description': 'One-time access to any Novaryo partner lounge worldwide.',
+                'description': 'One-time access to any COTRIPVn partner lounge worldwide.',
                 'points_required': 3000,
                 'cash_equivalent': 45.00,
                 'is_available': True,
@@ -234,7 +234,7 @@ class Command(BaseCommand):
 
             # Merchandise
             {
-                'name': 'Novaryo Travel Backpack',
+                'name': 'COTRIPVn Backpack',
                 'slug': 'travel-backpack',
                 'category': 'merchandise',
                 'description': 'Premium travel backpack with laptop compartment and TSA-friendly design.',

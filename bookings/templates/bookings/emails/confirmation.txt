@@ -1,8 +1,8 @@
-Booking {{ booking.booking_reference }} confirmed
+﻿Booking {{ booking.booking_reference }} confirmed
 
 Hello {{ passenger.full_name|default:booking.user.email }},
 
-Your Vietnam Travel booking is confirmed.
+Your COTRIPVn booking is confirmed.
 
 Flight: {{ booking.flight.flight_code }}
 Route: {{ booking.flight.origin.city }} ({{ booking.flight.origin.iata_code }}) to {{ booking.flight.destination.city }} ({{ booking.flight.destination.iata_code }})
@@ -10,4 +10,4 @@ Departure: {{ booking.flight.departure_time|date:"M d, Y H:i" }}
 Cabin: {{ booking.get_cabin_class_display }}
 Total: {{ booking.total_price }} {{ booking.currency }}
 
-Thank you for choosing Vietnam Travel.
+Thank you for choosing COTRIPVn.

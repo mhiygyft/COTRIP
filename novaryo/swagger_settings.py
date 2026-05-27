@@ -1,5 +1,5 @@
-"""
-Swagger/OpenAPI documentation settings for Novaryo API
+﻿"""
+Swagger/OpenAPI documentation settings for COTRIPVn API
 """
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -8,14 +8,14 @@ from rest_framework import permissions
 # API Schema configuration
 schema_view = get_schema_view(
     openapi.Info(
-        title="Novaryo Travel Platform API",
+        title="COTRIPVn Travel Platform API",
         default_version='v1',
         description="""
-        # Novaryo Travel Platform REST API
+        # COTRIPVn Travel Platform REST API
         
-        **"Discover Comfort. Discover Novaryo."**
+        **"Plan smarter. Travel better with COTRIPVn."**
         
-        Complete RESTful API for the Novaryo travel booking platform with integrated loyalty program.
+        Complete RESTful API for the COTRIPVn travel booking platform with integrated loyalty program.
         
         ## Features
         
@@ -80,13 +80,13 @@ schema_view = get_schema_view(
         - **Anonymous users**: 100 requests/hour
         
         ## Support
-        For API support, contact: api-support@novaryo.com
+        For API support, contact: api-support@cotripvn.com
         """,
-        terms_of_service="https://novaryo.com/terms/",
+        terms_of_service="https://cotripvn.com/terms/",
         contact=openapi.Contact(
-            name="Novaryo API Team",
-            email="api-support@novaryo.com",
-            url="https://novaryo.com/contact/"
+            name="COTRIPVn API Team",
+            email="api-support@cotripvn.com",
+            url="https://cotripvn.com/contact/"
         ),
         license=openapi.License(
             name="MIT License",

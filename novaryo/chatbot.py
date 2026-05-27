@@ -1,4 +1,4 @@
-import json
+﻿import json
 import logging
 from decimal import Decimal
 
@@ -231,7 +231,7 @@ def _ask_openai(message, recommendations):
 
     inventory = json.dumps(recommendations, ensure_ascii=False)
     system_prompt = (
-        "Bạn là chatbot tư vấn du lịch cho website Du lịch Việt Nam. "
+        "Bạn là chatbot tư vấn du lịch cho website COTRIPVn. "
         "Trả lời bằng tiếng Việt có dấu, thân thiện và ngắn gọn. "
         "Chỉ đề xuất các khách sạn, tour, trải nghiệm hoặc chuyến bay có trong INVENTORY. "
         "Nếu dữ liệu chưa đủ, hãy hỏi thêm 1 câu hỏi ngắn về điểm đến, ngân sách hoặc thời gian."

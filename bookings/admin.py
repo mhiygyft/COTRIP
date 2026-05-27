@@ -1,4 +1,4 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -345,6 +345,6 @@ class BookingPaymentAdmin(admin.ModelAdmin):
 
 
 # Customize admin site header and title
-admin.site.site_header = "Vietnam Travel Administration"
-admin.site.site_title = "Vietnam Travel Admin"
+admin.site.site_header = "COTRIPVn Administration"
+admin.site.site_title = "COTRIPVn Admin"
 admin.site.index_title = "Quan tri he thong du lich Viet Nam"

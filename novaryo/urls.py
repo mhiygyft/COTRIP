@@ -1,6 +1,6 @@
-"""
-Novaryo Travel Booking Platform - URL Configuration
-"Discover Comfort. Discover Novaryo."
+﻿"""
+COTRIPVn Travel Booking Platform - URL Configuration
+"Plan smarter. Travel better with COTRIPVn."
 
 © 2025 Aniket Kumar. All rights reserved.
 This software is proprietary and confidential.
@@ -24,8 +24,8 @@ from . import admin_dashboard
 from . import chatbot
 from .swagger_settings import schema_view
 
-admin.site.site_header = "Vietnam Travel Administration"
-admin.site.site_title = "Vietnam Travel Admin"
+admin.site.site_header = "COTRIPVn Administration"
+admin.site.site_title = "COTRIPVn Admin"
 admin.site.index_title = "Quản trị hệ thống du lịch Việt Nam"
 
 urlpatterns = [

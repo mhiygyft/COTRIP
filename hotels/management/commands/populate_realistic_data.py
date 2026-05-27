@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+﻿from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from django.utils import timezone
@@ -592,7 +592,7 @@ class Command(BaseCommand):
 
 ## Test User Accounts
 
-Here are the sample user accounts created for testing the Novaryo platform:
+Here are the sample user accounts created for testing the COTRIPVn platform:
 
 ### 1. John Doe (Gold Tier Member)
 - **Email:** john.doe@email.com

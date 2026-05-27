@@ -1,4 +1,4 @@
-"""
+﻿"""
 Email notification system for booking-related events
 """
 import logging
@@ -26,7 +26,7 @@ class BookingEmailService:
                 'booking': booking,
                 'passenger': booking.passengers.first(),
                 'site': current_site,
-                'support_email': 'support@novaryo.com',
+                'support_email': 'support@cotripvn.com',
                 'year': timezone.now().year
             }
             
@@ -42,7 +42,7 @@ class BookingEmailService:
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[booking.contact_email],
                 cc=[booking.user.email] if booking.user.email != booking.contact_email else [],
-                reply_to=['support@novaryo.com']
+                reply_to=['support@cotripvn.com']
             )
             msg.attach_alternative(html_content, "text/html")
             
@@ -68,7 +68,7 @@ class BookingEmailService:
                 'passenger': booking.passengers.first(),
                 'reason': reason,
                 'site': current_site,
-                'support_email': 'support@novaryo.com',
+                'support_email': 'support@cotripvn.com',
                 'year': timezone.now().year
             }
             
@@ -84,7 +84,7 @@ class BookingEmailService:
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[booking.contact_email],
                 cc=[booking.user.email] if booking.user.email != booking.contact_email else [],
-                reply_to=['support@novaryo.com']
+                reply_to=['support@cotripvn.com']
             )
             msg.attach_alternative(html_content, "text/html")
             
@@ -114,7 +114,7 @@ class BookingEmailService:
                 'payment': payment,
                 'passenger': booking.passengers.first(),
                 'site': current_site,
-                'support_email': 'support@novaryo.com',
+                'support_email': 'support@cotripvn.com',
                 'year': timezone.now().year
             }
             
@@ -130,7 +130,7 @@ class BookingEmailService:
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[booking.contact_email],
                 cc=[booking.user.email] if booking.user.email != booking.contact_email else [],
-                reply_to=['support@novaryo.com']
+                reply_to=['support@cotripvn.com']
             )
             msg.attach_alternative(html_content, "text/html")
             
@@ -156,7 +156,7 @@ class BookingEmailService:
                 'passenger': booking.passengers.first(),
                 'days_until_departure': days_until_departure,
                 'site': current_site,
-                'support_email': 'support@novaryo.com',
+                'support_email': 'support@cotripvn.com',
                 'year': timezone.now().year
             }
             
@@ -172,7 +172,7 @@ class BookingEmailService:
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[booking.contact_email],
                 cc=[booking.user.email] if booking.user.email != booking.contact_email else [],
-                reply_to=['support@novaryo.com']
+                reply_to=['support@cotripvn.com']
             )
             msg.attach_alternative(html_content, "text/html")
             

@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <body>
     <h1>Booking {{ booking.booking_reference }} confirmed</h1>
     <p>Hello {{ passenger.full_name|default:booking.user.email }},</p>
-    <p>Your Vietnam Travel booking is confirmed.</p>
+    <p>Your COTRIPVn booking is confirmed.</p>
     <ul>
         <li>Flight: {{ booking.flight.flight_code }}</li>
         <li>Route: {{ booking.flight.origin.city }} ({{ booking.flight.origin.iata_code }}) to {{ booking.flight.destination.city }} ({{ booking.flight.destination.iata_code }})</li>
