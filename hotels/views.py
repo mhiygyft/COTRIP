@@ -182,7 +182,7 @@ class HotelSearchView(ListView):
     model = Hotel
     template_name = 'hotels/search_results.html'
     context_object_name = 'hotels'
-    paginate_by = 20
+    paginate_by = 100
     
     def get_queryset(self):
         queryset = Hotel.objects.filter(is_active=True).prefetch_related('images', 'amenities')
@@ -252,7 +252,7 @@ class HotelListView(ListView):
     model = Hotel
     template_name = 'hotels/search_results.html'
     context_object_name = 'hotels'
-    paginate_by = 20
+    paginate_by = 100
     
     def get_queryset(self):
         return Hotel.objects.filter(is_active=True).prefetch_related('images', 'amenities').order_by('-is_featured', '-average_rating')

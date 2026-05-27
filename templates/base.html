@@ -456,6 +456,26 @@
             })();
         </script>
     {% endif %}
+    <script>
+        (function () {
+            const fallbackImages = [
+                "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+            ];
+
+            document.addEventListener("error", function (event) {
+                const image = event.target;
+                if (!image || image.tagName !== "IMG" || image.dataset.fallbackApplied === "1") {
+                    return;
+                }
+                image.dataset.fallbackApplied = "1";
+                const seed = image.alt ? image.alt.length : 0;
+                image.src = fallbackImages[seed % fallbackImages.length];
+            }, true);
+        })();
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
