@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Ve tau xe cua toi{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Vé tàu & xe khách của tôi</h1>
+        <a class="btn btn-primary" href="{% url 'transport:search' %}">Đặt vé mới</a>
+    </div>
+    {% for booking in bookings %}
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row align-items-center g-3">
+                <div class="col-md-7">
+                    <div class="fw-bold text-primary">{{ booking.booking_reference }}</div>
+                    <div>{{ booking.trip.route.origin.city }} → {{ booking.trip.route.destination.city }}</div>
+                    <div class="small text-muted">{{ booking.trip.provider.name }} {{ booking.trip.trip_code }} · {{ booking.trip.departure_time|date:"d/m/Y H:i" }}</div>
+                </div>
+                <div class="col-md-2">
+                    <span class="badge text-bg-warning">{{ booking.get_status_display }}</span>
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <strong class="text-success">{{ booking.total_price|floatformat:0 }} VND</strong>
+                    <a class="btn btn-sm btn-outline-primary d-block mt-2" href="{% url 'transport:booking_detail' booking.booking_reference %}">Chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5">
+        <h2 class="h5">Chưa có vé tàu/xe</h2>
+        <p class="text-muted">Bạn có thể tìm vé tàu hỏa hoặc xe khách cho hành trình tiếp theo.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

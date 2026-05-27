@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     "packages.apps.PackagesConfig",
     "activities.apps.ActivitiesConfig",
     "bookings.apps.BookingsConfig",
+    "transport.apps.TransportConfig",
     "payments.apps.PaymentsConfig",
     "reviews.apps.ReviewsConfig",
     "loyalty.apps.LoyaltyConfig",

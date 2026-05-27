@@ -1,0 +1,30 @@
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5">Tóm tắt chuyến</h2>
+        <div class="d-flex justify-content-between align-items-start mt-3">
+            <div>
+                <strong>{{ trip.provider.name }}</strong>
+                <div class="small text-muted">{{ trip.trip_code }} · {{ trip.get_seat_class_display }}</div>
+            </div>
+            <span class="badge text-bg-light">{{ trip.route.get_transport_type_display }}</span>
+        </div>
+        <div class="row text-center my-3">
+            <div class="col">
+                <div class="fw-bold">{{ trip.departure_time|date:"H:i" }}</div>
+                <div class="small text-muted">{{ trip.route.origin.city }}</div>
+            </div>
+            <div class="col-2"><i class="bi bi-arrow-right text-primary"></i></div>
+            <div class="col">
+                <div class="fw-bold">{{ trip.arrival_time|date:"H:i" }}</div>
+                <div class="small text-muted">{{ trip.route.destination.city }}</div>
+            </div>
+        </div>
+        <div class="small text-muted mb-3">{{ trip.departure_time|date:"d/m/Y" }} · {{ trip.duration_display }}</div>
+        <div class="border-top pt-3">
+            <div class="d-flex justify-content-between"><span>Số khách</span><strong>{{ passengers }}</strong></div>
+            <div class="d-flex justify-content-between"><span>Giá vé</span><strong>{{ base_price|floatformat:0 }} VND</strong></div>
+            <div class="d-flex justify-content-between"><span>Phí dịch vụ</span><strong>{{ service_fee|floatformat:0 }} VND</strong></div>
+            <div class="d-flex justify-content-between fs-5 text-success border-top mt-2 pt-2"><span>Tổng</span><strong>{{ total_price|floatformat:0 }} VND</strong></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Xac nhan dat ve{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <div class="display-5 text-success"><i class="bi bi-check-circle"></i></div>
+        <h1 class="h3">Đặt vé thành công</h1>
+        <p class="text-muted">Mã đặt vé của bạn là <strong>{{ booking.booking_reference }}</strong></p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            {% include "transport/partials/booking_detail_card.html" %}
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5">Thanh toán</h2>
+                    <div class="d-flex justify-content-between"><span>Trạng thái</span><strong>{{ booking.payment_status }}</strong></div>
+                    <div class="d-flex justify-content-between"><span>Tổng tiền</span><strong class="text-success">{{ booking.total_price|floatformat:0 }} VND</strong></div>
+                    <a class="btn btn-primary w-100 mt-3" href="{% url 'transport:my_bookings' %}">Xem vé của tôi</a>
+                    <a class="btn btn-outline-secondary w-100 mt-2" href="{% url 'transport:search' %}">Đặt vé khác</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

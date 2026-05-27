@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Thanh toan ve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <h1 class="h3 mb-3">Thanh toán</h1>
+            <form method="post" class="card border-0 shadow-sm">
+                {% csrf_token %}
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Phương thức thanh toán</h2>
+                    {% for value, label in form.payment_method.field.choices %}
+                    <label class="border rounded p-3 d-block mb-2">
+                        <input class="form-check-input me-2" type="radio" name="payment_method" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+                        <strong>{{ label }}</strong>
+                    </label>
+                    {% endfor %}
+                    <div class="alert alert-info small mt-3">
+                        Đây là thanh toán demo. Với chuyển khoản ngân hàng, hệ thống sẽ tạo booking và đánh dấu chờ xác nhận như luồng khách sạn.
+                    </div>
+                    <div class="form-check mt-3">
+                        {{ form.accept_terms }}
+                        <label class="form-check-label" for="{{ form.accept_terms.id_for_label }}">Tôi đồng ý với điều khoản đặt vé</label>
+                    </div>
+                    {% if form.accept_terms.errors %}
+                    <div class="text-danger small">{{ form.accept_terms.errors }}</div>
+                    {% endif %}
+                    <button class="btn btn-primary btn-lg mt-4" type="submit">Hoàn tất đặt vé</button>
+                </div>
+            </form>
+        </div>
+        <aside class="col-lg-4">
+            {% include "transport/partials/booking_summary.html" %}
+        </aside>
+    </div>
+</div>
+{% endblock %}
