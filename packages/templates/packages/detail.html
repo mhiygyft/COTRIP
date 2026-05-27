@@ -20,7 +20,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <p><strong>{{ package.base_price_per_person }} USD</strong> mỗi người</p>
+        <p><strong>{{ package.base_price_per_person|floatformat:0 }} VND</strong> mỗi người</p>
         <p class="text-success">Con {{ package.max_participants }} suat moi dot khoi hanh</p>
         <form method="post" action="{% url 'packages:book' package.id %}" class="row g-3 border rounded p-3 mt-3">
             {% csrf_token %}

@@ -423,17 +423,17 @@
                 <div class="price-breakdown">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Giá vé cơ bản ({{ booking.passenger_count }} hành khách)</span>
-                        <span>${{ booking.base_price }}</span>
+                        <span>{{ booking.base_price|floatformat:0 }} VND</span>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-2">
                         <span>Thuế và phí</span>
-                        <span>${{ booking.taxes_and_fees }}</span>
+                        <span>{{ booking.taxes_and_fees|floatformat:0 }} VND</span>
                     </div>
                     
                     <div class="d-flex justify-content-between total-paid">
                         <span><strong>Total {% if booking.payment_method == 'skipped' %}(Testing){% else %}Paid{% endif %}</strong></span>
-                        <span><strong>${{ booking.total_price }}</strong></span>
+                        <span><strong>{{ booking.total_price|floatformat:0 }} VND</strong></span>
                     </div>
                     
                     {% if booking.payment_method != 'skipped' %}

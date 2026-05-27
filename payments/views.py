@@ -68,7 +68,7 @@ def checkout(request, booking_type, object_id):
             user=request.user,
             booking=booking if booking_type == "flight" else None,
             amount=booking.total_price,
-            currency=getattr(booking, "currency", "USD"),
+            currency=getattr(booking, "currency", "VND"),
             method=method,
             status="completed",
             booking_type=booking_type,

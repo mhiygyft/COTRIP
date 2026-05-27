@@ -27,7 +27,7 @@ class PaymentTransaction(models.Model):
     booking_type = models.CharField(max_length=30, blank=True)
     object_id = models.PositiveIntegerField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default="USD")
+    currency = models.CharField(max_length=3, default="VND")
     method = models.CharField(max_length=30, choices=METHOD_CHOICES, default="manual")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="pending")
     provider = models.CharField(max_length=50, blank=True)

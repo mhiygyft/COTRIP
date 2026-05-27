@@ -257,7 +257,7 @@ class Command(BaseCommand):
                         star_rating=random.randint(3, 5),
                         hotel_chain=random.choice(hotel_chains) if random.choice([True, False]) else None,
                         price_from=Decimal(str(random.randint(50, 500))),
-                        currency='USD',
+                        currency='VND',
                         is_active=True,
                         is_featured=random.choice([True, False, False, False]),  # 25% chance of being featured
                         is_verified=True,

@@ -106,7 +106,7 @@ class Command(BaseCommand):
                     "description": description,
                     "star_rating": 4,
                     "price_from": Decimal(str(price)),
-                    "currency": "USD",
+                    "currency": "VND",
                     "is_active": True,
                     "is_featured": True,
                     "is_verified": True,

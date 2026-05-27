@@ -30,9 +30,9 @@
 
         <section class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-icon"><i class="bi bi-currency-dollar"></i></div>
+                <div class="kpi-icon"><i class="bi bi-cash-coin"></i></div>
                 <span>Doanh thu</span>
-                <strong>${{ kpis.revenue|floatformat:2 }}</strong>
+                <strong>{{ kpis.revenue|floatformat:0 }} VND</strong>
                 <small>Vé bay + tour + trải nghiệm</small>
             </div>
             <div class="kpi-card">
@@ -64,7 +64,7 @@
                 <div class="revenue-chart">
                     {% for item in revenue_chart %}
                     <div class="bar-item">
-                        <div class="bar-value">${{ item.total|floatformat:0 }}</div>
+                        <div class="bar-value">{{ item.total|floatformat:0 }} VND</div>
                         <div class="bar-track"><div class="bar-fill" style="height: {{ item.height }}%;"></div></div>
                         <div class="bar-label">{{ item.label }}</div>
                     </div>
@@ -78,10 +78,10 @@
                     <span>Thanh toán</span>
                 </div>
                 <ul class="metric-list">
-                    <li><span>Doanh thu vé bay</span><strong>${{ finance.flight_revenue|floatformat:2 }}</strong></li>
-                    <li><span>Doanh thu khách sạn</span><strong>${{ finance.hotel_revenue|floatformat:2 }}</strong></li>
-                    <li><span>Doanh thu tour</span><strong>${{ finance.package_revenue|floatformat:2 }}</strong></li>
-                    <li><span>Doanh thu trải nghiệm</span><strong>${{ finance.activity_revenue|floatformat:2 }}</strong></li>
+                    <li><span>Doanh thu vé bay</span><strong>{{ finance.flight_revenue|floatformat:0 }} VND</strong></li>
+                    <li><span>Doanh thu khách sạn</span><strong>{{ finance.hotel_revenue|floatformat:0 }} VND</strong></li>
+                    <li><span>Doanh thu tour</span><strong>{{ finance.package_revenue|floatformat:0 }} VND</strong></li>
+                    <li><span>Doanh thu trải nghiệm</span><strong>{{ finance.activity_revenue|floatformat:0 }} VND</strong></li>
                     <li><span>Thanh toán lỗi</span><strong>{{ finance.failed_payments }}</strong></li>
                     <li><span>Refund</span><strong>{{ finance.refunds }}</strong></li>
                 </ul>
@@ -116,7 +116,7 @@
                             <td>{{ booking.service }}</td>
                             <td>{{ booking.payment }}</td>
                             <td><span class="status-pill status-{{ booking.status }}">{{ booking.status }}</span></td>
-                            <td>${{ booking.total|floatformat:2 }}</td>
+                            <td>{{ booking.total|floatformat:0 }} VND</td>
                             <td class="text-end">
                                 {% if booking.can_confirm %}
                                 <form class="action-inline" method="post" action="{% url 'admin_booking_action' booking.type booking.id 'confirm' %}">
@@ -174,7 +174,7 @@
                     <div class="tour-row">
                         <div>
                             <strong>{{ tour.title }}</strong>
-                            <div class="small text-muted">{{ tour.duration_days }}N{{ tour.duration_nights }}D · {{ tour.max_participants }} cho · ${{ tour.base_price_per_person }}</div>
+                            <div class="small text-muted">{{ tour.duration_days }}N{{ tour.duration_nights }}D · {{ tour.max_participants }} cho · {{ tour.base_price_per_person|floatformat:0 }} VND</div>
                         </div>
                         <span class="badge text-bg-success">{{ tour.sold }} booking</span>
                     </div>

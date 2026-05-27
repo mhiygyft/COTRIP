@@ -151,7 +151,7 @@
                     <div class="col-md-4">
                         <!-- Price -->
                         <div class="text-end mb-3">
-                            <div class="h5 text-success mb-0">${{ booking.total_price }}</div>
+                            <div class="h5 text-success mb-0">{{ booking.total_price|floatformat:0 }} VND</div>
                             <small class="text-muted">{{ booking.get_cabin_class_display }}</small>
                         </div>
                         

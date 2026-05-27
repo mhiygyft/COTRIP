@@ -12,7 +12,7 @@
                     <h1 class="h3 mb-3">{{ booking_label }}</h1>
                     <div class="payment-total mb-4">
                         <span>Số tiền cần thanh toán</span>
-                        <strong>${{ amount|floatformat:2 }}</strong>
+                        <strong>{{ amount|floatformat:0 }} VND</strong>
                     </div>
 
                     <form method="post">

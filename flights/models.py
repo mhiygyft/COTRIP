@@ -15,7 +15,7 @@ class Country(models.Model):
     name = models.CharField(max_length=100, unique=True)
     code = models.CharField(max_length=3, unique=True)  # ISO 3166-1 alpha-3
     iso_code = models.CharField(max_length=2, unique=True)  # ISO 3166-1 alpha-2
-    currency = models.CharField(max_length=3, default='USD')
+    currency = models.CharField(max_length=3, default='VND')
     timezone = models.CharField(max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
     

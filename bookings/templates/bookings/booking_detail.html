@@ -116,7 +116,7 @@
                 <div class="summary-row"><span>Ngày đặt</span><strong>{{ booking.created_at|date:"d/m/Y H:i" }}</strong></div>
                 <div class="summary-row"><span>Email</span><strong>{{ booking.contact_email }}</strong></div>
                 <div class="summary-row"><span>Điện thoại</span><strong>{{ booking.contact_phone|default:"Chưa cập nhật" }}</strong></div>
-                <div class="summary-row total"><span>Tổng tiền</span><strong>${{ booking.total_price }}</strong></div>
+                <div class="summary-row total"><span>Tổng tiền</span><strong>{{ booking.total_price|floatformat:0 }} VND</strong></div>
             </div>
 
             <div class="d-grid gap-2">

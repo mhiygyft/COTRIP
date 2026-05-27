@@ -152,7 +152,7 @@ class Hotel(models.Model):
         validators=[MinValueValidator(Decimal('0.01'))],
         help_text="Starting price per night"
     )
-    currency = models.CharField(max_length=3, default='USD')
+    currency = models.CharField(max_length=3, default='VND')
     
     # Status
     is_active = models.BooleanField(default=True)
@@ -399,7 +399,7 @@ class HotelReservation(models.Model):
     rooms = models.PositiveIntegerField(default=1)
     price_per_room = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
+    currency = models.CharField(max_length=3, default='VND')
     contact_email = models.EmailField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='confirmed')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='completed')

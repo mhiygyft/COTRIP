@@ -53,7 +53,7 @@
                     <div class="col-md-4 text-end">
                         <div class="price-display mb-3">
                             <span class="text-white-50">Giá từ</span>
-                            <div class="display-5 fw-bold">${{ hotel.price_from }}</div>
+                            <div class="display-5 fw-bold">{{ hotel.price_from|floatformat:0 }} VND</div>
                             <small>mỗi đêm</small>
                         </div>
                         <button class="btn btn-warning btn-lg" onclick="scrollToRooms()">
@@ -207,7 +207,7 @@
                                 <!-- Price -->
                                 <div class="price-section">
                                     <div class="price mb-2">
-                                        <div class="fw-bold fs-4 text-primary">${{ room_type.base_price }}</div>
+                                        <div class="fw-bold fs-4 text-primary">{{ room_type.base_price|floatformat:0 }} VND</div>
                                         <small class="text-muted">mỗi đêm</small>
                                     </div>
                                     <div class="small text-success mb-2">
@@ -339,7 +339,7 @@
                                     <i class="bi bi-star-fill" style="color: #fbbf24; font-size: 0.8rem;"></i>
                                 {% endfor %}
                             </div>
-                            <div class="fw-bold text-primary small">Từ ${{ nearby_hotel.price_from }}/đêm</div>
+                            <div class="fw-bold text-primary small">Từ {{ nearby_hotel.price_from|floatformat:0 }} VND/đêm</div>
                         </div>
                     </div>
                     {% endfor %}

@@ -33,7 +33,7 @@ class Booking(models.Model):
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
     taxes_and_fees = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
+    currency = models.CharField(max_length=3, default='VND')
     
     # Booking status
     STATUS_CHOICES = [
@@ -268,7 +268,7 @@ class BookingPayment(models.Model):
     
     # Payment details
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
+    currency = models.CharField(max_length=3, default='VND')
     
     # Payment method specific fields
     payment_method = models.CharField(max_length=20, choices=Booking.PAYMENT_METHOD_CHOICES)

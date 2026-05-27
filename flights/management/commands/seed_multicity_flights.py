@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     continue
                 distance = self.estimate_distance_km(origin, destination)
                 duration = max(45, int(distance / 650 * 60) + 30)
-                base_price = Decimal(max(45, int(distance * 0.12))).quantize(Decimal('0.01'))
+                base_price = Decimal(max(900000, int(distance * 1800))).quantize(Decimal('1'))
                 route, _ = Route.objects.get_or_create(
                     origin=origin,
                     destination=destination,

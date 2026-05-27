@@ -24,7 +24,7 @@ def _normalize(value):
     return unidecode(str(value or "")).lower()
 
 
-def _money(value, currency="USD"):
+def _money(value, currency="VND"):
     if value is None:
         return ""
     amount = value if isinstance(value, Decimal) else Decimal(str(value))

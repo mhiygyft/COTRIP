@@ -65,7 +65,7 @@ class Command(BaseCommand):
     def create_countries(self):
         """Create sample countries for flights"""
         countries_data = [
-            {'name': 'United States', 'code': 'USA', 'iso_code': 'US', 'currency': 'USD', 'timezone': 'America/New_York'},
+            {'name': 'United States', 'code': 'USA', 'iso_code': 'US', 'currency': 'VND', 'timezone': 'America/New_York'},
             {'name': 'United Kingdom', 'code': 'GBR', 'iso_code': 'GB', 'currency': 'GBP', 'timezone': 'Europe/London'},
             {'name': 'Germany', 'code': 'DEU', 'iso_code': 'DE', 'currency': 'EUR', 'timezone': 'Europe/Berlin'},
             {'name': 'France', 'code': 'FRA', 'iso_code': 'FR', 'currency': 'EUR', 'timezone': 'Europe/Paris'},
@@ -211,7 +211,7 @@ class Command(BaseCommand):
                     destination=airports[dest_code],
                     distance_km=distance,
                     typical_duration_minutes=duration,
-                    base_price=Decimal(str(random.randint(200, 1500))),
+                    base_price=Decimal(str(random.randint(1500000, 6500000))),
                     is_popular=True
                 )
                 routes.append(route)
@@ -222,7 +222,7 @@ class Command(BaseCommand):
                     destination=airports[origin_code],
                     distance_km=distance,
                     typical_duration_minutes=duration,
-                    base_price=Decimal(str(random.randint(200, 1500))),
+                    base_price=Decimal(str(random.randint(1500000, 6500000))),
                     is_popular=True
                 )
                 routes.append(reverse_route)

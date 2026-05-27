@@ -670,11 +670,11 @@ class FilterOptionsView(TemplateView):
         return JsonResponse({
             'amenities': list(Amenity.objects.filter(is_popular=True).values('id', 'name')),
             'price_ranges': [
-                {'min': 0, 'max': 50, 'label': 'Under $50'},
-                {'min': 50, 'max': 100, 'label': '$50 - $100'},
-                {'min': 100, 'max': 200, 'label': '$100 - $200'},
-                {'min': 200, 'max': 500, 'label': '$200 - $500'},
-                {'min': 500, 'max': 9999, 'label': 'Over $500'},
+                {'min': 0, 'max': 1000000, 'label': 'Duoi 1.000.000 VND'},
+                {'min': 1000000, 'max': 2000000, 'label': '1.000.000 - 2.000.000 VND'},
+                {'min': 2000000, 'max': 4000000, 'label': '2.000.000 - 4.000.000 VND'},
+                {'min': 4000000, 'max': 8000000, 'label': '4.000.000 - 8.000.000 VND'},
+                {'min': 8000000, 'max': 999999999, 'label': 'Tren 8.000.000 VND'},
             ],
             'star_ratings': [1, 2, 3, 4, 5],
         })
