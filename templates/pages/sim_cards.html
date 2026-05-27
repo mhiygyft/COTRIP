@@ -166,33 +166,187 @@
 
             <div class="col-lg-5">
                 <div class="bg-white rounded-3 border p-4 shadow-sm sticky-lg-top" id="sim-order-form" style="top: 90px;">
-                    <h2 class="h5">Gửi yêu cầu đặt SIM</h2>
-                    <p class="text-muted small">Form này tạo email nhanh để đội hỗ trợ liên hệ lại.</p>
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                        <div>
+                            <h2 class="h5">Đặt SIM du lịch</h2>
+                            <p class="text-muted small mb-3">Chỉ cần nhập tên và SĐT để giữ gói. Các thông tin khác có thể bổ sung sau.</p>
+                        </div>
+                        <span class="badge text-bg-success">Bước 1</span>
+                    </div>
 
-                    <form action="mailto:support@novaryo.local" method="get" enctype="text/plain">
+                    <form id="sim-request-form" novalidate>
                         <div class="mb-3">
-                            <label class="form-label small">Gói SIM</label>
-                            <select class="form-select" name="subject">
-                                <option value="Đặt SIM Traveler 7GB">Traveler 7GB - 180.000đ</option>
-                                <option value="Đặt SIM Explorer 15GB" selected>Explorer 15GB - 280.000đ</option>
-                                <option value="Đặt SIM Nomad 30GB">Nomad 30GB - 450.000đ</option>
+                            <label class="form-label small" for="sim-package">Gói SIM</label>
+                            <select class="form-select" id="sim-package" name="package">
+                                <option value="Traveler 7GB" data-price="180000">Traveler 7GB - 180.000đ</option>
+                                <option value="Explorer 15GB" data-price="280000" selected>Explorer 15GB - 280.000đ</option>
+                                <option value="Nomad 30GB" data-price="450000">Nomad 30GB - 450.000đ</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label small">Thông tin khách</label>
-                            <textarea class="form-control" name="body" rows="8" placeholder="Họ tên:
-Quốc tịch:
-Số hộ chiếu:
-Ngày đến:
-Sân bay/khách sạn nhận SIM:
-Số người cần SIM:
-WhatsApp/Zalo/Email:"></textarea>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small" for="sim-name">Họ tên <span class="text-danger">*</span></label>
+                                <input class="form-control" id="sim-name" name="name" type="text" placeholder="Nguyễn Văn A" required>
+                                <div class="invalid-feedback">Vui lòng nhập họ tên.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small" for="sim-phone">Số điện thoại/Zalo <span class="text-danger">*</span></label>
+                                <input class="form-control" id="sim-phone" name="phone" type="tel" placeholder="090..." required>
+                                <div class="invalid-feedback">Vui lòng nhập số điện thoại.</div>
+                            </div>
                         </div>
-                        <button class="btn btn-primary w-100" type="submit">Gửi yêu cầu</button>
+
+                        <div class="mb-3">
+                            <label class="form-label small mt-3" for="sim-pickup">Địa điểm nhận SIM</label>
+                            <select class="form-select" id="sim-pickup" name="pickup">
+                                <option value="Sân bay Nội Bài">Sân bay Nội Bài</option>
+                                <option value="Sân bay Tân Sơn Nhất">Sân bay Tân Sơn Nhất</option>
+                                <option value="Sân bay Đà Nẵng">Sân bay Đà Nẵng</option>
+                                <option value="Khách sạn">Khách sạn</option>
+                                <option value="Điểm hẹn trung tâm">Điểm hẹn trung tâm</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small" for="sim-pickup-detail">Chi tiết nơi nhận <span class="text-muted">(tùy chọn)</span></label>
+                            <input class="form-control" id="sim-pickup-detail" name="pickup_detail" type="text" placeholder="Tên khách sạn, ga đến, cổng sân bay...">
+                        </div>
+
+                        <button class="btn btn-primary w-100" type="submit">Tiếp tục xác nhận</button>
+
+                        <button class="btn btn-link w-100 small mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#sim-optional-fields" aria-expanded="false" aria-controls="sim-optional-fields">
+                            Bổ sung thông tin khác nếu có
+                        </button>
+
+                        <div class="collapse" id="sim-optional-fields">
+                            <div class="border rounded-3 p-3 mt-2 bg-light">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small" for="sim-nationality">Quốc tịch</label>
+                                        <input class="form-control" id="sim-nationality" name="nationality" type="text" placeholder="Ví dụ: Korea">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small" for="sim-passport">Số hộ chiếu</label>
+                                        <input class="form-control" id="sim-passport" name="passport" type="text" placeholder="Có thể gửi sau">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small" for="sim-arrival">Ngày đến</label>
+                                        <input class="form-control" id="sim-arrival" name="arrival_date" type="date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small" for="sim-flight">Chuyến bay/ga đến</label>
+                                        <input class="form-control" id="sim-flight" name="flight" type="text" placeholder="VN123, VJ456...">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small" for="sim-note">Ghi chú</label>
+                                        <textarea class="form-control" id="sim-note" name="note" rows="3" placeholder="Số lượng SIM, giờ nhận, yêu cầu eSIM nếu có..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
 
+                    <div class="border rounded-3 p-3 mt-4 d-none" id="sim-confirmation">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div>
+                                <h3 class="h6 mb-1">Xác nhận và thanh toán</h3>
+                                <p class="text-muted small mb-0">Kiểm tra lại thông tin trước khi gửi yêu cầu.</p>
+                            </div>
+                            <span class="badge text-bg-primary">Bước 2</span>
+                        </div>
+
+                        <dl class="small row mt-3 mb-3" id="sim-summary"></dl>
+
+                        <button class="btn btn-success w-100" id="sim-submit-link" type="button">Gửi yêu cầu đặt SIM</button>
+                        <p class="text-muted small mt-2 mb-0">Sau khi gửi, hệ thống sẽ chuyển sang bước thanh toán để hoàn tất giữ SIM.</p>
+                    </div>
+
+                    <div class="border rounded-3 p-3 mt-4 d-none" id="sim-payment-panel">
+                        <div class="alert alert-success small mb-3">
+                            Yêu cầu đặt SIM đã được xác nhận thành công. Vui lòng chọn cách thanh toán để hoàn tất.
+                        </div>
+
+                        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                            <div>
+                                <h3 class="h6 mb-1">Thanh toán</h3>
+                                <p class="text-muted small mb-0">Thông tin thanh toán tạm thời. Admin có thể thay bằng cổng thanh toán thật sau.</p>
+                            </div>
+                            <span class="badge text-bg-success">Bước 3</span>
+                        </div>
+
+                        <div class="payment-total mb-4">
+                            <span>Số tiền cần thanh toán</span>
+                            <strong id="sim-payment-total">280.000đ</strong>
+                        </div>
+
+                        <div class="bg-light rounded-3 p-3 small mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Mã đơn</span>
+                                <strong id="sim-order-code">SIM-0000</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Gói SIM</span>
+                                <strong id="sim-payment-package">Explorer 15GB</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Nội dung chuyển khoản</span>
+                                <strong id="sim-transfer-note">SIM-0000</strong>
+                            </div>
+                        </div>
+
+                        <form id="sim-payment-form">
+                            <label class="form-label">Phương thức thanh toán</label>
+                            <div class="payment-option selected">
+                                <input class="form-check-input" type="radio" name="sim_payment_method" id="sim_pay_card" value="card" checked>
+                                <label for="sim_pay_card">Thẻ tín dụng / ghi nợ</label>
+                            </div>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="sim_payment_method" id="sim_pay_paypal" value="paypal">
+                                <label for="sim_pay_paypal">PayPal</label>
+                            </div>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="sim_payment_method" id="sim_pay_bank" value="bank_transfer">
+                                <label for="sim_pay_bank">Chuyển khoản ngân hàng</label>
+                            </div>
+                            <div class="payment-option">
+                                <input class="form-check-input" type="radio" name="sim_payment_method" id="sim_pay_manual" value="manual">
+                                <label for="sim_pay_manual">Thanh toán thủ công tại quầy</label>
+                            </div>
+
+                            <div class="alert alert-info small mt-3">
+                                Đây là thanh toán demo: bạn chỉ cần chọn phương thức, không cần nhập số thẻ, CVV hay thông tin ngân hàng. Khi bấm thanh toán, đơn SIM sẽ được đánh dấu thành công.
+                            </div>
+
+                            <div class="alert alert-light border small d-none" id="sim-bank-info">
+                                <strong>Thông tin chuyển khoản demo</strong>
+                                <div>Ngân hàng: Vietcombank</div>
+                                <div>Chủ tài khoản: NOVARYO TRAVEL</div>
+                                <div>Số tài khoản: 0123456789</div>
+                                <div>Nội dung: <span id="sim-bank-note">SIM-0000</span></div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-8">
+                                    <label class="form-label" for="sim-card-number">Số thẻ <span class="text-muted small">(không bắt buộc)</span></label>
+                                    <input class="form-control" id="sim-card-number" placeholder="4242 4242 4242 4242">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="sim-card-cvv">CVV <span class="text-muted small">(không bắt buộc)</span></label>
+                                    <input class="form-control" id="sim-card-cvv" placeholder="123">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100" type="submit">Thanh toán</button>
+                        </form>
+
+                        <div class="alert alert-success small mt-3 mb-0 d-none" id="sim-payment-success">
+                            Thanh toán thành công. Đơn SIM của bạn đang chờ nhân viên xác nhận điểm nhận SIM.
+                        </div>
+                    </div>
+
                     <div class="alert alert-info small mt-3 mb-0">
-                        Lưu ý: Khách nước ngoài thường cần thông tin hộ chiếu để đăng ký SIM theo quy định nhà mạng.
+                        Lưu ý: Tên và số điện thoại là bắt buộc để liên hệ nhanh. Hộ chiếu/ngày đến có thể bổ sung sau khi xác nhận.
                     </div>
                 </div>
             </div>
@@ -228,5 +382,143 @@ WhatsApp/Zalo/Email:"></textarea>
     justify-content: center;
     width: 36px;
 }
+.payment-total {
+    align-items: center;
+    background: #eef7f4;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+}
+.payment-total span {
+    color: #64736f;
+}
+.payment-total strong {
+    color: #13795b;
+    font-size: 28px;
+}
+.payment-option {
+    align-items: center;
+    border: 1px solid #e4e8eb;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 12px;
+}
+.payment-option.selected {
+    background: #eef7f4;
+    border-color: #13795b;
+}
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('sim-request-form');
+    const packageSelect = document.getElementById('sim-package');
+    const confirmation = document.getElementById('sim-confirmation');
+    const paymentPanel = document.getElementById('sim-payment-panel');
+    const summary = document.getElementById('sim-summary');
+    const submitLink = document.getElementById('sim-submit-link');
+    const paymentPackage = document.getElementById('sim-payment-package');
+    const paymentTotal = document.getElementById('sim-payment-total');
+    const orderCode = document.getElementById('sim-order-code');
+    const transferNote = document.getElementById('sim-transfer-note');
+    const bankNote = document.getElementById('sim-bank-note');
+    const bankInfo = document.getElementById('sim-bank-info');
+    const paymentForm = document.getElementById('sim-payment-form');
+    const paymentSuccess = document.getElementById('sim-payment-success');
+    let currentOrder = null;
+
+    function formatVnd(value) {
+        return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+    }
+
+    function addSummaryRow(label, value) {
+        const term = document.createElement('dt');
+        term.className = 'col-5 text-muted fw-normal';
+        term.textContent = label;
+
+        const desc = document.createElement('dd');
+        desc.className = 'col-7 fw-semibold mb-2';
+        desc.textContent = value || 'Bổ sung sau';
+
+        summary.appendChild(term);
+        summary.appendChild(desc);
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        form.classList.add('was-validated');
+
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        const selectedPackage = packageSelect.options[packageSelect.selectedIndex];
+        const price = Number(selectedPackage.dataset.price || 0);
+        const data = new FormData(form);
+        summary.innerHTML = '';
+        addSummaryRow('Khách hàng', data.get('name'));
+        addSummaryRow('SĐT/Zalo', data.get('phone'));
+        addSummaryRow('Gói SIM', selectedPackage.value);
+        addSummaryRow('Tạm tính', formatVnd(price));
+        addSummaryRow('Nơi nhận', data.get('pickup'));
+        addSummaryRow('Chi tiết nơi nhận', data.get('pickup_detail'));
+        addSummaryRow('Ngày đến', data.get('arrival_date'));
+        addSummaryRow('Quốc tịch', data.get('nationality'));
+        addSummaryRow('Hộ chiếu', data.get('passport'));
+
+        confirmation.classList.remove('d-none');
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        currentOrder = {
+            code: 'SIM-' + Date.now().toString().slice(-6),
+            packageName: selectedPackage.value,
+            price: price
+        };
+    });
+
+    submitLink.addEventListener('click', function () {
+        if (!currentOrder) {
+            form.requestSubmit();
+            return;
+        }
+
+        orderCode.textContent = currentOrder.code;
+        paymentPackage.textContent = currentOrder.packageName;
+        paymentTotal.textContent = formatVnd(currentOrder.price);
+        transferNote.textContent = currentOrder.code;
+        bankNote.textContent = currentOrder.code;
+        paymentSuccess.classList.add('d-none');
+        paymentPanel.classList.remove('d-none');
+        paymentPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.querySelectorAll('#sim-payment-form .payment-option').forEach(function (option) {
+        option.addEventListener('click', function () {
+            const radio = option.querySelector('input[type="radio"]');
+            if (!radio) {
+                return;
+            }
+
+            radio.checked = true;
+            document.querySelectorAll('#sim-payment-form .payment-option').forEach(function (item) {
+                item.classList.remove('selected');
+            });
+            option.classList.add('selected');
+            bankInfo.classList.toggle('d-none', radio.value !== 'bank_transfer');
+        });
+    });
+
+    paymentForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        paymentSuccess.classList.remove('d-none');
+        paymentSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+});
+</script>
 {% endblock %}
