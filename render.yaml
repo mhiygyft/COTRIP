@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: cotripvn
+    env: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: gunicorn novaryo.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: .onrender.com,localhost,127.0.0.1
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://*.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cotripvn-db
+          property: connectionString
+
+databases:
+  - name: cotripvn-db
+    plan: free

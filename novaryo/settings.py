@@ -16,6 +16,7 @@ Unauthorized use, reproduction, or distribution is strictly prohibited.
 """
 
 import os
+import importlib.util
 from pathlib import Path
 from decouple import config
 from decouple import UndefinedValueError
@@ -131,6 +132,9 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
+if importlib.util.find_spec("whitenoise"):
+    MIDDLEWARE.insert(3, "whitenoise.middleware.WhiteNoiseMiddleware")
+
 ROOT_URLCONF = "novaryo.urls"
 
 TEMPLATES = [
@@ -166,6 +170,16 @@ DATABASES = {
         "PORT": config("DB_PORT", default="5432"),
     }
 }
+
+DATABASE_URL = config("DATABASE_URL", default="")
+if DATABASE_URL and importlib.util.find_spec("dj_database_url"):
+    import dj_database_url
+
+    DATABASES["default"] = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=not DEBUG,
+    )
 
 # Fallback to SQLite for development if PostgreSQL is not available
 if config_bool("USE_SQLITE", default=False):
@@ -216,6 +230,15 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+if importlib.util.find_spec("whitenoise"):
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # Media files
 MEDIA_URL = config("MEDIA_URL", default="/media/")
@@ -347,6 +370,12 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in config("CSRF_TRUSTED_ORIGINS", default="").split(",")
+    if origin.strip()
+]
+
 # Site ID for Django Sites framework
 SITE_ID = 1
 
@@ -429,6 +458,7 @@ OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
 
 # Security Settings
 if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
