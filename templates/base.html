@@ -126,6 +126,33 @@
                 bottom: .75rem;
             }
         }
+        .goog-te-banner-frame,
+        .goog-te-banner-frame.skiptranslate,
+        iframe.goog-te-banner-frame,
+        body > .skiptranslate:not(#google_translate_element),
+        .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .VIpgJd-ZVi9od-ORHb {
+            display: none !important;
+            height: 0 !important;
+            visibility: hidden !important;
+            width: 0 !important;
+        }
+        html,
+        body {
+            top: 0 !important;
+            position: static !important;
+        }
+        #google_translate_element {
+            height: 0 !important;
+            overflow: hidden !important;
+            visibility: hidden !important;
+            width: 0 !important;
+        }
+        .goog-te-gadget,
+        .goog-logo-link,
+        .goog-te-gadget span {
+            display: none !important;
+        }
     </style>
     {% block extra_head %}{% endblock %}
     {% block extra_css %}{% endblock %}
@@ -157,6 +184,17 @@
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Ngôn ngữ
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><button class="dropdown-item language-option" type="button" data-lang="vi">Tiếng Việt</button></li>
+                            <li><button class="dropdown-item language-option" type="button" data-lang="en">English</button></li>
+                            <li><button class="dropdown-item language-option" type="button" data-lang="zh-CN">中文</button></li>
+                            <li><button class="dropdown-item language-option" type="button" data-lang="ko">한국어</button></li>
+                        </ul>
+                    </li>
                     {% if request.user.is_authenticated %}
                         {% if request.user.is_staff %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Django Admin</a></li>
@@ -183,6 +221,8 @@
     {% endif %}
 
     {% block content %}{% endblock %}
+
+    <div id="google_translate_element" class="visually-hidden"></div>
 
     {% if not request.user.is_authenticated or not request.user.is_staff %}
         <section class="ai-chat-panel flex-column bg-white border" id="aiChatPanel" aria-label="Tư vấn du lịch AI">
@@ -226,6 +266,71 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: "vi",
+                includedLanguages: "vi,en,zh-CN,ko",
+                autoDisplay: false
+            }, "google_translate_element");
+        }
+
+        (() => {
+            const setCookie = (name, value) => {
+                document.cookie = `${name}=${value};path=/;max-age=31536000`;
+                if (location.hostname.includes(".")) {
+                    document.cookie = `${name}=${value};path=/;domain=.${location.hostname};max-age=31536000`;
+                }
+            };
+
+            const changeLanguage = (lang) => {
+                if (lang === "vi") {
+                    setCookie("googtrans", "/vi/vi");
+                    window.location.reload();
+                    return;
+                }
+
+                setCookie("googtrans", `/vi/${lang}`);
+                const select = document.querySelector(".goog-te-combo");
+                if (select) {
+                    select.value = lang;
+                    select.dispatchEvent(new Event("change"));
+                    return;
+                }
+                window.location.reload();
+            };
+
+            document.querySelectorAll(".language-option").forEach((button) => {
+                button.addEventListener("click", () => {
+                    changeLanguage(button.dataset.lang);
+                });
+            });
+
+            const hideGoogleTranslateBanner = () => {
+                document.documentElement.style.top = "0px";
+                document.body.style.top = "0px";
+                document.querySelectorAll([
+                    "iframe.goog-te-banner-frame",
+                    ".goog-te-banner-frame",
+                    "body > .skiptranslate:not(#google_translate_element)",
+                    ".VIpgJd-ZVi9od-ORHb-OEVmcd",
+                    ".VIpgJd-ZVi9od-ORHb"
+                ].join(",")).forEach((item) => {
+                    item.style.display = "none";
+                    item.style.visibility = "hidden";
+                    item.style.height = "0";
+                    item.style.width = "0";
+                });
+            };
+
+            new MutationObserver(hideGoogleTranslateBanner).observe(document.documentElement, {
+                childList: true,
+                subtree: true
+            });
+            setInterval(hideGoogleTranslateBanner, 500);
+        })();
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     {% if not request.user.is_authenticated or not request.user.is_staff %}
         <script>
             (() => {
