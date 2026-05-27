@@ -286,7 +286,36 @@
                 <h6 class="fw-bold mb-3">
                     <i class="fas fa-plane me-2"></i>Tóm tắt chuyến bay
                 </h6>
-                
+                {% if is_multi_city %}
+                    <div class="mb-3">
+                        <span class="badge bg-primary">Hành trình nhiều chặng</span>
+                    </div>
+                    {% for segment in booking_flights %}
+                    <div class="border rounded p-3 mb-3 bg-white">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <strong>Chặng {{ forloop.counter }}</strong>
+                            <span class="small text-muted">{{ segment.departure_time|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="small text-muted mb-2">{{ segment.airline.name }} {{ segment.flight_number }}</div>
+                        <div class="row text-center">
+                            <div class="col">
+                                <div class="fw-bold">{{ segment.departure_time|date:"H:i" }}</div>
+                                <div class="small text-muted">{{ segment.origin.iata_code }}</div>
+                                <div class="small text-muted">{{ segment.origin.city }}</div>
+                            </div>
+                            <div class="col-2">
+                                <i class="fas fa-arrow-right text-primary"></i>
+                                <div class="small text-muted">{{ segment.duration_minutes|floatformat:0 }}m</div>
+                            </div>
+                            <div class="col">
+                                <div class="fw-bold">{{ segment.arrival_time|date:"H:i" }}</div>
+                                <div class="small text-muted">{{ segment.destination.iata_code }}</div>
+                                <div class="small text-muted">{{ segment.destination.city }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
                 <div class="d-flex align-items-center mb-2">
                     <div class="airline-logo me-2" style="width: 30px; height: 30px; background: #667eea; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: bold;">
                         {{ flight.airline.iata_code }}
@@ -318,6 +347,7 @@
                         <div class="small text-muted">{{ flight.destination.city }}</div>
                     </div>
                 </div>
+                {% endif %}
                 
                 <div class="border-top pt-3">
                     <div class="d-flex justify-content-between">

@@ -209,6 +209,49 @@
                 
                 <div class="flight-info-section">
                     <!-- Flight Information -->
+                    {% if booking.is_multi_city %}
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-1">Hành trình nhiều chặng</h5>
+                            <p class="text-muted mb-0">{{ booking_flights|length }} chặng bay trong cùng một mã booking</p>
+                        </div>
+                        <span class="status-badge {% if booking.status == 'confirmed' %}status-confirmed{% else %}status-pending{% endif %}">
+                            <i class="fas {% if booking.status == 'confirmed' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                            {{ booking.get_status_display }}
+                        </span>
+                    </div>
+                    {% for segment in booking_flights %}
+                    <div class="passenger-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <strong>Chặng {{ segment.segment_order }}: {{ segment.flight.origin.city }} → {{ segment.flight.destination.city }}</strong>
+                            <span class="small text-muted">{{ segment.flight.departure_time|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="small text-muted mb-2">{{ segment.flight.airline.name }} {{ segment.flight.flight_number }}</div>
+                        <div class="flight-route my-3">
+                            <div class="airport-info">
+                                <div class="airport-time">{{ segment.flight.departure_time|date:"H:i" }}</div>
+                                <div class="airport-code">{{ segment.flight.origin.iata_code }}</div>
+                                <div class="text-muted">{{ segment.flight.origin.city }}</div>
+                            </div>
+                            <div class="flight-arrow">
+                                <div class="duration-badge">{{ segment.flight.duration_minutes|floatformat:0 }}m</div>
+                                <i class="fas fa-arrow-right fs-3"></i>
+                            </div>
+                            <div class="airport-info">
+                                <div class="airport-time">{{ segment.flight.arrival_time|date:"H:i" }}</div>
+                                <div class="airport-code">{{ segment.flight.destination.iata_code }}</div>
+                                <div class="text-muted">{{ segment.flight.destination.city }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-chair me-2"></i>Hạng ghế</h6>
+                            <p>{{ booking.get_cabin_class_display }}</p>
+                        </div>
+                    </div>
+                    {% else %}
                     <div class="d-flex align-items-center mb-4">
                         <div class="airline-logo me-3" style="width: 50px; height: 50px; background: #667eea; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1rem;">
                             {{ booking.flight.airline.iata_code }}
@@ -263,6 +306,7 @@
                             <p>{{ booking.get_cabin_class_display }}</p>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             

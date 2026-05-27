@@ -129,6 +129,22 @@
         height: 100%;
         padding: 1rem;
     }
+
+    .multi-city-panel {
+        display: none;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .multi-city-leg {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
 </style>
 {% endblock %}
 
@@ -161,9 +177,9 @@
                         {% endfor %}
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-3" id="standard-flight-fields">
                         <!-- Origin and Destination -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 standard-only">
                             <div class="position-relative">
                                 <div class="form-floating">
                                     {{ form.origin }}
@@ -175,7 +191,7 @@
                             </div>
                         </div>
                         
-                        <div class="col-md-6">
+                        <div class="col-md-6 standard-only">
                             <div class="form-floating">
                                 {{ form.destination }}
                                 <label for="{{ form.destination.id_for_label }}">Điểm đến</label>
@@ -183,14 +199,14 @@
                         </div>
 
                         <!-- Dates -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 standard-only">
                             <div class="form-floating">
                                 {{ form.departure_date }}
                                 <label for="{{ form.departure_date.id_for_label }}">Ngày đi</label>
                             </div>
                         </div>
                         
-                        <div class="col-md-6" id="return-date-container">
+                        <div class="col-md-6 standard-only" id="return-date-container">
                             <div class="form-floating">
                                 {{ form.return_date }}
                                 <label for="{{ form.return_date.id_for_label }}">Ngày về</label>
@@ -209,6 +225,80 @@
                             <div class="form-floating">
                                 {{ form.cabin_class }}
                                 <label for="{{ form.cabin_class.id_for_label }}">Hạng ghế</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="multi-city-panel mt-3" id="multi-city-panel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="mb-1">Bay nhiều chặng</h5>
+                                <p class="text-muted small mb-0">Ví dụ: Hà Nội → Đà Nẵng → TP. Hồ Chí Minh, mỗi chặng có ngày bay riêng.</p>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-leg-btn">
+                                <i class="fas fa-plus me-1"></i>Thêm chặng
+                            </button>
+                        </div>
+
+                        <div id="multi-city-legs">
+                            <div class="multi-city-leg" data-leg-index="1">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Chặng 1</strong>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Điểm đi</label>
+                                        <select name="multi_origin" class="form-select multi-city-input">
+                                            <option value="">Chọn sân bay đi</option>
+                                            {% for airport in airports %}
+                                            <option value="{{ airport.id }}">{{ airport.city }} ({{ airport.iata_code }}) - {{ airport.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Điểm đến</label>
+                                        <select name="multi_destination" class="form-select multi-city-input">
+                                            <option value="">Chọn sân bay đến</option>
+                                            {% for airport in airports %}
+                                            <option value="{{ airport.id }}">{{ airport.city }} ({{ airport.iata_code }}) - {{ airport.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Ngày bay</label>
+                                        <input type="date" name="multi_date" class="form-control multi-city-input">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="multi-city-leg" data-leg-index="2">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Chặng 2</strong>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Điểm đi</label>
+                                        <select name="multi_origin" class="form-select multi-city-input">
+                                            <option value="">Chọn sân bay đi</option>
+                                            {% for airport in airports %}
+                                            <option value="{{ airport.id }}">{{ airport.city }} ({{ airport.iata_code }}) - {{ airport.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Điểm đến</label>
+                                        <select name="multi_destination" class="form-select multi-city-input">
+                                            <option value="">Chọn sân bay đến</option>
+                                            {% for airport in airports %}
+                                            <option value="{{ airport.id }}">{{ airport.city }} ({{ airport.iata_code }}) - {{ airport.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Ngày bay</label>
+                                        <input type="date" name="multi_date" class="form-control multi-city-input">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -328,12 +418,29 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const flightSearchForm = document.getElementById('flight-search-form');
     const tripTypeInputs = document.querySelectorAll('input[name="trip_type"]');
+    const standardFields = document.getElementById('standard-flight-fields');
+    const standardOnlyFields = standardFields.querySelectorAll('.standard-only');
+    const standardControls = standardFields.querySelectorAll('.standard-only select, .standard-only input');
+    const multiCityPanel = document.getElementById('multi-city-panel');
     const returnDateContainer = document.getElementById('return-date-container');
     const returnDateInput = document.querySelector('input[name="return_date"]');
     
     function updateReturnDateVisibility() {
         const selectedTripType = document.querySelector('input[name="trip_type"]:checked').value;
+        const isMultiCity = selectedTripType === 'multi_city';
+
+        standardOnlyFields.forEach(field => {
+            field.style.display = isMultiCity ? 'none' : '';
+        });
+        multiCityPanel.style.display = isMultiCity ? 'block' : 'none';
+        standardControls.forEach(control => {
+            control.disabled = isMultiCity;
+        });
+        multiCityPanel.querySelectorAll('.multi-city-input').forEach(control => {
+            control.disabled = !isMultiCity;
+        });
         
         if (selectedTripType === 'round_trip') {
             returnDateContainer.style.display = 'block';
@@ -352,6 +459,36 @@ document.addEventListener('DOMContentLoaded', function() {
     tripTypeInputs.forEach(input => {
         input.addEventListener('change', updateReturnDateVisibility);
     });
+
+    flightSearchForm.addEventListener('submit', function(event) {
+        const selectedTripType = document.querySelector('input[name="trip_type"]:checked').value;
+        if (selectedTripType !== 'multi_city') {
+            return;
+        }
+
+        const completeLegs = [];
+        const invalidLegs = [];
+        multiCityPanel.querySelectorAll('.multi-city-leg').forEach((leg, index) => {
+            const origin = leg.querySelector('select[name="multi_origin"]').value;
+            const destination = leg.querySelector('select[name="multi_destination"]').value;
+            const date = leg.querySelector('input[name="multi_date"]').value;
+
+            if (origin || destination || date) {
+                if (!origin || !destination || !date) {
+                    invalidLegs.push(index + 1);
+                } else if (origin === destination) {
+                    invalidLegs.push(index + 1);
+                } else {
+                    completeLegs.push(index + 1);
+                }
+            }
+        });
+
+        if (invalidLegs.length || completeLegs.length < 2) {
+            event.preventDefault();
+            alert('Vui lòng nhập đủ ít nhất 2 chặng bay. Mỗi chặng cần có điểm đi, điểm đến khác nhau và ngày bay.');
+        }
+    });
 });
 
 function swapAirports() {
@@ -368,6 +505,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
     const departureDateInput = document.querySelector('input[name="departure_date"]');
     const returnDateInput = document.querySelector('input[name="return_date"]');
+    const legsContainer = document.getElementById('multi-city-legs');
+    const addLegBtn = document.getElementById('add-leg-btn');
     
     if (departureDateInput) {
         departureDateInput.min = today;
@@ -388,6 +527,58 @@ document.addEventListener('DOMContentLoaded', function() {
     if (returnDateInput) {
         returnDateInput.min = today;
     }
+
+    document.querySelectorAll('input[name="multi_date"]').forEach(input => {
+        input.min = today;
+    });
+
+    function renumberLegs() {
+        legsContainer.querySelectorAll('.multi-city-leg').forEach((leg, index) => {
+            leg.dataset.legIndex = String(index + 1);
+            leg.querySelector('strong').textContent = `Chặng ${index + 1}`;
+            const removeBtn = leg.querySelector('.remove-leg-btn');
+            if (removeBtn) {
+                removeBtn.disabled = legsContainer.querySelectorAll('.multi-city-leg').length <= 2;
+            }
+        });
+    }
+
+    addLegBtn.addEventListener('click', function() {
+        const currentLegs = legsContainer.querySelectorAll('.multi-city-leg');
+        if (currentLegs.length >= 5) {
+            alert('Tối đa 5 chặng bay trong một lần tìm kiếm.');
+            return;
+        }
+
+        const newLeg = currentLegs[currentLegs.length - 1].cloneNode(true);
+        newLeg.querySelectorAll('select, input').forEach(control => {
+            control.value = '';
+            control.disabled = false;
+            if (control.type === 'date') {
+                control.min = today;
+            }
+        });
+
+        if (!newLeg.querySelector('.remove-leg-btn')) {
+            const header = newLeg.querySelector('.d-flex');
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-outline-danger btn-sm remove-leg-btn';
+            removeBtn.innerHTML = '<i class="fas fa-trash me-1"></i>Xóa';
+            header.appendChild(removeBtn);
+        }
+
+        legsContainer.appendChild(newLeg);
+        renumberLegs();
+    });
+
+    legsContainer.addEventListener('click', function(event) {
+        const removeBtn = event.target.closest('.remove-leg-btn');
+        if (!removeBtn) return;
+        if (legsContainer.querySelectorAll('.multi-city-leg').length <= 2) return;
+        removeBtn.closest('.multi-city-leg').remove();
+        renumberLegs();
+    });
 });
 </script>
 {% endblock %}

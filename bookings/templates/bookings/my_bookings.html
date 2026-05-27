@@ -97,6 +97,20 @@
             <div class="card-body p-4">
                 <div class="row">
                     <div class="col-md-8">
+                        {% if booking.is_multi_city %}
+                        <div class="mb-3">
+                            <span class="badge bg-primary">Hành trình nhiều chặng</span>
+                        </div>
+                        {% for segment in booking.itinerary_flights %}
+                        <div class="border rounded p-2 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <strong>Chặng {{ segment.segment_order }}: {{ segment.flight.origin.iata_code }} → {{ segment.flight.destination.iata_code }}</strong>
+                                <span class="small text-muted">{{ segment.flight.departure_time|date:"d/m/Y" }}</span>
+                            </div>
+                            <div class="small text-muted">{{ segment.flight.airline.name }} {{ segment.flight.flight_number }}</div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
                         <!-- Flight Info -->
                         <div class="d-flex align-items-center mb-3">
                             <div class="airline-logo me-3" style="width: 40px; height: 40px; background: #667eea; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
@@ -131,6 +145,7 @@
                             <i class="fas fa-calendar me-1"></i>
                             {{ booking.flight.departure_time|date:"l, F d, Y" }}
                         </div>
+                        {% endif %}
                     </div>
                     
                     <div class="col-md-4">

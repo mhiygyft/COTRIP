@@ -19,6 +19,44 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="panel mb-4">
+                {% if booking.is_multi_city %}
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="h5 mb-1">Hành trình nhiều chặng</h2>
+                        <p class="text-muted mb-0">{{ booking_flights|length }} chặng bay trong cùng một mã booking</p>
+                    </div>
+                    <span class="status-pill status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                </div>
+
+                {% for segment in booking_flights %}
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <strong>Chặng {{ segment.segment_order }}: {{ segment.flight.airline.name }} {{ segment.flight.flight_number }}</strong>
+                            <div class="text-muted small">{{ segment.flight.departure_time|date:"d/m/Y" }}</div>
+                        </div>
+                        <span class="badge text-bg-light">{{ segment.cabin_class|capfirst }}</span>
+                    </div>
+                    <div class="route-row">
+                        <div>
+                            <div class="time">{{ segment.flight.departure_time|date:"H:i" }}</div>
+                            <div class="code">{{ segment.flight.origin.iata_code }}</div>
+                            <div class="text-muted">{{ segment.flight.origin.city }}</div>
+                        </div>
+                        <div class="route-mid">
+                            <div>{{ segment.flight.duration_display }}</div>
+                            <div class="line"></div>
+                            <div class="small text-muted">{% if segment.flight.stops == 0 %}Bay thẳng{% else %}{{ segment.flight.stops }} điểm dừng{% endif %}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="time">{{ segment.flight.arrival_time|date:"H:i" }}</div>
+                            <div class="code">{{ segment.flight.destination.iata_code }}</div>
+                            <div class="text-muted">{{ segment.flight.destination.city }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
                 <div class="d-flex justify-content-between align-items-start mb-4">
                     <div>
                         <h2 class="h5 mb-1">{{ booking.flight.airline.name }} {{ booking.flight.flight_number }}</h2>
@@ -50,6 +88,7 @@
                     <div class="col-md-4"><span class="label">Hạng ghế</span><strong>{{ booking.get_cabin_class_display }}</strong></div>
                     <div class="col-md-4"><span class="label">Thanh toán</span><strong>{{ booking.payment_status }}</strong></div>
                 </div>
+                {% endif %}
             </div>
 
             <div class="panel">

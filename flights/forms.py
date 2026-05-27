@@ -8,6 +8,7 @@ class FlightSearchForm(forms.Form):
     TRIP_TYPE_CHOICES = [
         ('round_trip', 'Round Trip'),
         ('one_way', 'One Way'),
+        ('multi_city', 'Multi City'),
     ]
     
     CLASS_CHOICES = [

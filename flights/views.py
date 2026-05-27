@@ -14,6 +14,85 @@ from .models import Flight, Airport, Airline, Route, FlightSearch
 from .forms import FlightSearchForm, FlightFilterForm, FlightSearchSaveForm, QuickFlightSearchForm
 
 
+def _parse_multi_city_legs(querydict):
+    origins = querydict.getlist('multi_origin')
+    destinations = querydict.getlist('multi_destination')
+    dates = querydict.getlist('multi_date')
+    legs = []
+    errors = []
+    today = timezone.localdate()
+
+    for index, (origin_id, destination_id, date_value) in enumerate(zip(origins, destinations, dates), start=1):
+        if not any([origin_id, destination_id, date_value]):
+            continue
+
+        if not all([origin_id, destination_id, date_value]):
+            errors.append(f'Please complete all fields for leg {index}.')
+            continue
+
+        try:
+            origin = Airport.objects.get(id=origin_id)
+            destination = Airport.objects.get(id=destination_id)
+            departure_date = datetime.strptime(date_value, '%Y-%m-%d').date()
+        except (Airport.DoesNotExist, ValueError):
+            errors.append(f'Invalid airport or date for leg {index}.')
+            continue
+
+        if origin == destination:
+            errors.append(f'Origin and destination must be different for leg {index}.')
+        if departure_date < today:
+            errors.append(f'Departure date cannot be in the past for leg {index}.')
+        if legs and departure_date < legs[-1]['departure_date']:
+            errors.append(f'Leg {index} must depart on or after the previous leg.')
+
+        legs.append({
+            'number': len(legs) + 1,
+            'origin': origin,
+            'destination': destination,
+            'departure_date': departure_date,
+        })
+
+    if len(legs) < 2:
+        errors.append('Please add at least 2 flight legs for a multi-city trip.')
+
+    return legs, errors
+
+
+def _flight_search_queryset(origin, destination, departure_date, cabin_class, passengers):
+    availability_field = f'{cabin_class}_available'
+    price_field = f'{cabin_class}_price'
+
+    exact_flights = (
+        Flight.objects
+        .filter(
+            origin=origin,
+            destination=destination,
+            departure_time__date=departure_date,
+            **{
+                f'{availability_field}__gte': passengers,
+                f'{price_field}__isnull': False,
+            }
+        )
+        .select_related('airline', 'aircraft', 'origin', 'destination')
+    )
+    if exact_flights.exists():
+        return exact_flights
+
+    return (
+        Flight.objects
+        .filter(
+            origin=origin,
+            destination=destination,
+            departure_time__date__range=(departure_date, departure_date + timedelta(days=30)),
+            **{
+                f'{availability_field}__gte': passengers,
+                f'{price_field}__isnull': False,
+            }
+        )
+        .select_related('airline', 'aircraft', 'origin', 'destination')
+    )
+
+
 def flight_search(request):
     """Main flight search page"""
     form = FlightSearchForm(request.GET or None)
@@ -41,6 +120,35 @@ def flight_search(request):
         'available_flights': available_flights,
         'page_title': 'Search Flights'
     }
+
+    if request.GET and request.GET.get('trip_type') == 'multi_city':
+        legs, errors = _parse_multi_city_legs(request.GET)
+        context['multi_city_legs'] = legs
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            try:
+                passengers = int(request.GET.get('passengers', 1))
+            except (TypeError, ValueError):
+                passengers = 1
+            passengers = max(1, min(passengers, 9))
+            cabin_class = request.GET.get('cabin_class', 'economy')
+            if cabin_class not in {'economy', 'premium_economy', 'business', 'first_class'}:
+                cabin_class = 'economy'
+
+            params = [
+                ('trip_type', 'multi_city'),
+                ('passengers', passengers),
+                ('cabin_class', cabin_class),
+            ]
+            for leg in legs:
+                params.extend([
+                    ('multi_origin', leg['origin'].id),
+                    ('multi_destination', leg['destination'].id),
+                    ('multi_date', leg['departure_date'].strftime('%Y-%m-%d')),
+                ])
+            return redirect(f"{reverse('flights:search_results')}?{urlencode(params)}")
     
     if form.is_valid():
         # Redirect to results with search parameters
@@ -75,12 +183,53 @@ def flight_search_results(request):
         passengers = 1
     cabin_class = request.GET.get('cabin_class', 'economy')
 
-    if trip_type not in {'one_way', 'round_trip'}:
-        messages.info(request, 'Multi-city search is not available yet. Showing one-way results instead.')
-        trip_type = 'one_way'
     if cabin_class not in {'economy', 'premium_economy', 'business', 'first_class'}:
         messages.info(request, 'Invalid cabin class. Showing economy results instead.')
         cabin_class = 'economy'
+
+    if trip_type == 'multi_city':
+        legs, errors = _parse_multi_city_legs(request.GET)
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return redirect('flights:search')
+
+        sort_by = request.GET.get('sort_by', 'price_low_high')
+        price_field = f'{cabin_class}_price'
+        multi_city_results = []
+        total_from_price = Decimal('0')
+
+        for leg in legs:
+            flights = _flight_search_queryset(
+                leg['origin'],
+                leg['destination'],
+                leg['departure_date'],
+                cabin_class,
+                passengers,
+            )
+            flights = sort_flights(flights, sort_by, cabin_class)
+            flight_list = list(flights[:6])
+            if flight_list:
+                total_from_price += (flight_list[0].get_price_for_class(cabin_class) or Decimal('0')) * passengers
+            multi_city_results.append({
+                'leg': leg,
+                'flights': flight_list,
+            })
+
+        context = {
+            'multi_city_results': multi_city_results,
+            'multi_city_legs': legs,
+            'trip_type': trip_type,
+            'passengers': passengers,
+            'cabin_class': cabin_class,
+            'sort_by': sort_by,
+            'total_from_price': total_from_price,
+            'page_title': 'Kết quả bay nhiều chặng',
+        }
+        return render(request, 'flights/search_results.html', context)
+
+    if trip_type not in {'one_way', 'round_trip'}:
+        trip_type = 'one_way'
     
     # Validate required parameters
     if not all([origin_id, destination_id, departure_date]):

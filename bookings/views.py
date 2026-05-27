@@ -16,7 +16,7 @@ import logging
 from .emails import send_booking_confirmation_email, send_payment_receipt_email, send_booking_cancellation_email
 
 from flights.models import Flight
-from .models import Booking, Passenger, BookingPayment
+from .models import Booking, BookingFlight, Passenger, BookingPayment
 from .forms import (
     PassengerForm, BookingContactForm, PaymentForm, 
     BookingSearchForm, CancellationForm
@@ -38,6 +38,33 @@ def make_session_safe(data):
     return safe_data
 
 
+def get_booking_flights_from_session(request):
+    flight_ids = request.session.get('booking_flight_ids')
+    if not flight_ids:
+        flight_id = request.session.get('booking_flight_id')
+        flight_ids = [flight_id] if flight_id else []
+
+    flights = list(
+        Flight.objects.filter(id__in=flight_ids).select_related(
+            'airline', 'aircraft', 'origin', 'destination'
+        )
+    )
+    flight_map = {flight.id: flight for flight in flights}
+    ordered_flights = [flight_map[int(flight_id)] for flight_id in flight_ids if int(flight_id) in flight_map]
+    return ordered_flights
+
+
+def calculate_booking_totals(flights, cabin_class):
+    base_price = Decimal('0')
+    for flight in flights:
+        price = flight.get_price_for_class(cabin_class)
+        if price:
+            base_price += Decimal(str(price))
+    taxes_and_fees = base_price * Decimal('0.15')
+    total_price = base_price + taxes_and_fees
+    return base_price, taxes_and_fees, total_price
+
+
 @booking_login_required
 def start_booking(request, flight_id):
     """Start the booking process for a specific flight"""
@@ -54,9 +81,68 @@ def start_booking(request, flight_id):
     
     # Store flight and cabin class in session for the booking process
     request.session['booking_flight_id'] = flight_id
+    request.session['booking_flight_ids'] = [flight_id]
+    request.session['booking_is_multi_city'] = False
     request.session['booking_cabin_class'] = cabin_class
     request.session['booking_price'] = str(price)
     
+    return redirect('bookings:passenger_details')
+
+
+def start_multi_city_booking(request):
+    """Start one booking that contains several selected flight segments."""
+    if request.method != 'POST':
+        return redirect('flights:search')
+
+    cabin_class = request.POST.get('cabin_class', 'economy')
+    flight_ids = [value for value in request.POST.getlist('flight_ids') if value]
+    if not flight_ids:
+        segment_keys = sorted(
+            [key for key in request.POST.keys() if key.startswith('segment_flight_')],
+            key=lambda value: int(value.rsplit('_', 1)[-1]) if value.rsplit('_', 1)[-1].isdigit() else 0,
+        )
+        flight_ids = [request.POST.get(key) for key in segment_keys if request.POST.get(key)]
+
+    if cabin_class not in {'economy', 'premium_economy', 'business', 'first_class'}:
+        cabin_class = 'economy'
+
+    if len(flight_ids) < 2:
+        messages.error(request, 'Vui lòng chọn đủ chuyến bay cho ít nhất 2 chặng.')
+        return redirect('flights:search')
+
+    if not request.user.is_authenticated:
+        request.session['pre_auth_flight_ids'] = flight_ids
+        request.session['pre_auth_cabin_class'] = cabin_class
+        request.session['pre_auth_is_multi_city'] = True
+        messages.info(request, 'Vui lòng đăng nhập để tiếp tục đặt toàn bộ hành trình.')
+        return redirect(f"{reverse('account_login')}?next={reverse('bookings:passenger_details')}")
+
+    flights = list(
+        Flight.objects.filter(id__in=flight_ids).select_related(
+            'airline', 'aircraft', 'origin', 'destination'
+        )
+    )
+    flight_map = {str(flight.id): flight for flight in flights}
+    ordered_flights = [flight_map[flight_id] for flight_id in flight_ids if flight_id in flight_map]
+
+    if len(ordered_flights) != len(flight_ids):
+        messages.error(request, 'Một hoặc nhiều chuyến bay không hợp lệ.')
+        return redirect('flights:search')
+
+    for index, flight in enumerate(ordered_flights, start=1):
+        available_seats = flight.get_available_seats_for_class(cabin_class)
+        price = flight.get_price_for_class(cabin_class)
+        if available_seats <= 0 or not price:
+            messages.error(request, f'Chặng {index} không còn hạng ghế đã chọn.')
+            return redirect('flights:search')
+
+    base_price, _, _ = calculate_booking_totals(ordered_flights, cabin_class)
+    request.session['booking_flight_id'] = ordered_flights[0].id
+    request.session['booking_flight_ids'] = [flight.id for flight in ordered_flights]
+    request.session['booking_is_multi_city'] = True
+    request.session['booking_cabin_class'] = cabin_class
+    request.session['booking_price'] = str(base_price)
+
     return redirect('bookings:passenger_details')
 
 
@@ -72,6 +158,9 @@ def passenger_details(request):
         return redirect('flights:search')
     
     flight = get_object_or_404(Flight, id=flight_id)
+    booking_flights = get_booking_flights_from_session(request)
+    is_multi_city = len(booking_flights) > 1
+    base_price, _, _ = calculate_booking_totals(booking_flights, cabin_class)
     
     # For simplicity, we'll handle just one passenger for now
     # In a full implementation, you'd handle multiple passengers
@@ -103,10 +192,12 @@ def passenger_details(request):
     
     context = {
         'flight': flight,
+        'booking_flights': booking_flights,
+        'is_multi_city': is_multi_city,
         'cabin_class': cabin_class,
         'passenger_form': passenger_form,
         'contact_form': contact_form,
-        'price': flight.get_price_for_class(cabin_class),
+        'price': base_price,
         'page_title': 'Passenger Details'
     }
     
@@ -127,12 +218,11 @@ def payment(request):
         return redirect('flights:search')
     
     flight = get_object_or_404(Flight, id=flight_id)
-    price = flight.get_price_for_class(cabin_class)
+    booking_flights = get_booking_flights_from_session(request)
+    is_multi_city = len(booking_flights) > 1
     
     # Calculate total price (base price + taxes/fees)
-    base_price = Decimal(str(price))
-    taxes_and_fees = base_price * Decimal('0.15')  # 15% taxes/fees
-    total_price = base_price + taxes_and_fees
+    base_price, taxes_and_fees, total_price = calculate_booking_totals(booking_flights, cabin_class)
     
     if request.method == 'POST':
         payment_form = PaymentForm(request.POST)
@@ -155,6 +245,15 @@ def payment(request):
                         special_requests=contact_data.get('special_requests', ''),
                         payment_method=payment_method if payment_method != 'skip' else 'skipped'
                     )
+
+                    for index, segment_flight in enumerate(booking_flights, start=1):
+                        BookingFlight.objects.create(
+                            booking=booking,
+                            flight=segment_flight,
+                            segment_order=index,
+                            cabin_class=cabin_class,
+                            base_price=segment_flight.get_price_for_class(cabin_class),
+                        )
                     
                     # Create passenger
                     passenger_data['booking'] = booking
@@ -175,11 +274,12 @@ def payment(request):
                         booking.payment_status = 'skipped'
                         booking.save()
                         
-                        # Update flight availability
+                        # Update flight availability for every segment
                         availability_field = f'{cabin_class}_available'
-                        current_availability = getattr(flight, availability_field)
-                        setattr(flight, availability_field, current_availability - 1)
-                        flight.save()
+                        for segment_flight in booking_flights:
+                            current_availability = getattr(segment_flight, availability_field)
+                            setattr(segment_flight, availability_field, current_availability - 1)
+                            segment_flight.save(update_fields=[availability_field])
                         
                         messages.success(request, 'Payment skipped. Booking is waiting for admin confirmation.')
 
@@ -209,11 +309,12 @@ def payment(request):
                         booking.payment_status = 'completed'
                         booking.save()
                         
-                        # Update flight availability
+                        # Update flight availability for every segment
                         availability_field = f'{cabin_class}_available'
-                        current_availability = getattr(flight, availability_field)
-                        setattr(flight, availability_field, current_availability - 1)
-                        flight.save()
+                        for segment_flight in booking_flights:
+                            current_availability = getattr(segment_flight, availability_field)
+                            setattr(segment_flight, availability_field, current_availability - 1)
+                            segment_flight.save(update_fields=[availability_field])
                         
                         messages.success(request, 'Payment successful. Your booking is waiting for admin confirmation.')
 
@@ -240,6 +341,8 @@ def payment(request):
     
     context = {
         'flight': flight,
+        'booking_flights': booking_flights,
+        'is_multi_city': is_multi_city,
         'cabin_class': cabin_class,
         'passenger_data': passenger_data,
         'contact_data': contact_data,
@@ -257,7 +360,11 @@ def payment(request):
 def booking_confirmation(request, booking_reference):
     """Show booking confirmation"""
     booking = get_object_or_404(
-        Booking.objects.select_related('flight__airline', 'flight__origin', 'flight__destination'),
+        Booking.objects.select_related('flight__airline', 'flight__origin', 'flight__destination').prefetch_related(
+            'flight_segments__flight__airline',
+            'flight_segments__flight__origin',
+            'flight_segments__flight__destination',
+        ),
         booking_reference=booking_reference
     )
     
@@ -268,6 +375,7 @@ def booking_confirmation(request, booking_reference):
     
     context = {
         'booking': booking,
+        'booking_flights': booking.itinerary_flights,
         'passengers': booking.passengers.all(),
         'page_title': f'Booking Confirmation - {booking.booking_reference}'
     }
@@ -281,7 +389,12 @@ def my_bookings(request):
     """List user's bookings"""
     bookings = Booking.objects.filter(user=request.user).select_related(
         'flight__airline', 'flight__origin', 'flight__destination'
-    ).prefetch_related('passengers').order_by('-created_at')
+    ).prefetch_related(
+        'passengers',
+        'flight_segments__flight__airline',
+        'flight_segments__flight__origin',
+        'flight_segments__flight__destination',
+    ).order_by('-created_at')
     
     context = {
         'bookings': bookings,
@@ -298,7 +411,11 @@ def my_bookings(request):
 def booking_detail(request, booking_reference):
     """Show detailed booking information"""
     booking = get_object_or_404(
-        Booking.objects.select_related('flight__airline', 'flight__origin', 'flight__destination'),
+        Booking.objects.select_related('flight__airline', 'flight__origin', 'flight__destination').prefetch_related(
+            'flight_segments__flight__airline',
+            'flight_segments__flight__origin',
+            'flight_segments__flight__destination',
+        ),
         booking_reference=booking_reference
     )
     
@@ -309,6 +426,7 @@ def booking_detail(request, booking_reference):
     
     context = {
         'booking': booking,
+        'booking_flights': booking.itinerary_flights,
         'passengers': booking.passengers.all(),
         'page_title': f'Booking {booking.booking_reference}'
     }
@@ -375,12 +493,19 @@ def cancel_booking(request, booking_reference):
                     booking.cancelled_at = timezone.now()
                     booking.save()
                     
-                    # Restore flight availability
-                    flight = booking.flight
+                    # Restore flight availability for every segment
                     availability_field = f'{booking.cabin_class}_available'
-                    current_availability = getattr(flight, availability_field)
-                    setattr(flight, availability_field, current_availability + 1)
-                    flight.save()
+                    segments = list(booking.flight_segments.select_related('flight'))
+                    if segments:
+                        for segment in segments:
+                            current_availability = getattr(segment.flight, availability_field)
+                            setattr(segment.flight, availability_field, current_availability + 1)
+                            segment.flight.save(update_fields=[availability_field])
+                    else:
+                        flight = booking.flight
+                        current_availability = getattr(flight, availability_field)
+                        setattr(flight, availability_field, current_availability + 1)
+                        flight.save(update_fields=[availability_field])
                     
                     # Send cancellation email
                     try:

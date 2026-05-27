@@ -95,7 +95,28 @@ class Booking(models.Model):
                 return code
     
     def __str__(self):
+        if self.is_multi_city:
+            return f"Booking {self.booking_reference} - Multi-city"
         return f"Booking {self.booking_reference} - {self.flight.flight_code}"
+
+    @property
+    def is_multi_city(self):
+        return self.flight_segments.count() > 1
+
+    @property
+    def itinerary_flights(self):
+        segments = list(self.flight_segments.select_related(
+            'flight__airline', 'flight__origin', 'flight__destination', 'flight__aircraft'
+        ).order_by('segment_order'))
+        if segments:
+            return segments
+        return [BookingFlight(
+            booking=self,
+            flight=self.flight,
+            segment_order=1,
+            cabin_class=self.cabin_class,
+            base_price=self.base_price,
+        )]
     
     @property
     def passenger_count(self):
@@ -112,6 +133,27 @@ class Booking(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('bookings:booking_detail', args=[self.booking_reference])
+
+
+class BookingFlight(models.Model):
+    """Flight segment included in a booking, used for multi-city itineraries."""
+
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='flight_segments')
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name='booking_segments')
+    segment_order = models.PositiveIntegerField(default=1)
+    cabin_class = models.CharField(max_length=20, choices=Booking.CABIN_CLASS_CHOICES, default='economy')
+    base_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        ordering = ['segment_order']
+        unique_together = ['booking', 'segment_order']
+        indexes = [
+            models.Index(fields=['booking', 'segment_order']),
+            models.Index(fields=['flight']),
+        ]
+
+    def __str__(self):
+        return f"{self.booking.booking_reference} segment {self.segment_order}: {self.flight.flight_code}"
 
 
 class Passenger(models.Model):

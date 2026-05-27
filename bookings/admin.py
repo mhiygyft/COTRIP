@@ -2,10 +2,11 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Booking, Passenger, BookingPayment
+from .models import Booking, BookingFlight, Passenger, BookingPayment
 
 MODEL_LABELS = {
     Booking: ("booking ve bay", "Booking ve bay"),
+    BookingFlight: ("chang bay trong booking", "Chang bay trong booking"),
     Passenger: ("hanh khach", "Hanh khach"),
     BookingPayment: ("thanh toan ve bay", "Thanh toan ve bay"),
 }
@@ -25,6 +26,12 @@ class PassengerInline(admin.TabularInline):
         'passport_number', 'passport_country', 'passport_expiry',
         'meal_preference', 'seat_preference', 'assigned_seat'
     )
+
+
+class BookingFlightInline(admin.TabularInline):
+    model = BookingFlight
+    extra = 0
+    fields = ('segment_order', 'flight', 'cabin_class', 'base_price')
 
 
 class BookingPaymentInline(admin.StackedInline):
@@ -96,7 +103,7 @@ class BookingAdmin(admin.ModelAdmin):
         'passenger_count'
     ]
     
-    inlines = [PassengerInline, BookingPaymentInline]
+    inlines = [BookingFlightInline, PassengerInline, BookingPaymentInline]
     
     fieldsets = (
         ('Booking Information', {

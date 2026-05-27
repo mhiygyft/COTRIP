@@ -48,8 +48,29 @@ def restore_booking_session_after_login(request):
     """
     Restore booking session data after user logs in
     """
+    if 'pre_auth_flight_ids' in request.session:
+        request.session['booking_flight_ids'] = request.session.pop('pre_auth_flight_ids')
+        request.session['booking_flight_id'] = request.session['booking_flight_ids'][0]
+        request.session['booking_cabin_class'] = request.session.pop('pre_auth_cabin_class', 'economy')
+        request.session['booking_is_multi_city'] = request.session.pop('pre_auth_is_multi_city', True)
+
+        try:
+            from flights.models import Flight
+            flights = Flight.objects.filter(id__in=request.session['booking_flight_ids'])
+            total_price = sum(
+                flight.get_price_for_class(request.session['booking_cabin_class']) or 0
+                for flight in flights
+            )
+            request.session['booking_price'] = str(total_price)
+        except Exception:
+            pass
+
+        return True
+
     if 'pre_auth_flight_id' in request.session:
         request.session['booking_flight_id'] = request.session.pop('pre_auth_flight_id')
+        request.session['booking_flight_ids'] = [request.session['booking_flight_id']]
+        request.session['booking_is_multi_city'] = False
         request.session['booking_cabin_class'] = request.session.pop('pre_auth_cabin_class', 'economy')
         
         # Calculate price for the stored flight/class
@@ -238,11 +259,15 @@ def clear_booking_session(request):
     """
     keys_to_clear = [
         'booking_flight_id',
+        'booking_flight_ids',
+        'booking_is_multi_city',
         'booking_cabin_class', 
         'booking_price',
         'passenger_data',
         'contact_data',
         'pre_auth_flight_id',
+        'pre_auth_flight_ids',
+        'pre_auth_is_multi_city',
         'pre_auth_cabin_class',
         'is_guest_booking'
     ]

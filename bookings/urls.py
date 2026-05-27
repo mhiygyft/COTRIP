@@ -6,6 +6,7 @@ app_name = 'bookings'
 urlpatterns = [
     # Booking flow
     path('book/<int:flight_id>/', views.start_booking, name='start_booking'),
+    path('book-multi-city/', views.start_multi_city_booking, name='start_multi_city_booking'),
     path('passenger-details/', views.passenger_details, name='passenger_details'),
     path('payment/', views.payment, name='payment'),
     path('confirmation/<str:booking_reference>/', views.booking_confirmation, name='confirmation'),
