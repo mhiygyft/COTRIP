@@ -229,6 +229,8 @@ class HotelSearchView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop('page', None)
         context.update({
             'location': self.request.GET.get('location', ''),
             'checkin': self.request.GET.get('checkin', ''),
@@ -240,6 +242,7 @@ class HotelSearchView(ListView):
             'selected_stars': self.request.GET.getlist('stars'),
             'selected_amenities': self.request.GET.getlist('amenities'),
             'sort': self.request.GET.get('sort', 'featured'),
+            'current_querystring': query_params.urlencode(),
         })
         return context
 
