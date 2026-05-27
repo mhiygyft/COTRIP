@@ -87,6 +87,7 @@ urlpatterns = [
     path('privacy/', TemplateView.as_view(template_name='pages/privacy.html'), name='privacy'),
     path('terms/', TemplateView.as_view(template_name='pages/terms.html'), name='terms'),
     path('sim-cards/', TemplateView.as_view(template_name='pages/sim_cards.html'), name='sim_cards'),
+    path('transfers/', user_views.transfer_booking, name='transfers'),
 ]
 
 # Serve media files in development

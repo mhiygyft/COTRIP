@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+
+{% block title %}Đặt xe - Du lịch Việt Nam{% endblock %}
+
+{% block content %}
+<section class="transfer-hero text-white py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <p class="text-white-50 mb-2">Di chuyển riêng cho khách du lịch</p>
+                <h1 class="display-6 fw-bold">Đặt xe sân bay, khách sạn và di chuyển theo điểm</h1>
+                <p class="lead mb-0">Chọn xe 4 chỗ, 7 chỗ hoặc 16 chỗ cho chặng sân bay - khách sạn hoặc di chuyển giữa các địa điểm trong lịch trình.</p>
+            </div>
+            <div class="col-lg-5">
+                <div class="bg-white text-dark rounded-3 p-4 shadow-sm">
+                    <h2 class="h5">Thông tin cần có</h2>
+                    <ul class="mb-0">
+                        <li>Tên và số điện thoại/Zalo</li>
+                        <li>Điểm đón, điểm đến và giờ đón</li>
+                        <li>Số khách, số hành lý và loại xe</li>
+                        <li>Số chuyến bay nếu là chặng sân bay</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+                <div>
+                    <p class="text-primary fw-semibold mb-1">Loại chuyến xe</p>
+                    <h2 class="h3 mb-0">Chọn đúng nhu cầu di chuyển</h2>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <button class="transfer-type-card active" type="button" data-transfer-type="airport">
+                        <i class="bi bi-airplane fs-3 text-primary"></i>
+                        <span>
+                            <strong>Đưa đón sân bay</strong>
+                            <small>Sân bay đến khách sạn hoặc khách sạn đến sân bay</small>
+                        </span>
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button class="transfer-type-card" type="button" data-transfer-type="point">
+                        <i class="bi bi-geo-alt fs-3 text-primary"></i>
+                        <span>
+                            <strong>Di chuyển theo điểm</strong>
+                            <small>Khách sạn, nhà hàng, điểm tham quan hoặc nhiều chặng</small>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3 class="h5">Bảng giá tham khảo</h3>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="price-card">
+                            <span>Xe 4 chỗ</span>
+                            <strong>350.000đ</strong>
+                            <small>1-3 khách, ít hành lý</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="price-card">
+                            <span>Xe 7 chỗ</span>
+                            <strong>500.000đ</strong>
+                            <small>3-5 khách hoặc nhiều vali</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="price-card">
+                            <span>Xe 16 chỗ</span>
+                            <strong>900.000đ</strong>
+                            <small>Nhóm đông, đoàn nhỏ</small>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted small mt-3 mb-0">Giá là mức demo cho một chặng trong nội thành. Chặng xa hoặc nhiều điểm dừng sẽ được nhân viên xác nhận lại.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="bg-white rounded-3 border p-4 shadow-sm sticky-lg-top" style="top: 90px;">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                    <div>
+                        <h2 class="h5">Thông tin đặt xe</h2>
+                        <p class="text-muted small mb-3">Chỉ bắt buộc tên, số điện thoại, điểm đón và điểm đến.</p>
+                    </div>
+                    <span class="badge text-bg-success">Bước 1</span>
+                </div>
+
+                <form id="transfer-form" novalidate>
+                    <input type="hidden" id="transfer-type" name="transfer_type" value="airport">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small" for="customer-name">Họ tên <span class="text-danger">*</span></label>
+                            <input class="form-control" id="customer-name" name="customer_name" type="text" required>
+                            <div class="invalid-feedback">Vui lòng nhập họ tên.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small" for="customer-phone">SĐT/Zalo <span class="text-danger">*</span></label>
+                            <input class="form-control" id="customer-phone" name="customer_phone" type="tel" required>
+                            <div class="invalid-feedback">Vui lòng nhập số điện thoại.</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3" id="airport-fields">
+                        <label class="form-label small" for="airport-direction">Chiều di chuyển</label>
+                        <select class="form-select" id="airport-direction" name="airport_direction">
+                            <option value="Sân bay đến khách sạn">Sân bay đến khách sạn</option>
+                            <option value="Khách sạn đến sân bay">Khách sạn đến sân bay</option>
+                        </select>
+
+                        <div class="row g-3 mt-0">
+                            <div class="col-md-6">
+                                <label class="form-label small" for="airport-name">Sân bay</label>
+                                <select class="form-select" id="airport-name" name="airport_name">
+                                    <option>Nội Bài</option>
+                                    <option>Tân Sơn Nhất</option>
+                                    <option>Đà Nẵng</option>
+                                    <option>Cam Ranh</option>
+                                    <option>Phú Quốc</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small" for="flight-number">Số chuyến bay</label>
+                                <input class="form-control" id="flight-number" name="flight_number" type="text" placeholder="VN123">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label small" for="pickup-point">Điểm đón <span class="text-danger">*</span></label>
+                            <input class="form-control" id="pickup-point" name="pickup_point" type="text" list="transfer-location-options" placeholder="Chọn hoặc nhập điểm đón" required>
+                            <div class="invalid-feedback">Vui lòng nhập điểm đón.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small" for="dropoff-point">Điểm đến <span class="text-danger">*</span></label>
+                            <input class="form-control" id="dropoff-point" name="dropoff_point" type="text" list="transfer-location-options" placeholder="Chọn hoặc nhập điểm đến" required>
+                            <div class="invalid-feedback">Vui lòng nhập điểm đến.</div>
+                        </div>
+                    </div>
+
+                    <div class="booking-location-box mt-3">
+                        <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                            <div>
+                                <label class="form-label small mb-1">Chọn nhanh từ booking của tôi</label>
+                                <div class="text-muted small">Dùng khách sạn hoặc sân bay bạn đã đặt trước đó để điền điểm đón/điểm đến.</div>
+                            </div>
+                        </div>
+
+                        {% if booked_hotels or booked_airports %}
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <select class="form-select form-select-sm saved-location-select" data-location-kind="hotel">
+                                        <option value="">Khách sạn đã đặt</option>
+                                        {% for hotel in booked_hotels %}
+                                            <option value="{{ hotel.location }}">{{ hotel.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select form-select-sm saved-location-select" data-location-kind="airport">
+                                        <option value="">Sân bay/chuyến bay đã đặt</option>
+                                        {% for airport in booked_airports %}
+                                            <option value="{{ airport.location }}">{{ airport.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="btn-group w-100 mt-2" role="group" aria-label="Chọn ô cần điền">
+                                <input class="btn-check" type="radio" name="fill_target" id="fill-pickup" value="pickup" checked>
+                                <label class="btn btn-outline-primary btn-sm" for="fill-pickup">Điền vào điểm đón</label>
+                                <input class="btn-check" type="radio" name="fill_target" id="fill-dropoff" value="dropoff">
+                                <label class="btn btn-outline-primary btn-sm" for="fill-dropoff">Điền vào điểm đến</label>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-light border small mb-0">
+                                Bạn chưa có booking khách sạn hoặc chuyến bay trong tài khoản này. Vẫn có thể nhập tay điểm đón/điểm đến.
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <datalist id="transfer-location-options">
+                        {% for hotel in booked_hotels %}
+                            <option value="{{ hotel.location }}">
+                        {% endfor %}
+                        {% for airport in booked_airports %}
+                            <option value="{{ airport.location }}">
+                        {% endfor %}
+                        <option value="Sân bay Nội Bài">
+                        <option value="Sân bay Tân Sơn Nhất">
+                        <option value="Sân bay Đà Nẵng">
+                        <option value="Sân bay Cam Ranh">
+                        <option value="Sân bay Phú Quốc">
+                        <option value="Khách sạn trung tâm Hà Nội">
+                        <option value="Khách sạn trung tâm TP.HCM">
+                        <option value="Khách sạn biển Đà Nẵng">
+                        <option value="Phố cổ Hà Nội">
+                        <option value="Hồ Hoàn Kiếm">
+                        <option value="Nhà thờ Đức Bà Sài Gòn">
+                        <option value="Chợ Bến Thành">
+                        <option value="Bà Nà Hills">
+                        <option value="Phố cổ Hội An">
+                        <option value="Bến du thuyền Hạ Long">
+                        <option value="Ga Hà Nội">
+                        <option value="Ga Sài Gòn">
+                    </datalist>
+
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label small" for="pickup-time">Ngày giờ đón</label>
+                            <input class="form-control" id="pickup-time" name="pickup_time" type="datetime-local">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small" for="car-type">Loại xe</label>
+                            <select class="form-select" id="car-type" name="car_type">
+                                <option value="Xe 4 chỗ" data-price="350000">Xe 4 chỗ - 350.000đ</option>
+                                <option value="Xe 7 chỗ" data-price="500000">Xe 7 chỗ - 500.000đ</option>
+                                <option value="Xe 16 chỗ" data-price="900000">Xe 16 chỗ - 900.000đ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-0">
+                        <div class="col-md-6">
+                            <label class="form-label small" for="passenger-count">Số khách</label>
+                            <input class="form-control" id="passenger-count" name="passenger_count" type="number" min="1" value="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small" for="luggage-count">Số hành lý</label>
+                            <input class="form-control" id="luggage-count" name="luggage_count" type="number" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <div class="mt-3 d-none" id="extra-stops-wrap">
+                        <label class="form-label small" for="extra-stops">Các chặng/điểm dừng thêm</label>
+                        <textarea class="form-control" id="extra-stops" name="extra_stops" rows="3" placeholder="Ví dụ: Khách sạn -> Bảo tàng Chăm -> Nhà hàng -> Khách sạn"></textarea>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label small" for="transfer-note">Ghi chú</label>
+                        <textarea class="form-control" id="transfer-note" name="note" rows="3" placeholder="Biển tên đón khách, trẻ em, ghế em bé, yêu cầu tiếng Anh..."></textarea>
+                    </div>
+
+                    <button class="btn btn-primary w-100 mt-3" type="submit">Tiếp tục xác nhận</button>
+                </form>
+
+                <div class="border rounded-3 p-3 mt-4 d-none" id="transfer-confirmation">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                        <div>
+                            <h3 class="h6 mb-1">Xác nhận đặt xe</h3>
+                            <p class="text-muted small mb-0">Kiểm tra thông tin trước khi chuyển thanh toán.</p>
+                        </div>
+                        <span class="badge text-bg-primary">Bước 2</span>
+                    </div>
+                    <dl class="small row mt-3 mb-3" id="transfer-summary"></dl>
+                    <button class="btn btn-success w-100" id="transfer-submit" type="button">Gửi yêu cầu đặt xe</button>
+                </div>
+
+                <div class="border rounded-3 p-3 mt-4 d-none" id="transfer-payment">
+                    <div class="alert alert-success small mb-3">Yêu cầu đặt xe đã được xác nhận thành công. Vui lòng chọn cách thanh toán.</div>
+                    <h3 class="h6">Thanh toán</h3>
+                    <div class="payment-total mb-3">
+                        <span>Số tiền cần thanh toán</span>
+                        <strong id="transfer-total">350.000đ</strong>
+                    </div>
+                    <div class="bg-light rounded-3 p-3 small mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Mã đơn</span>
+                            <strong id="transfer-code">CAR-0000</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Nội dung chuyển khoản</span>
+                            <strong id="transfer-bank-note">CAR-0000</strong>
+                        </div>
+                    </div>
+
+                    <form id="transfer-payment-form">
+                        <label class="form-label">Phương thức thanh toán</label>
+                        <div class="payment-option selected">
+                            <input class="form-check-input" type="radio" name="transfer_payment_method" id="transfer_pay_card" value="card" checked>
+                            <label for="transfer_pay_card">Thẻ tín dụng / ghi nợ</label>
+                        </div>
+                        <div class="payment-option">
+                            <input class="form-check-input" type="radio" name="transfer_payment_method" id="transfer_pay_bank" value="bank_transfer">
+                            <label for="transfer_pay_bank">Chuyển khoản ngân hàng</label>
+                        </div>
+                        <div class="payment-option">
+                            <input class="form-check-input" type="radio" name="transfer_payment_method" id="transfer_pay_manual" value="manual">
+                            <label for="transfer_pay_manual">Thanh toán khi lên xe</label>
+                        </div>
+
+                        <div class="alert alert-light border small d-none" id="transfer-bank-info">
+                            <strong>Thông tin chuyển khoản demo</strong>
+                            <div>Ngân hàng: Vietcombank</div>
+                            <div>Chủ tài khoản: NOVARYO TRAVEL</div>
+                            <div>Số tài khoản: 0123456789</div>
+                            <div>Nội dung: <span id="transfer-bank-info-note">CAR-0000</span></div>
+                        </div>
+
+                        <button class="btn btn-primary w-100 mt-3" type="submit">Thanh toán</button>
+                    </form>
+
+                    <div class="alert alert-success small mt-3 mb-0 d-none" id="transfer-payment-success">
+                        Thanh toán thành công. Nhân viên sẽ liên hệ xác nhận xe và tài xế.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.transfer-hero {
+    background:
+        linear-gradient(90deg, rgba(7, 52, 45, .82), rgba(19, 121, 91, .58)),
+        url("https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1800&q=80") center/cover;
+}
+.transfer-type-card {
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid #e4e8eb;
+    border-radius: 8px;
+    display: flex;
+    gap: 14px;
+    height: 100%;
+    padding: 18px;
+    text-align: left;
+    width: 100%;
+}
+.transfer-type-card.active {
+    background: #eef7f4;
+    border-color: #13795b;
+}
+.transfer-type-card small {
+    color: #64736f;
+    display: block;
+    margin-top: 4px;
+}
+.info-panel,
+.price-card {
+    background: #fff;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    padding: 18px;
+}
+.price-card {
+    height: 100%;
+}
+.price-card span,
+.price-card small {
+    color: #64736f;
+    display: block;
+}
+.price-card strong {
+    color: #13795b;
+    display: block;
+    font-size: 24px;
+    margin: 4px 0;
+}
+.booking-location-box {
+    background: #f8faf9;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    padding: 12px;
+}
+.payment-total {
+    align-items: center;
+    background: #eef7f4;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+}
+.payment-total span {
+    color: #64736f;
+}
+.payment-total strong {
+    color: #13795b;
+    font-size: 28px;
+}
+.payment-option {
+    align-items: center;
+    border: 1px solid #e4e8eb;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 12px;
+}
+.payment-option.selected {
+    background: #eef7f4;
+    border-color: #13795b;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('transfer-form');
+    const transferType = document.getElementById('transfer-type');
+    const airportFields = document.getElementById('airport-fields');
+    const extraStopsWrap = document.getElementById('extra-stops-wrap');
+    const carType = document.getElementById('car-type');
+    const pickupPoint = document.getElementById('pickup-point');
+    const dropoffPoint = document.getElementById('dropoff-point');
+    const confirmation = document.getElementById('transfer-confirmation');
+    const summary = document.getElementById('transfer-summary');
+    const submitButton = document.getElementById('transfer-submit');
+    const paymentPanel = document.getElementById('transfer-payment');
+    const paymentTotal = document.getElementById('transfer-total');
+    const transferCode = document.getElementById('transfer-code');
+    const transferBankNote = document.getElementById('transfer-bank-note');
+    const transferBankInfoNote = document.getElementById('transfer-bank-info-note');
+    const bankInfo = document.getElementById('transfer-bank-info');
+    const paymentForm = document.getElementById('transfer-payment-form');
+    const paymentSuccess = document.getElementById('transfer-payment-success');
+    let currentOrder = null;
+
+    function formatVnd(value) {
+        return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+    }
+
+    function addSummaryRow(label, value) {
+        const term = document.createElement('dt');
+        term.className = 'col-5 text-muted fw-normal';
+        term.textContent = label;
+
+        const desc = document.createElement('dd');
+        desc.className = 'col-7 fw-semibold mb-2';
+        desc.textContent = value || 'Bổ sung sau';
+
+        summary.appendChild(term);
+        summary.appendChild(desc);
+    }
+
+    document.querySelectorAll('.saved-location-select').forEach(function (select) {
+        select.addEventListener('change', function () {
+            if (!select.value) {
+                return;
+            }
+
+            const target = document.querySelector('input[name="fill_target"]:checked')?.value || 'pickup';
+            if (target === 'dropoff') {
+                dropoffPoint.value = select.value;
+            } else {
+                pickupPoint.value = select.value;
+            }
+        });
+    });
+
+    document.querySelectorAll('.transfer-type-card').forEach(function (button) {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.transfer-type-card').forEach(function (item) {
+                item.classList.remove('active');
+            });
+            button.classList.add('active');
+
+            const type = button.dataset.transferType;
+            transferType.value = type;
+            airportFields.classList.toggle('d-none', type !== 'airport');
+            extraStopsWrap.classList.toggle('d-none', type !== 'point');
+        });
+    });
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        const data = new FormData(form);
+        const selectedCar = carType.options[carType.selectedIndex];
+        const basePrice = Number(selectedCar.dataset.price || 0);
+        const price = transferType.value === 'point' ? basePrice + 100000 : basePrice;
+        const label = transferType.value === 'airport' ? 'Đưa đón sân bay' : 'Di chuyển theo điểm';
+
+        summary.innerHTML = '';
+        addSummaryRow('Khách hàng', data.get('customer_name'));
+        addSummaryRow('SĐT/Zalo', data.get('customer_phone'));
+        addSummaryRow('Loại chuyến', label);
+        addSummaryRow('Chiều sân bay', transferType.value === 'airport' ? data.get('airport_direction') : '');
+        addSummaryRow('Điểm đón', data.get('pickup_point'));
+        addSummaryRow('Điểm đến', data.get('dropoff_point'));
+        addSummaryRow('Ngày giờ đón', data.get('pickup_time'));
+        addSummaryRow('Loại xe', selectedCar.value);
+        addSummaryRow('Số khách', data.get('passenger_count'));
+        addSummaryRow('Số hành lý', data.get('luggage_count'));
+        addSummaryRow('Tạm tính', formatVnd(price));
+
+        currentOrder = {
+            code: 'CAR-' + Date.now().toString().slice(-6),
+            price: price
+        };
+
+        confirmation.classList.remove('d-none');
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    submitButton.addEventListener('click', function () {
+        if (!currentOrder) {
+            form.requestSubmit();
+            return;
+        }
+
+        transferCode.textContent = currentOrder.code;
+        transferBankNote.textContent = currentOrder.code;
+        transferBankInfoNote.textContent = currentOrder.code;
+        paymentTotal.textContent = formatVnd(currentOrder.price);
+        paymentSuccess.classList.add('d-none');
+        paymentPanel.classList.remove('d-none');
+        paymentPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.querySelectorAll('#transfer-payment-form .payment-option').forEach(function (option) {
+        option.addEventListener('click', function () {
+            const radio = option.querySelector('input[type="radio"]');
+            if (!radio) {
+                return;
+            }
+            radio.checked = true;
+            document.querySelectorAll('#transfer-payment-form .payment-option').forEach(function (item) {
+                item.classList.remove('selected');
+            });
+            option.classList.add('selected');
+            bankInfo.classList.toggle('d-none', radio.value !== 'bank_transfer');
+        });
+    });
+
+    paymentForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        paymentSuccess.classList.remove('d-none');
+        paymentSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+});
+</script>
+{% endblock %}

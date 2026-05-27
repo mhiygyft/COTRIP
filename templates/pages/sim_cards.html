@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}SIM du lịch cho người nước ngoài - Du lịch Việt Nam{% endblock %}
+{% block title %}SIM và dịch vụ đến nơi cho người nước ngoài - Du lịch Việt Nam{% endblock %}
 
 {% block content %}
 <section class="bg-primary text-white py-5">
@@ -8,8 +8,8 @@
         <div class="row align-items-center g-4">
             <div class="col-lg-7">
                 <p class="text-white-50 mb-2">Dành cho khách quốc tế đến Việt Nam</p>
-                <h1 class="display-6 fw-bold">Mua SIM du lịch nhanh, có data ngay khi hạ cánh</h1>
-                <p class="lead mb-0">Chọn gói data phù hợp, nhận SIM tại sân bay/khách sạn và được hỗ trợ kích hoạt.</p>
+                <h1 class="display-6 fw-bold">SIM, đón sân bay và dịch vụ cần thiết khi đến Việt Nam</h1>
+                <p class="lead mb-0">Chọn gói data, đổi tiền và bảo hiểm du lịch trong cùng một yêu cầu.</p>
             </div>
             <div class="col-lg-5">
                 <div class="bg-white text-dark rounded-3 p-4 shadow-sm">
@@ -19,6 +19,7 @@
                         <li>Ngày đến Việt Nam và giờ hạ cánh</li>
                         <li>Sân bay/khách sạn/điểm hẹn nhận SIM</li>
                         <li>Điện thoại mở khóa mạng để dùng SIM quốc tế</li>
+                        <li>Thông tin đổi tiền hoặc bảo hiểm nếu cần thêm dịch vụ</li>
                     </ul>
                 </div>
             </div>
@@ -82,6 +83,35 @@
                     </ul>
                     <a class="btn btn-primary w-100" href="#sim-order-form">Chọn gói này</a>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container pb-5">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+        <div>
+            <p class="text-primary fw-semibold mb-1">Dịch vụ khi đến nơi</p>
+            <h2 class="h3 mb-0">Thêm vào đơn đặt SIM nếu khách cần</h2>
+        </div>
+        <span class="text-muted small">Giá demo để khách thấy tổng chi phí trước khi thanh toán.</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="service-card">
+                <div class="service-icon">💱</div>
+                <h3 class="h6">Đổi tiền</h3>
+                <p class="text-muted small mb-2">Hỗ trợ đổi USD/EUR/KRW/JPY sang VND khi nhận SIM hoặc tại điểm hẹn.</p>
+                <strong>Phí giữ dịch vụ 50.000đ</strong>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="service-card">
+                <div class="service-icon">🛡</div>
+                <h3 class="h6">Bảo hiểm du lịch</h3>
+                <p class="text-muted small mb-2">Gói bảo hiểm ngắn ngày cho khách quốc tế trong thời gian ở Việt Nam.</p>
+                <strong>Từ 120.000đ</strong>
             </div>
         </div>
     </div>
@@ -211,6 +241,58 @@
                         <div class="mb-3">
                             <label class="form-label small" for="sim-pickup-detail">Chi tiết nơi nhận <span class="text-muted">(tùy chọn)</span></label>
                             <input class="form-control" id="sim-pickup-detail" name="pickup_detail" type="text" placeholder="Tên khách sạn, ga đến, cổng sân bay...">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small">Dịch vụ cần thêm</label>
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="addon-option">
+                                        <input class="form-check-input sim-addon" type="checkbox" name="addons" value="Đổi tiền khi nhận SIM" data-price="50000" data-target="#currency-exchange-fields">
+                                        <span>💱 Đổi tiền <strong>+50.000đ phí giữ dịch vụ</strong></span>
+                                    </label>
+                                </div>
+                                <div class="col-12">
+                                    <label class="addon-option">
+                                        <input class="form-check-input sim-addon" type="checkbox" name="addons" value="Bảo hiểm du lịch" data-price="120000" data-target="#insurance-fields">
+                                        <span>🛡 Bảo hiểm du lịch <strong>+120.000đ</strong></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="addon-fields d-none" id="currency-exchange-fields">
+                            <h3 class="h6">Thông tin đổi tiền</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small" for="currency-from">Loại tiền</label>
+                                    <select class="form-select" id="currency-from" name="currency_from">
+                                        <option>USD</option>
+                                        <option>EUR</option>
+                                        <option>KRW</option>
+                                        <option>JPY</option>
+                                        <option>SGD</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small" for="currency-amount">Số tiền muốn đổi</label>
+                                    <input class="form-control" id="currency-amount" name="currency_amount" type="text" placeholder="Ví dụ: 200 USD">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="addon-fields d-none" id="insurance-fields">
+                            <h3 class="h6">Thông tin bảo hiểm du lịch</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small" for="insurance-days">Số ngày bảo hiểm</label>
+                                    <input class="form-control" id="insurance-days" name="insurance_days" type="number" min="1" placeholder="7">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small" for="insurance-people">Số người</label>
+                                    <input class="form-control" id="insurance-people" name="insurance_people" type="number" min="1" placeholder="1">
+                                </div>
+                            </div>
                         </div>
 
                         <button class="btn btn-primary w-100" type="submit">Tiếp tục xác nhận</button>
@@ -411,6 +493,39 @@
     background: #eef7f4;
     border-color: #13795b;
 }
+.service-card {
+    background: #fff;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    height: 100%;
+    padding: 18px;
+}
+.service-icon {
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+.addon-option {
+    align-items: center;
+    border: 1px solid #e4e8eb;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    width: 100%;
+}
+.addon-option strong {
+    color: #13795b;
+    font-size: 12px;
+}
+.addon-fields {
+    background: #f8faf9;
+    border: 1px solid #e7ecea;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 14px;
+}
 </style>
 {% endblock %}
 
@@ -431,6 +546,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const bankInfo = document.getElementById('sim-bank-info');
     const paymentForm = document.getElementById('sim-payment-form');
     const paymentSuccess = document.getElementById('sim-payment-success');
+    const addonInputs = document.querySelectorAll('.sim-addon');
     let currentOrder = null;
 
     function formatVnd(value) {
@@ -450,6 +566,26 @@ document.addEventListener('DOMContentLoaded', function () {
         summary.appendChild(desc);
     }
 
+    function selectedAddons() {
+        return Array.from(addonInputs)
+            .filter(function (input) { return input.checked; })
+            .map(function (input) {
+                return {
+                    name: input.value,
+                    price: Number(input.dataset.price || 0)
+                };
+            });
+    }
+
+    addonInputs.forEach(function (input) {
+        input.addEventListener('change', function () {
+            const target = document.querySelector(input.dataset.target);
+            if (target) {
+                target.classList.toggle('d-none', !input.checked);
+            }
+        });
+    });
+
     form.addEventListener('submit', function (event) {
         event.preventDefault();
         form.classList.add('was-validated');
@@ -461,13 +597,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedPackage = packageSelect.options[packageSelect.selectedIndex];
         const price = Number(selectedPackage.dataset.price || 0);
         const data = new FormData(form);
+        const addons = selectedAddons();
+        const addonTotal = addons.reduce(function (sum, addon) {
+            return sum + addon.price;
+        }, 0);
+        const total = price + addonTotal;
+
         summary.innerHTML = '';
         addSummaryRow('Khách hàng', data.get('name'));
         addSummaryRow('SĐT/Zalo', data.get('phone'));
         addSummaryRow('Gói SIM', selectedPackage.value);
-        addSummaryRow('Tạm tính', formatVnd(price));
         addSummaryRow('Nơi nhận', data.get('pickup'));
         addSummaryRow('Chi tiết nơi nhận', data.get('pickup_detail'));
+        addSummaryRow('Dịch vụ thêm', addons.length ? addons.map(function (addon) { return addon.name; }).join(', ') : 'Không chọn');
+        addSummaryRow('Tạm tính SIM', formatVnd(price));
+        addSummaryRow('Tạm tính dịch vụ', formatVnd(addonTotal));
+        addSummaryRow('Tổng thanh toán', formatVnd(total));
         addSummaryRow('Ngày đến', data.get('arrival_date'));
         addSummaryRow('Quốc tịch', data.get('nationality'));
         addSummaryRow('Hộ chiếu', data.get('passport'));
@@ -478,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function () {
         currentOrder = {
             code: 'SIM-' + Date.now().toString().slice(-6),
             packageName: selectedPackage.value,
-            price: price
+            price: total
         };
     });
 

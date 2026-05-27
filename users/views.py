@@ -196,6 +196,46 @@ def dashboard(request):
     return render(request, "users/dashboard.html", context)
 
 
+def transfer_booking(request):
+    booked_hotels = []
+    booked_airports = []
+
+    if request.user.is_authenticated:
+        hotel_reservations = HotelReservation.objects.filter(user=request.user).select_related(
+            "room_type__hotel", "room_type__hotel__city"
+        )
+        for reservation in hotel_reservations:
+            hotel = reservation.room_type.hotel
+            booked_hotels.append({
+                "label": f"{hotel.name} - {hotel.city.name}",
+                "location": f"{hotel.name}, {hotel.address}",
+            })
+
+        flight_bookings = Booking.objects.filter(user=request.user).select_related(
+            "flight__origin", "flight__destination", "flight__airline"
+        )
+        seen_airports = set()
+        for booking in flight_bookings:
+            for airport, direction in (
+                (booking.flight.origin, "Sân bay đi"),
+                (booking.flight.destination, "Sân bay đến"),
+            ):
+                key = airport.id
+                if key in seen_airports:
+                    continue
+                seen_airports.add(key)
+                booked_airports.append({
+                    "label": f"{airport.name} ({airport.iata_code}) - {direction}",
+                    "location": f"{airport.name} ({airport.iata_code})",
+                })
+
+    return render(request, "pages/transfer_booking.html", {
+        "booked_hotels": booked_hotels,
+        "booked_airports": booked_airports,
+        "page_title": "Đặt xe",
+    })
+
+
 @login_required
 def saved_flights(request):
     context = {
