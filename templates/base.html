@@ -90,6 +90,7 @@
             padding: .65rem .8rem;
             font-size: .92rem;
             line-height: 1.35;
+            white-space: pre-line;
         }
         .ai-chat-bubble.user {
             margin-left: auto;
@@ -230,7 +231,7 @@
             <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
                 <div>
                     <div class="fw-semibold">Tư vấn AI</div>
-                    <div class="small text-muted">Gợi ý khách sạn, tour, trải nghiệm, chuyến bay</div>
+                    <div class="small text-muted">Lên plan, so sánh lựa chọn và tư vấn dịch vụ</div>
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="aiChatClose" aria-label="Đóng chatbot">
                     <i class="bi bi-x-lg"></i>
@@ -238,13 +239,13 @@
             </div>
             <div class="ai-chat-messages p-3" id="aiChatMessages">
                 <div class="ai-chat-bubble bot mb-2">
-                    Bạn muốn đi đâu, ngân sách bao nhiêu, thích nghỉ dưỡng hay trải nghiệm? Mình sẽ gợi ý các lựa chọn đang có trên website.
+                    Bạn có thể nhờ mình lên plan chi tiết, so sánh khách sạn/tour/trải nghiệm/chuyến bay hoặc tư vấn SIM, đổi tiền, bảo hiểm và đặt xe.
                 </div>
                 <div class="d-flex flex-wrap gap-2 mt-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Khách sạn ở Đà Nẵng</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Tour gia đình 3 ngày</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Trải nghiệm ẩm thực</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Chuyến bay còn chỗ</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Lên plan Đà Nẵng 3 ngày cho 2 người</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">So sánh lựa chọn đi Phú Quốc</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">Gợi ý ăn chơi nghỉ ở Hà Nội</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary ai-chat-chip">SIM, đổi tiền và bảo hiểm cho khách nước ngoài</button>
                 </div>
             </div>
             <form class="border-top p-3" id="aiChatForm">
@@ -405,7 +406,7 @@
                     appendBubble(message, "user");
                     input.value = "";
                     input.disabled = true;
-                    const loading = appendBubble("Đang tìm gợi ý phù hợp...", "bot");
+                    const loading = appendBubble("Đang phân tích yêu cầu và tìm lựa chọn phù hợp...", "bot");
 
                     try {
                         const response = await fetch("{% url 'chatbot_api' %}", {
