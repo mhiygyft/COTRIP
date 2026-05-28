@@ -16,7 +16,9 @@ from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailab
 
 
 def normalize_location(value):
-    value = (value or "").replace("Đ", "D").replace("đ", "d").lower()
+    value = (
+        value or ""
+    ).replace("Đ", "D").replace("đ", "d").replace("Ä", "D").replace("Ä‘", "d").lower()
     return "".join(
         char for char in unicodedata.normalize("NFD", value)
         if unicodedata.category(char) != "Mn"
@@ -52,6 +54,32 @@ def serialize_editable_itinerary(itinerary):
 def default_activity_suggestions(city_name):
     city_key = normalize_location(city_name)
     city_data = {
+        'dong do': [
+            ('attraction', 'Ho Dong Do SUP va camping', 'Check-in ven ho, SUP nhe, cam trai va BBQ cuoi tuan gan Ha Noi.', 380000),
+            ('attraction', 'Rung thong Soc Son picnic', 'Picnic, chup anh doi thong va ket hop cafe/homestay quanh Soc Son.', 250000),
+            ('attraction', 'Hoang hon ven ho Dong Do', 'Khung gio chieu de di dao, chup anh va nghi truoc bua BBQ toi.', 80000),
+            ('transport', 'Xe rieng Ha Noi - Dong Do', 'Don tu noi thanh Ha Noi, di Soc Son va tra ve homestay/camping ven ho.', 650000),
+            ('transport', 'Taxi/Grab noi khu Soc Son', 'Di chuyen giua homestay, ho Dong Do, cafe va diem picnic gan do.', 220000),
+            ('transport', 'Thue xe may Soc Son 1 ngay', 'Phu hop nhom nho muon tu di cac diem quanh ho va doi thong.', 180000),
+            ('accommodation', 'Lakeside camping stay Dong Do', 'Luu tru ven ho, hop nhom ban thich BBQ, chill dem va di ngan ngay.', 620000),
+            ('accommodation', 'Pine hill homestay Soc Son', 'Homestay doi thong gan ho Dong Do, yen tinh va co goc check-in.', 680000),
+            ('food', 'BBQ ven ho Dong Do', 'Bua toi phu hop nhom ban sau khi SUP/cam trai.', 250000),
+            ('food', 'Cafe chill Soc Son', 'Dung nghi buoi chieu, chup anh va can bang lich trinh.', 90000),
+            ('food', 'Bua sang homestay', 'An sang nhe truoc khi di dao ho hoac quay lai Ha Noi.', 70000),
+        ],
+        'quan lan': [
+            ('attraction', 'Bai bien Quan Lan', 'Tam bien, check-in bai cat dai va ngam hoang hon tren dao.', 120000),
+            ('attraction', 'Bai Minh Chau', 'Bai cat trang dep, hop chup anh, tam bien va di ca ngay.', 180000),
+            ('attraction', 'Eo Gio Quan Lan', 'Diem ngam bien va chup anh tren cung duong xe dien quanh dao.', 160000),
+            ('transport', 'Tau cao toc Van Don - Quan Lan', 'Chang di chinh de ra dao Quan Lan tu cang Van Don.', 300000),
+            ('transport', 'Xe dien tren dao Quan Lan', 'Di chuyen giua ben tau, homestay, bai bien Quan Lan, Minh Chau va Eo Gio.', 250000),
+            ('transport', 'Taxi/xe rieng Ha Noi - Van Don', 'Ket noi san bay/Ha Noi voi cang Van Don truoc khi len tau cao toc.', 1200000),
+            ('accommodation', 'Quan Lan beach local stay', 'Local stay gan bien, tien di xe dien va an hai san buoi toi.', 720000),
+            ('accommodation', 'Minh Chau white sand homestay', 'Homestay gan Minh Chau, hop nhom ban thich bien vang va khong gian yen tinh.', 760000),
+            ('food', 'Hai san Quan Lan', 'Bua toi hai san dia phuong sau khi tam bien va di xe dien quanh dao.', 320000),
+            ('food', 'Cafe/chill gan bien Minh Chau', 'Nghi chieu, uong nuoc va sap xep lich ngam hoang hon.', 100000),
+            ('food', 'An sang dia phuong tren dao', 'Bua sang gon nhe truoc khi di bai bien hoac quay ve dat lien.', 80000),
+        ],
         'da nang': [
             ('attraction', 'Cầu Rồng', 'Check-in biểu tượng Đà Nẵng, đẹp nhất vào buổi tối cuối tuần khi cầu phun lửa/phun nước.', 0),
             ('attraction', 'Bãi biển Mỹ Khê', 'Tắm biển, đi bộ bờ cát và chụp ảnh bình minh.', 50000),

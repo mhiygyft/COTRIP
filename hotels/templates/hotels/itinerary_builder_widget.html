@@ -74,6 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let travelers = 1;
         let requestedBudget = 0;
 
+        hydrateFromQueryString();
+
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             const params = new URLSearchParams(new FormData(form));
@@ -383,6 +385,21 @@ document.addEventListener('DOMContentLoaded', function() {
         function autosize(textarea) { textarea.style.height = 'auto'; textarea.style.height = `${textarea.scrollHeight}px`; }
         function formatVnd(value) { return `${Number(value || 0).toLocaleString('vi-VN')} VND`; }
         function escapeHtml(value) { return String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[char])); }
+
+        function hydrateFromQueryString() {
+            const params = new URLSearchParams(window.location.search);
+            const destination = params.get('destination');
+            if (!destination) return;
+            form.elements.destination.value = destination;
+            if (params.get('days')) form.elements.days.value = params.get('days');
+            if (params.get('travelers')) form.elements.travelers.value = params.get('travelers');
+            if (params.get('budget')) form.elements.budget.value = params.get('budget');
+            if (params.get('from_chat') === '1' || params.get('autostart') === '1') {
+                window.setTimeout(function() {
+                    form.dispatchEvent(new Event('submit', {bubbles: true, cancelable: true}));
+                }, 150);
+            }
+        }
     });
 });
 </script>

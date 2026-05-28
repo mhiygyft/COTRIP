@@ -105,6 +105,16 @@ CITY_IMAGES = {
         commons_file("Moc Chau trong suong som (20880297811).jpg"),
         commons_file("Thacdaiyem.jpg"),
     ],
+    "Dong Do": [
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "Quan Lan": [
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513415564515-763d91423bdd?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513553404607-988bf2703777?auto=format&fit=crop&w=1200&q=80",
+    ],
 }
 
 HOTEL_IMAGE_SETS = {
@@ -159,9 +169,23 @@ HOTEL_CITY_STYLE = {
     "Con Dao": "beach",
     "Ha Long": "beach",
     "Can Tho": "riverside",
+    "Dong Do": "mountain",
+    "Quan Lan": "beach",
 }
 
 ACTIVITY_KEYWORD_IMAGES = {
+    "dong do": [
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "quan lan": [
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513415564515-763d91423bdd?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "minh chau": [
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513553404607-988bf2703777?auto=format&fit=crop&w=1200&q=80",
+    ],
     "hoan kiem": [commons_file("Ho Hoan Kiem.jpg"), commons_file("Hoan Kiem Lake.jpg")],
     "old quarter": [commons_file("Ho Hoan Kiem.jpg"), commons_file("Hoan Kiem Lake.jpg")],
     "sapa": [commons_file("Terraced fields Sa Pa 6.jpg"), commons_file("Terraced fields Sa Pa 3.jpg")],

@@ -94,10 +94,14 @@ def _extract_destination(message, recommendations=None):
 
 def _has_plan_intent(message):
     normalized = _normalize(message)
-    return any(phrase in normalized for phrase in [
+    if any(phrase in normalized for phrase in [
         "lich trinh", "lịch trình", "ke hoach", "kế hoạch", "len plan",
         "lên plan", "itinerary", "timeline", "plan chi tiet", "plan chi tiết",
-    ])
+    ]):
+        return True
+    asks_for_suggestion = any(phrase in normalized for phrase in ["goi y", "gợi ý"])
+    has_trip_length = bool(re.search(r"\d+\s*(ngay|ngày|day|days)", normalized))
+    return asks_for_suggestion and has_trip_length and bool(_extract_destination(message))
 
 
 def _has_compare_intent(message):

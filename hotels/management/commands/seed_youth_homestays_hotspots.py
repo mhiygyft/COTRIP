@@ -40,7 +40,7 @@ class Command(BaseCommand):
             "Ha Noi", "Sa Pa", "Ninh Binh", "Ha Long", "Hue", "Da Nang",
             "Hoi An", "Nha Trang", "Da Lat", "TP. Ho Chi Minh", "Can Tho",
             "Phu Quoc", "Phong Nha", "Ha Giang", "Mui Ne", "Quy Nhon",
-            "Con Dao", "Moc Chau",
+            "Con Dao", "Moc Chau", "Dong Do", "Quan Lan",
         ]
         cities = {}
         for name in city_names:
@@ -144,6 +144,10 @@ class Command(BaseCommand):
             ("Thao Dien Garden Room", "TP. Ho Chi Minh", "Phong nho khu Thao Dien voi cafe, brunch, khong gian quoc te va di chuyen trung tam nhanh.", 740000, "https://en.wikivoyage.org/wiki/Ho_Chi_Minh_City", "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80"),
             ("Nguyen Hue Pocket Hotel", "TP. Ho Chi Minh", "Khach san nho gan pho di bo Nguyen Hue, hop lich trinh dem va song Sai Gon.", 820000, "https://en.wikivoyage.org/wiki/Ho_Chi_Minh_City", "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80"),
             ("Bui Vien Quiet Guesthouse", "TP. Ho Chi Minh", "Guesthouse gan khu Bui Vien nhung trong hem yen tinh, phu hop backpacker.", 520000, "https://en.wikivoyage.org/wiki/Ho_Chi_Minh_City", "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80"),
+            ("Dong Do Lakeside Camping Stay", "Dong Do", "Luu tru ven ho Dong Do, hop nhom ban di cam trai, SUP, BBQ va chill gan Ha Noi.", 620000, "https://www.lakeside-homestay.com/", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"),
+            ("Soc Son Pine Hill Homestay", "Dong Do", "Homestay doi thong Soc Son gan ho Dong Do, hop di tron cuoi tuan va check-in nhe.", 680000, "https://www.lakeside-homestay.com/", "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80"),
+            ("Quan Lan Beach Local Stay", "Quan Lan", "Local stay gan bai bien Quan Lan, hop lich trinh bien hoang so, xe dien va hai san.", 720000, "https://vietnamtourism.gov.vn/post/42603", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"),
+            ("Minh Chau White Sand Homestay", "Quan Lan", "Homestay gan Minh Chau, hop nhom ban thich bien vang, cat trang va cam trai dem.", 760000, "https://vinpearl.com/vi/chia-se-kinh-nghiem-du-lich-bai-tam-minh-chau-quan-lan-quang-ninh", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"),
         ]
 
         homestays = []
@@ -253,6 +257,10 @@ class Command(BaseCommand):
             ("Con Dao Dam Trau Beach Chill", "Con Dao", "Buoi chieu bien Dam Trau, cafe nho va ngam may bay/hoang hon neu dung gio.", 260000, "Viewpoint", "https://en.wikivoyage.org/wiki/Con_Dao", "https://images.unsplash.com/photo-1513415564515-763d91423bdd?auto=format&fit=crop&w=1200&q=80"),
             ("Can Tho Night Market Snack Walk", "Can Tho", "Lich trinh an vat cho dem Can Tho, ben Ninh Kieu va cafe ven song.", 240000, "Local experience", "https://en.wikivoyage.org/wiki/Can_Tho", "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80"),
             ("Nha Trang Hon Chong Sunset Stop", "Nha Trang", "Diem ngam bien Hon Chong, chup anh da bien va ket hop cafe ven bien.", 180000, "Viewpoint", "https://en.wikivoyage.org/wiki/Nha_Trang", "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1200&q=80"),
+            ("Dong Do Lake SUP & Camping", "Dong Do", "Ho Dong Do gan Ha Noi, hop SUP, cam trai ven ho, BBQ va chill cuoi tuan voi nhom ban.", 380000, "Local experience", "https://www.lakeside-homestay.com/", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"),
+            ("Soc Son Pine Forest Picnic", "Dong Do", "Picnic doi thong Soc Son, chup anh ngoai troi va ket hop cafe/homestay gan ho Dong Do.", 250000, "Viewpoint", "https://www.lakeside-homestay.com/", "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80"),
+            ("Quan Lan Minh Chau Beach Day", "Quan Lan", "Bai Minh Chau - Quan Lan voi cat trang, nuoc trong, hop tam bien, check-in va ngam hoang hon.", 420000, "Local experience", "https://vietnamtourism.gov.vn/post/42603", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"),
+            ("Quan Lan Eo Gio & Seafood Walk", "Quan Lan", "Di xe dien tham Eo Gio, cum di tich Quan Lan va an hai san dia phuong buoi toi.", 520000, "Viewpoint", "https://vietnamtourism.gov.vn/post/42603", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"),
         ]
         activities = []
         for title, city, text, price, category_name, source, image in rows:
