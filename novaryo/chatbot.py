@@ -2,6 +2,7 @@ import json
 import logging
 import re
 from decimal import Decimal
+from urllib.parse import urlencode
 
 import requests
 from django.conf import settings
@@ -15,7 +16,7 @@ from text_unidecode import unidecode
 
 from activities.models import Activity
 from flights.models import Flight
-from hotels.models import Hotel
+from hotels.models import City, Hotel
 from packages.models import TravelPackage
 from transport.models import TransportTrip
 
@@ -55,6 +56,40 @@ def _extract_days(message, default=3):
     if not match:
         return default
     return max(1, min(int(match.group(1)), 7))
+
+
+def _extract_travelers(message, default=2):
+    normalized = _normalize(message)
+    match = re.search(r"(\d+)\s*(nguoi|người|khach|khách|pax)", normalized)
+    if not match:
+        return default
+    return max(1, min(int(match.group(1)), 20))
+
+
+def _extract_budget(message):
+    normalized = _normalize(message).replace(".", "").replace(",", "")
+    million_match = re.search(r"(\d+)\s*(trieu|triệu|m)", normalized)
+    if million_match:
+        return int(million_match.group(1)) * 1000000
+    number_match = re.search(r"(\d{6,})", normalized)
+    if number_match:
+        return int(number_match.group(1))
+    return 0
+
+
+def _extract_destination(message, recommendations=None):
+    normalized = _normalize(message)
+    for city in City.objects.filter(is_popular=True).order_by("-is_popular", "name"):
+        if _normalize(city.name) in normalized:
+            return city.name
+    for city in City.objects.order_by("name"):
+        if _normalize(city.name) in normalized:
+            return city.name
+    for item in recommendations or []:
+        subtitle = item.get("subtitle", "")
+        if subtitle:
+            return subtitle.split(",", 1)[0].split(" - ", 1)[0].strip()
+    return ""
 
 
 def _has_plan_intent(message):
@@ -374,6 +409,28 @@ def _build_plan_answer(message, recommendations):
     return "\n".join(lines)
 
 
+def _planner_action(request, message, recommendations):
+    if not _has_plan_intent(message):
+        return None
+    destination = _extract_destination(message, recommendations)
+    if not destination:
+        return None
+    params = {
+        "destination": destination,
+        "days": _extract_days(message),
+        "travelers": _extract_travelers(message),
+        "from_chat": "1",
+    }
+    budget = _extract_budget(message)
+    if budget:
+        params["budget"] = budget
+    return {
+        "label": "Mở lịch trình để chỉnh sửa",
+        "url": _absolute_url(request, f"{reverse('hotels:itinerary_planner')}?{urlencode(params)}"),
+        "type": "itinerary_planner",
+    }
+
+
 def _fallback_answer(message, recommendations):
     if not recommendations:
         return (
@@ -473,11 +530,16 @@ def chatbot_api(request):
     recommendations = _collect_recommendations(request, message)
     ai_answer = _ask_openai(message, recommendations)
     answer = ai_answer or _fallback_answer(message, recommendations)
+    actions = []
+    planner_action = _planner_action(request, message, recommendations)
+    if planner_action:
+        actions.append(planner_action)
 
     return JsonResponse(
         {
             "answer": answer,
             "recommendations": recommendations,
+            "actions": actions,
             "used_ai": bool(ai_answer),
         }
     )
