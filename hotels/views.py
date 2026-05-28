@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse
 from django.views.generic import ListView, DetailView, TemplateView
 from django.http import JsonResponse
 from django.db.models import Q
@@ -12,6 +13,9 @@ from django.utils import timezone
 from django.utils.dateparse import parse_time
 from django.views.decorators.http import require_http_methods
 from datetime import datetime, timedelta
+from activities.models import Activity, ActivityBooking
+from packages.models import TravelPackage
+from transport.models import TransportTrip
 from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType, Itinerary, ItineraryStop
 
 
@@ -49,6 +53,10 @@ def serialize_editable_itinerary(itinerary):
             for day_number in range(1, itinerary.days + 1)
         ],
     }
+
+
+def itinerary_cost(itinerary):
+    return sum(int(stop.estimated_cost or 0) for stop in itinerary.stops.all())
 
 
 def default_activity_suggestions(city_name):
@@ -591,6 +599,30 @@ class ItineraryBuilderAPIView(TemplateView):
 
 
 @login_required
+def saved_itineraries_api(request):
+    itineraries = (
+        Itinerary.objects.filter(created_by=request.user, is_active=True)
+        .select_related('city')
+        .prefetch_related('stops')
+        .order_by('-created_at')
+    )
+    return JsonResponse({
+        'ok': True,
+        'itineraries': [
+            {
+                'id': itinerary.id,
+                'title': itinerary.title,
+                'city': itinerary.city.name,
+                'days': itinerary.days,
+                'estimated_cost_per_person': itinerary_cost(itinerary),
+                'book_url': reverse('hotels:itinerary_booking_plan', args=[itinerary.id]),
+            }
+            for itinerary in itineraries
+        ],
+    })
+
+
+@login_required
 @require_http_methods(["GET", "PATCH"])
 def editable_itinerary_api(request, itinerary_id):
     itinerary = get_object_or_404(
@@ -603,7 +635,23 @@ def editable_itinerary_api(request, itinerary_id):
         return JsonResponse({'ok': False, 'message': 'Chỉ admin được sửa lịch trình mẫu.'}, status=403)
 
     if request.method == "GET":
-        return JsonResponse({'ok': True, 'itinerary': serialize_editable_itinerary(itinerary)})
+        return JsonResponse({
+            'ok': True,
+            'itinerary': serialize_editable_itinerary(itinerary),
+            'suggestion_options': default_activity_suggestions(itinerary.city.name),
+            'replacement_options': [
+                {
+                    'day': stop.day_number,
+                    'type': stop.activity_type,
+                    'time_start': stop.start_time.strftime('%H:%M') if stop.start_time else '',
+                    'title': stop.place_name,
+                    'description': stop.description,
+                    'estimated_cost': int(stop.estimated_cost or 0),
+                    'google_maps_url': stop.google_maps_url,
+                }
+                for stop in itinerary.city.itineraries.filter(is_active=True, created_by__isnull=True).prefetch_related('stops').first().stops.all()
+            ] if itinerary.city.itineraries.filter(is_active=True, created_by__isnull=True).exists() else [],
+        })
 
     try:
         payload = json.loads(request.body.decode('utf-8'))
@@ -644,6 +692,189 @@ def editable_itinerary_api(request, itinerary_id):
         'ok': True,
         'message': 'Đã lưu',
         'itinerary': serialize_editable_itinerary(itinerary),
+    })
+
+
+def text_match_score(query, *fields):
+    query_key = normalize_location(query)
+    haystack = normalize_location(" ".join(str(field or "") for field in fields))
+    if not query_key:
+        return 0
+    score = 10 if query_key in haystack else 0
+    score += sum(2 for token in query_key.split() if len(token) > 2 and token in haystack)
+    return score
+
+
+def best_hotel_for_stop(stop):
+    hotels = Hotel.objects.filter(city=stop.itinerary.city, is_active=True).prefetch_related('room_types')
+    scored = [
+        (text_match_score(stop.place_name, hotel.name, hotel.description, hotel.address), hotel)
+        for hotel in hotels
+    ]
+    scored = [item for item in scored if item[0] > 0]
+    if scored:
+        return sorted(scored, key=lambda item: (-item[0], item[1].price_from))[0][1]
+    return hotels.order_by('-is_featured', 'price_from').first()
+
+
+def best_activity_for_stop(stop):
+    activities = Activity.objects.filter(is_active=True, city__iexact=stop.itinerary.city.name).select_related('category')
+    scored = [
+        (text_match_score(stop.place_name, activity.title, activity.description, activity.short_description), activity)
+        for activity in activities
+    ]
+    scored = [item for item in scored if item[0] > 0]
+    if scored:
+        return sorted(scored, key=lambda item: (-item[0], item[1].price_adult))[0][1]
+    if stop.activity_type == 'attraction':
+        return activities.order_by('-featured', 'price_adult').first()
+    return None
+
+
+def itinerary_bookable_items(itinerary):
+    items = []
+    for stop in itinerary.stops.all():
+        item = {
+            'stop': stop,
+            'kind': stop.activity_type,
+            'label': stop.get_activity_type_display(),
+            'match': None,
+            'price': int(stop.estimated_cost or 0),
+            'detail_url': stop.google_maps_url,
+            'can_create_booking': False,
+        }
+        if stop.activity_type == 'accommodation':
+            hotel = best_hotel_for_stop(stop)
+            if hotel:
+                room = hotel.room_types.filter(is_active=True).order_by('base_price').first()
+                item.update({
+                    'label': 'Chỗ nghỉ',
+                    'match': hotel,
+                    'price': int(room.base_price if room else hotel.price_from),
+                    'detail_url': reverse('hotels:hotel_detail', args=[hotel.slug]),
+                    'can_create_booking': bool(room),
+                    'room': room,
+                })
+        elif stop.activity_type == 'attraction':
+            activity = best_activity_for_stop(stop)
+            if activity:
+                item.update({
+                    'label': 'Vé/Trải nghiệm',
+                    'match': activity,
+                    'price': int(activity.price_adult),
+                    'detail_url': reverse('activities:detail', args=[activity.id]),
+                    'can_create_booking': True,
+                    'activity': activity,
+                })
+        elif stop.activity_type == 'transport':
+            trip = (
+                TransportTrip.objects.filter(is_active=True, status='scheduled')
+                .filter(Q(route__origin__city__icontains=itinerary.city.name) | Q(route__destination__city__icontains=itinerary.city.name))
+                .select_related('provider', 'route__origin', 'route__destination')
+                .order_by('departure_time')
+                .first()
+            )
+            item.update({
+                'label': 'Xe/Tàu',
+                'match': trip,
+                'price': int(trip.base_price) if trip else int(stop.estimated_cost or 0),
+                'detail_url': reverse('transport:start_booking', args=[trip.id]) if trip else reverse('transport:search') + f'?destination={itinerary.city.name}',
+            })
+        elif stop.activity_type == 'food':
+            item.update({
+                'label': 'Ăn uống',
+                'detail_url': stop.google_maps_url or f"https://www.google.com/maps/search/?api=1&query={stop.place_name.replace(' ', '+')}",
+            })
+        items.append(item)
+    package = (
+        TravelPackage.objects.filter(is_active=True, destination_city__iexact=itinerary.city.name)
+        .order_by('-featured', 'base_price_per_person')
+        .first()
+    )
+    return items, package
+
+
+@login_required
+def itinerary_booking_plan(request, itinerary_id):
+    itinerary = get_object_or_404(
+        Itinerary.objects.select_related('city').prefetch_related('stops'),
+        id=itinerary_id,
+        created_by=request.user,
+        is_active=True,
+    )
+    start_date_raw = request.POST.get('start_date') or request.GET.get('start_date')
+    try:
+        start_date = datetime.strptime(start_date_raw, '%Y-%m-%d').date() if start_date_raw else timezone.localdate() + timedelta(days=7)
+    except (TypeError, ValueError):
+        start_date = timezone.localdate() + timedelta(days=7)
+    try:
+        travelers = max(1, min(int(request.POST.get('travelers') or request.GET.get('travelers') or 2), 20))
+    except (TypeError, ValueError):
+        travelers = 2
+
+    items, package = itinerary_bookable_items(itinerary)
+    created_payments = []
+    if request.method == 'POST':
+        with transaction.atomic():
+            for item in items:
+                stop = item['stop']
+                service_date = start_date + timedelta(days=max(stop.day_number - 1, 0))
+                if item.get('room'):
+                    room = item['room']
+                    occupancy = max(room.max_occupancy, 1)
+                    rooms = max(1, (travelers + occupancy - 1) // occupancy)
+                    reservation = HotelReservation.objects.create(
+                        user=request.user,
+                        room_type=room,
+                        stay_date=service_date,
+                        rooms=rooms,
+                        price_per_room=room.base_price,
+                        total_price=room.base_price * rooms,
+                        currency='VND',
+                        contact_email=request.user.email,
+                        status='pending',
+                        payment_status='pending',
+                    )
+                    created_payments.append({
+                        'label': f"{room.hotel.name} - {room.name}",
+                        'url': reverse('payments:checkout', kwargs={'booking_type': 'hotel', 'object_id': reservation.id}),
+                        'amount': reservation.total_price,
+                    })
+                elif item.get('activity'):
+                    activity = item['activity']
+                    booking, _ = ActivityBooking.objects.update_or_create(
+                        user=request.user,
+                        activity=activity,
+                        booking_date=service_date,
+                        defaults={
+                            'booking_time': stop.start_time,
+                            'adults': travelers,
+                            'children': 0,
+                            'contact_name': request.user.get_full_name() or request.user.email,
+                            'contact_email': request.user.email,
+                            'adult_price': activity.price_adult,
+                            'child_price': activity.price_child or 0,
+                            'total_price': activity.price_adult * travelers,
+                            'status': 'pending',
+                            'payment_status': 'pending',
+                            'special_requests': f'Tu lich trinh: {itinerary.title} - ngay {stop.day_number}',
+                        },
+                    )
+                    created_payments.append({
+                        'label': activity.title,
+                        'url': reverse('payments:checkout', kwargs={'booking_type': 'activity', 'object_id': booking.id}),
+                        'amount': booking.total_price,
+                    })
+        messages.success(request, f'Đã tạo {len(created_payments)} booking nháp từ lịch trình. Vui lòng thanh toán từng mục để gửi admin xác nhận.')
+
+    return render(request, 'hotels/itinerary_booking_plan.html', {
+        'itinerary': itinerary,
+        'items': items,
+        'package': package,
+        'start_date': start_date,
+        'travelers': travelers,
+        'created_payments': created_payments,
+        'total_estimated': sum(item['price'] for item in items) * travelers,
     })
 
 

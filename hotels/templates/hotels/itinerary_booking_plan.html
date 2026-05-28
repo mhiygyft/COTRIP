@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Đặt theo lịch trình - COTRIPVn{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb text-white-50 mb-0">
+                <li class="breadcrumb-item"><a class="text-white-50 text-decoration-none" href="{% url 'home' %}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a class="text-white-50 text-decoration-none" href="{% url 'hotels:itinerary_planner' %}">Lịch trình</a></li>
+                <li class="breadcrumb-item active text-white">Đặt theo lịch trình</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-1">{{ itinerary.title }}</h1>
+        <p class="mb-0 text-white-50">{{ itinerary.city.name }} · {{ itinerary.days }} ngày · gom các mục có thể đặt trên COTRIPVn</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h2 class="h5 mb-0">Các mục trong lịch trình</h2>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'hotels:itinerary_planner' %}?saved={{ itinerary.id }}">Chỉnh sửa lịch trình</a>
+            </div>
+
+            {% for item in items %}
+                <div class="border rounded-3 p-3 mb-3">
+                    <div class="d-flex justify-content-between gap-3 flex-wrap">
+                        <div>
+                            <span class="badge text-bg-light mb-2">Ngày {{ item.stop.day_number }} · {{ item.label }}</span>
+                            <h3 class="h6 mb-1">{{ item.stop.place_name }}</h3>
+                            <p class="text-muted small mb-2">{{ item.stop.description }}</p>
+                            {% if item.match %}
+                                <div class="small">Khớp với dịch vụ trên web: <strong>{{ item.match }}</strong></div>
+                            {% else %}
+                                <div class="small text-muted">Chưa có dịch vụ đặt trực tiếp, có thể mở map/link để tự kiểm tra.</div>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <strong class="text-success d-block">{{ item.price|floatformat:0 }} VND</strong>
+                            {% if item.detail_url %}
+                                <a class="btn btn-sm btn-outline-primary mt-2" href="{{ item.detail_url }}" {% if item.kind == 'food' %}target="_blank" rel="noopener"{% endif %}>Xem/đặt</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-warning">Lịch trình này chưa có hoạt động.</div>
+            {% endfor %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="border rounded-3 p-3 position-sticky" style="top: 90px;">
+                <h2 class="h5">Đặt tất cả mục phù hợp</h2>
+                <p class="text-muted small">Hệ thống sẽ tạo booking nháp cho chỗ nghỉ và vé/trải nghiệm đã khớp được. Xe/tàu, ăn uống và package vẫn mở sang luồng đặt tương ứng để bạn xác nhận thêm.</p>
+
+                <form method="post" class="row g-2">
+                    {% csrf_token %}
+                    <div class="col-12">
+                        <label class="form-label small">Ngày bắt đầu</label>
+                        <input class="form-control" type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small">Số người</label>
+                        <input class="form-control" type="number" min="1" max="20" name="travelers" value="{{ travelers }}">
+                    </div>
+                    <div class="col-12 d-flex justify-content-between border-top pt-3 mt-2">
+                        <span>Tạm tính nhóm</span>
+                        <strong>{{ total_estimated|floatformat:0 }} VND</strong>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100" type="submit">Tạo booking nháp</button>
+                    </div>
+                </form>
+
+                {% if package %}
+                    <hr>
+                    <div class="small text-muted mb-2">Gói tour gần nhất</div>
+                    <div class="fw-semibold">{{ package.title }}</div>
+                    <div class="small text-success">{{ package.base_price_per_person|floatformat:0 }} VND/người</div>
+                    <a class="btn btn-sm btn-outline-primary mt-2" href="{% url 'packages:detail' package.id %}">Xem gói tour</a>
+                {% endif %}
+
+                {% if created_payments %}
+                    <hr>
+                    <h3 class="h6">Thanh toán các booking vừa tạo</h3>
+                    {% for payment in created_payments %}
+                        <a class="btn btn-sm btn-success w-100 text-start mb-2" href="{{ payment.url }}">
+                            {{ payment.label }} · {{ payment.amount|floatformat:0 }} VND
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
