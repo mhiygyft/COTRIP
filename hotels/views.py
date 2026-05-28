@@ -15,6 +15,7 @@ from django.views.decorators.http import require_http_methods
 from datetime import datetime, timedelta
 from activities.models import Activity, ActivityBooking
 from packages.models import TravelPackage
+from payments.models import PaymentTransaction
 from transport.models import TransportTrip
 from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType, Itinerary, ItineraryStop
 
@@ -794,6 +795,61 @@ def itinerary_bookable_items(itinerary):
     return items, package
 
 
+def create_itinerary_booking_for_item(user, itinerary, item, service_date, travelers):
+    stop = item['stop']
+    if item.get('room'):
+        room = item['room']
+        occupancy = max(room.max_occupancy, 1)
+        rooms = max(1, (travelers + occupancy - 1) // occupancy)
+        reservation = HotelReservation.objects.create(
+            user=user,
+            room_type=room,
+            stay_date=service_date,
+            rooms=rooms,
+            price_per_room=room.base_price,
+            total_price=room.base_price * rooms,
+            currency='VND',
+            contact_email=user.email,
+            status='pending',
+            payment_status='pending',
+        )
+        return {
+            'booking': reservation,
+            'booking_type': 'hotel',
+            'label': f"{room.hotel.name} - {room.name}",
+            'amount': reservation.total_price,
+            'checkout_url': reverse('payments:checkout', kwargs={'booking_type': 'hotel', 'object_id': reservation.id}),
+        }
+    if item.get('activity'):
+        activity = item['activity']
+        booking, _ = ActivityBooking.objects.update_or_create(
+            user=user,
+            activity=activity,
+            booking_date=service_date,
+            defaults={
+                'booking_time': stop.start_time,
+                'adults': travelers,
+                'children': 0,
+                'contact_name': user.get_full_name() or user.email,
+                'contact_email': user.email,
+                'adult_price': activity.price_adult,
+                'child_price': activity.price_child or 0,
+                'total_price': activity.price_adult * travelers,
+                'status': 'pending',
+                'payment_status': 'pending',
+                'special_requests': f'Tu lich trinh: {itinerary.title} - ngay {stop.day_number}',
+            },
+        )
+        return {
+            'booking': booking,
+            'booking_type': 'activity',
+            'label': activity.title,
+            'amount': booking.total_price,
+            'checkout_url': reverse('payments:checkout', kwargs={'booking_type': 'activity', 'object_id': booking.id}),
+        }
+    return None
+
+
 @login_required
 def itinerary_booking_plan(request, itinerary_id):
     itinerary = get_object_or_404(
@@ -814,58 +870,53 @@ def itinerary_booking_plan(request, itinerary_id):
 
     items, package = itinerary_bookable_items(itinerary)
     created_payments = []
+    paid_payments = []
     if request.method == 'POST':
+        selected_stop_ids = {
+            int(value) for value in request.POST.getlist('selected_stops')
+            if str(value).isdigit()
+        }
+        payment_method = request.POST.get('payment_method', 'bank_transfer')
+        if payment_method not in {'card', 'paypal', 'bank_transfer', 'manual'}:
+            payment_method = 'bank_transfer'
+        pay_total = request.POST.get('action') == 'pay_total'
         with transaction.atomic():
             for item in items:
+                if item['stop'].id not in selected_stop_ids:
+                    continue
                 stop = item['stop']
                 service_date = start_date + timedelta(days=max(stop.day_number - 1, 0))
-                if item.get('room'):
-                    room = item['room']
-                    occupancy = max(room.max_occupancy, 1)
-                    rooms = max(1, (travelers + occupancy - 1) // occupancy)
-                    reservation = HotelReservation.objects.create(
+                created = create_itinerary_booking_for_item(request.user, itinerary, item, service_date, travelers)
+                if not created:
+                    continue
+                if pay_total:
+                    booking = created['booking']
+                    PaymentTransaction.objects.create(
                         user=request.user,
-                        room_type=room,
-                        stay_date=service_date,
-                        rooms=rooms,
-                        price_per_room=room.base_price,
-                        total_price=room.base_price * rooms,
+                        booking=booking if created['booking_type'] == 'flight' else None,
+                        amount=created['amount'],
                         currency='VND',
-                        contact_email=request.user.email,
-                        status='pending',
-                        payment_status='pending',
-                    )
-                    created_payments.append({
-                        'label': f"{room.hotel.name} - {room.name}",
-                        'url': reverse('payments:checkout', kwargs={'booking_type': 'hotel', 'object_id': reservation.id}),
-                        'amount': reservation.total_price,
-                    })
-                elif item.get('activity'):
-                    activity = item['activity']
-                    booking, _ = ActivityBooking.objects.update_or_create(
-                        user=request.user,
-                        activity=activity,
-                        booking_date=service_date,
-                        defaults={
-                            'booking_time': stop.start_time,
-                            'adults': travelers,
-                            'children': 0,
-                            'contact_name': request.user.get_full_name() or request.user.email,
-                            'contact_email': request.user.email,
-                            'adult_price': activity.price_adult,
-                            'child_price': activity.price_child or 0,
-                            'total_price': activity.price_adult * travelers,
-                            'status': 'pending',
-                            'payment_status': 'pending',
-                            'special_requests': f'Tu lich trinh: {itinerary.title} - ngay {stop.day_number}',
+                        method=payment_method,
+                        status='completed',
+                        booking_type=created['booking_type'],
+                        object_id=booking.id,
+                        metadata={
+                            'label': created['label'],
+                            'itinerary_id': itinerary.id,
+                            'itinerary_title': itinerary.title,
+                            'bulk_itinerary_payment': True,
                         },
                     )
-                    created_payments.append({
-                        'label': activity.title,
-                        'url': reverse('payments:checkout', kwargs={'booking_type': 'activity', 'object_id': booking.id}),
-                        'amount': booking.total_price,
-                    })
-        messages.success(request, f'Đã tạo {len(created_payments)} booking nháp từ lịch trình. Vui lòng thanh toán từng mục để gửi admin xác nhận.')
+                    booking.payment_status = 'completed'
+                    booking.status = 'pending'
+                    booking.save(update_fields=['payment_status', 'status', 'updated_at'])
+                    paid_payments.append(created)
+                else:
+                    created_payments.append(created)
+        if pay_total:
+            messages.success(request, f'Đã thanh toán tổng {len(paid_payments)} booking đã chọn. Booking đang chờ admin xác nhận.')
+        else:
+            messages.success(request, f'Đã tạo {len(created_payments)} booking nháp từ lịch trình. Vui lòng thanh toán từng mục hoặc thanh toán tổng các mục đã chọn.')
 
     return render(request, 'hotels/itinerary_booking_plan.html', {
         'itinerary': itinerary,
@@ -874,7 +925,9 @@ def itinerary_booking_plan(request, itinerary_id):
         'start_date': start_date,
         'travelers': travelers,
         'created_payments': created_payments,
+        'paid_payments': paid_payments,
         'total_estimated': sum(item['price'] for item in items) * travelers,
+        'bookable_total': sum(item['price'] for item in items if item.get('can_create_booking')) * travelers,
     })
 
 

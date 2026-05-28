@@ -34,7 +34,15 @@
             {% for item in items %}
                 <div class="border rounded-3 p-3 mb-3">
                     <div class="d-flex justify-content-between gap-3 flex-wrap">
-                        <div>
+                        <div class="d-flex gap-3">
+                            <div class="pt-1">
+                                {% if item.can_create_booking %}
+                                    <input class="form-check-input itinerary-booking-check" form="itinerary-booking-form" type="checkbox" name="selected_stops" value="{{ item.stop.id }}" checked data-item-price="{{ item.price }}">
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" disabled>
+                                {% endif %}
+                            </div>
+                            <div>
                             <span class="badge text-bg-light mb-2">Ngày {{ item.stop.day_number }} · {{ item.label }}</span>
                             <h3 class="h6 mb-1">{{ item.stop.place_name }}</h3>
                             <p class="text-muted small mb-2">{{ item.stop.description }}</p>
@@ -43,6 +51,7 @@
                             {% else %}
                                 <div class="small text-muted">Chưa có dịch vụ đặt trực tiếp, có thể mở map/link để tự kiểm tra.</div>
                             {% endif %}
+                            </div>
                         </div>
                         <div class="text-end">
                             <strong class="text-success d-block">{{ item.price|floatformat:0 }} VND</strong>
@@ -62,7 +71,7 @@
                 <h2 class="h5">Đặt tất cả mục phù hợp</h2>
                 <p class="text-muted small">Hệ thống sẽ tạo booking nháp cho chỗ nghỉ và vé/trải nghiệm đã khớp được. Xe/tàu, ăn uống và package vẫn mở sang luồng đặt tương ứng để bạn xác nhận thêm.</p>
 
-                <form method="post" class="row g-2">
+                <form method="post" class="row g-2" id="itinerary-booking-form">
                     {% csrf_token %}
                     <div class="col-12">
                         <label class="form-label small">Ngày bắt đầu</label>
@@ -76,8 +85,24 @@
                         <span>Tạm tính nhóm</span>
                         <strong>{{ total_estimated|floatformat:0 }} VND</strong>
                     </div>
+                    <div class="col-12 d-flex justify-content-between">
+                        <span>Đã chọn để thanh toán</span>
+                        <strong class="text-primary" data-selected-total>{{ bookable_total|floatformat:0 }} VND</strong>
+                    </div>
                     <div class="col-12">
-                        <button class="btn btn-primary w-100" type="submit">Tạo booking nháp</button>
+                        <label class="form-label small">Phương thức thanh toán tổng</label>
+                        <select class="form-select" name="payment_method">
+                            <option value="bank_transfer" selected>Chuyển khoản ngân hàng</option>
+                            <option value="card">Thẻ tín dụng / ghi nợ</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="manual">Thanh toán thủ công</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-outline-primary w-100" type="submit" name="action" value="create_draft">Tạo booking nháp</button>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-success w-100" type="submit" name="action" value="pay_total">Thanh toán tổng các mục đã chọn</button>
                     </div>
                 </form>
 
@@ -93,13 +118,46 @@
                     <hr>
                     <h3 class="h6">Thanh toán các booking vừa tạo</h3>
                     {% for payment in created_payments %}
-                        <a class="btn btn-sm btn-success w-100 text-start mb-2" href="{{ payment.url }}">
+                        <a class="btn btn-sm btn-success w-100 text-start mb-2" href="{{ payment.checkout_url }}">
                             {{ payment.label }} · {{ payment.amount|floatformat:0 }} VND
                         </a>
+                    {% endfor %}
+                {% endif %}
+
+                {% if paid_payments %}
+                    <hr>
+                    <h3 class="h6">Đã thanh toán tổng</h3>
+                    {% for payment in paid_payments %}
+                        <div class="small border rounded p-2 mb-2">
+                            {{ payment.label }} · {{ payment.amount|floatformat:0 }} VND
+                        </div>
                     {% endfor %}
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checks = document.querySelectorAll('.itinerary-booking-check');
+    const selectedTotal = document.querySelector('[data-selected-total]');
+    const travelersInput = document.querySelector('#itinerary-booking-form input[name="travelers"]');
+    function formatVnd(value) {
+        return `${Number(value || 0).toLocaleString('vi-VN')} VND`;
+    }
+    function updateSelectedTotal() {
+        if (!selectedTotal) return;
+        const travelers = Number(travelersInput ? travelersInput.value || 1 : 1);
+        let total = 0;
+        checks.forEach(function(check) {
+            if (check.checked) total += Number(check.dataset.itemPrice || 0) * travelers;
+        });
+        selectedTotal.textContent = formatVnd(total);
+    }
+    checks.forEach(check => check.addEventListener('change', updateSelectedTotal));
+    if (travelersInput) travelersInput.addEventListener('input', updateSelectedTotal);
+    updateSelectedTotal();
+});
+</script>
 {% endblock %}
