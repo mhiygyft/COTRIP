@@ -424,7 +424,7 @@ class ItineraryBuilderAPIView(TemplateView):
 
         destination_key = normalize_location(destination)
         itineraries = list(
-            Itinerary.objects.filter(is_active=True)
+            Itinerary.objects.filter(is_active=True, created_by__isnull=True)
             .select_related('city', 'city__country')
             .prefetch_related('stops')
         )
