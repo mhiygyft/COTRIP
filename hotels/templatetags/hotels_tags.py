@@ -6,8 +6,21 @@ across different pages of the application.
 """
 from django import template
 from hotels.models import Hotel
+import re
 
 register = template.Library()
+
+PUBLIC_SOURCE_NOTE_RE = re.compile(
+    r"\s*(?:Du lieu tham khao tu nguon cong khai|Dữ liệu tham khảo từ nguồn công khai):\s*\S+\s*",
+    re.IGNORECASE,
+)
+
+
+@register.filter
+def without_public_source_note(value):
+    if value is None:
+        return ""
+    return PUBLIC_SOURCE_NOTE_RE.sub("", str(value)).strip()
 
 @register.simple_tag
 def get_featured_hotels(limit=3):

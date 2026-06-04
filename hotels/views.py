@@ -1,5 +1,6 @@
 import unicodedata
 import json
+import re
 from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -17,7 +18,21 @@ from activities.models import Activity, ActivityBooking
 from packages.models import TravelPackage
 from payments.models import PaymentTransaction
 from transport.models import TransportTrip
-from .models import Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType, Itinerary, ItineraryStop
+from .models import (
+    Hotel, City, Country, Amenity, HotelReservation, RoomAvailability, RoomType,
+    Itinerary, ItineraryStop, ItineraryOrder, ItineraryOrderItem,
+)
+
+PUBLIC_SOURCE_NOTE_RE = re.compile(
+    r"\s*(?:Du lieu tham khao tu nguon cong khai|Dữ liệu tham khảo từ nguồn công khai):\s*\S+\s*",
+    re.IGNORECASE,
+)
+
+
+def clean_public_source_note(value):
+    if value is None:
+        return ""
+    return PUBLIC_SOURCE_NOTE_RE.sub("", str(value)).strip()
 
 
 def normalize_location(value):
@@ -38,7 +53,7 @@ def serialize_editable_itinerary(itinerary):
             'type': stop.activity_type,
             'time_start': stop.start_time.strftime('%H:%M') if stop.start_time else '',
             'title': stop.place_name,
-            'description': stop.description,
+            'description': clean_public_source_note(stop.description),
             'estimated_cost': int(stop.estimated_cost or 0),
             'google_maps_url': stop.google_maps_url,
             'order': stop.order,
@@ -505,7 +520,7 @@ class ItineraryBuilderAPIView(TemplateView):
                     session=stop.session,
                     start_time=stop.start_time,
                     place_name=stop.place_name,
-                    description=stop.description,
+                    description=clean_public_source_note(stop.description),
                     duration_hours=stop.duration_hours,
                     estimated_cost=stop.estimated_cost,
                     currency=stop.currency,
@@ -545,7 +560,7 @@ class ItineraryBuilderAPIView(TemplateView):
                     'type': stop.activity_type,
                     'time_start': stop.start_time.strftime('%H:%M') if stop.start_time else '',
                     'title': stop.place_name,
-                    'description': stop.description,
+                    'description': clean_public_source_note(stop.description),
                     'estimated_cost': int(stop.estimated_cost or 0),
                     'google_maps_url': stop.google_maps_url,
                 }
@@ -569,7 +584,7 @@ class ItineraryBuilderAPIView(TemplateView):
                         'time': stop.start_time.strftime('%H:%M') if stop.start_time else '',
                         'session': stop.get_session_display(),
                         'place_name': stop.place_name,
-                        'description': stop.description,
+                        'description': clean_public_source_note(stop.description),
                         'duration_hours': float(stop.duration_hours),
                         'estimated_cost_per_person': int(stop.estimated_cost or 0),
                         'estimated_cost': int(stop.estimated_cost or 0) * travelers,
@@ -646,7 +661,7 @@ def editable_itinerary_api(request, itinerary_id):
                     'type': stop.activity_type,
                     'time_start': stop.start_time.strftime('%H:%M') if stop.start_time else '',
                     'title': stop.place_name,
-                    'description': stop.description,
+                    'description': clean_public_source_note(stop.description),
                     'estimated_cost': int(stop.estimated_cost or 0),
                     'google_maps_url': stop.google_maps_url,
                 }
@@ -871,6 +886,7 @@ def itinerary_booking_plan(request, itinerary_id):
     items, package = itinerary_bookable_items(itinerary)
     created_payments = []
     paid_payments = []
+    itinerary_order = None
     if request.method == 'POST':
         selected_stop_ids = {
             int(value) for value in request.POST.getlist('selected_stops')
@@ -881,6 +897,20 @@ def itinerary_booking_plan(request, itinerary_id):
             payment_method = 'bank_transfer'
         pay_total = request.POST.get('action') == 'pay_total'
         with transaction.atomic():
+            if pay_total:
+                itinerary_order = ItineraryOrder.objects.create(
+                    user=request.user,
+                    itinerary=itinerary,
+                    title=itinerary.title,
+                    destination=itinerary.city.name,
+                    start_date=start_date,
+                    travelers=travelers,
+                    total_amount=0,
+                    currency='VND',
+                    payment_method=payment_method,
+                    payment_status='completed',
+                    status='pending',
+                )
             for item in items:
                 if item['stop'].id not in selected_stop_ids:
                     continue
@@ -891,7 +921,7 @@ def itinerary_booking_plan(request, itinerary_id):
                     continue
                 if pay_total:
                     booking = created['booking']
-                    PaymentTransaction.objects.create(
+                    transaction_obj = PaymentTransaction.objects.create(
                         user=request.user,
                         booking=booking if created['booking_type'] == 'flight' else None,
                         amount=created['amount'],
@@ -905,16 +935,34 @@ def itinerary_booking_plan(request, itinerary_id):
                             'itinerary_id': itinerary.id,
                             'itinerary_title': itinerary.title,
                             'bulk_itinerary_payment': True,
+                            'itinerary_order_code': itinerary_order.order_code if itinerary_order else '',
                         },
                     )
                     booking.payment_status = 'completed'
                     booking.status = 'pending'
                     booking.save(update_fields=['payment_status', 'status', 'updated_at'])
+                    ItineraryOrderItem.objects.create(
+                        order=itinerary_order,
+                        day_number=stop.day_number,
+                        booking_type=created['booking_type'],
+                        object_id=booking.id,
+                        title=created['label'],
+                        service_date=service_date,
+                        amount=created['amount'],
+                        currency='VND',
+                        payment_transaction_id=str(transaction_obj.id),
+                        status='pending',
+                    )
                     paid_payments.append(created)
                 else:
                     created_payments.append(created)
+            if itinerary_order:
+                total_amount = sum(item['amount'] for item in paid_payments)
+                itinerary_order.total_amount = total_amount
+                itinerary_order.save(update_fields=['total_amount', 'updated_at'])
         if pay_total:
-            messages.success(request, f'Đã thanh toán tổng {len(paid_payments)} booking đã chọn. Booking đang chờ admin xác nhận.')
+            messages.success(request, f'Đã thanh toán tổng {len(paid_payments)} booking đã chọn trong đơn {itinerary_order.order_code}. Booking đang chờ admin xác nhận.')
+            return redirect('hotels:itinerary_order_detail', order_code=itinerary_order.order_code)
         else:
             messages.success(request, f'Đã tạo {len(created_payments)} booking nháp từ lịch trình. Vui lòng thanh toán từng mục hoặc thanh toán tổng các mục đã chọn.')
 
@@ -926,8 +974,35 @@ def itinerary_booking_plan(request, itinerary_id):
         'travelers': travelers,
         'created_payments': created_payments,
         'paid_payments': paid_payments,
+        'itinerary_order': itinerary_order,
         'total_estimated': sum(item['price'] for item in items) * travelers,
         'bookable_total': sum(item['price'] for item in items if item.get('can_create_booking')) * travelers,
+    })
+
+
+@login_required
+def itinerary_orders(request):
+    orders = (
+        ItineraryOrder.objects.filter(user=request.user)
+        .prefetch_related('items')
+        .order_by('-created_at')
+    )
+    return render(request, 'hotels/itinerary_orders.html', {
+        'orders': orders,
+        'page_title': 'Lịch trình đã đặt',
+    })
+
+
+@login_required
+def itinerary_order_detail(request, order_code):
+    order = get_object_or_404(
+        ItineraryOrder.objects.prefetch_related('items'),
+        user=request.user,
+        order_code=order_code,
+    )
+    return render(request, 'hotels/itinerary_order_detail.html', {
+        'order': order,
+        'page_title': f'Lịch trình {order.order_code}',
     })
 
 

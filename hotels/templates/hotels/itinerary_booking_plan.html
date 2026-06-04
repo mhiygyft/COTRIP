@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load hotels_tags %}
 
 {% block title %}Đặt theo lịch trình - COTRIPVn{% endblock %}
 
@@ -45,7 +46,7 @@
                             <div>
                             <span class="badge text-bg-light mb-2">Ngày {{ item.stop.day_number }} · {{ item.label }}</span>
                             <h3 class="h6 mb-1">{{ item.stop.place_name }}</h3>
-                            <p class="text-muted small mb-2">{{ item.stop.description }}</p>
+                            <p class="text-muted small mb-2">{{ item.stop.description|without_public_source_note }}</p>
                             {% if item.match %}
                                 <div class="small">Khớp với dịch vụ trên web: <strong>{{ item.match }}</strong></div>
                             {% else %}

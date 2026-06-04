@@ -1,5 +1,7 @@
 ﻿{% extends 'base.html' %}
 
+{% load hotels_tags %}
+
 {% block title %}Tìm khách sạn Việt Nam - COTRIPVn{% endblock %}
 
 {% block content %}
@@ -160,7 +162,7 @@
                                 <i class="bi bi-geo-alt"></i> {{ hotel.city.name }}, {{ hotel.city.country.name }}
                             </p>
                             
-                            <p class="card-text flex-grow-1">{{ hotel.description|truncatewords:20 }}</p>
+                            <p class="card-text flex-grow-1">{{ hotel.description|without_public_source_note|truncatewords:20 }}</p>
                             
                             <!-- Amenities -->
                             <div class="amenities">

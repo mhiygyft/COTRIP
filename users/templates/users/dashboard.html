@@ -49,14 +49,37 @@
                 <p class="text-primary fw-semibold mb-1">Lịch trình du lịch</p>
                 <h2 class="h5 mb-0">Tạo và chỉnh sửa plan du lịch riêng của bạn</h2>
             </div>
-            <a class="btn btn-primary" href="{% url 'hotels:itinerary_planner' %}">
-                Tạo lịch trình
-            </a>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-primary" href="{% url 'hotels:itinerary_orders' %}">Lịch trình đã đặt</a>
+                <a class="btn btn-primary" href="{% url 'hotels:itinerary_planner' %}">Tạo lịch trình</a>
+            </div>
         </div>
     </div>
 
     <div class="row g-4">
         <div class="col-lg-8">
+            <div class="panel mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">Lịch trình đã đặt</h2>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'hotels:itinerary_orders' %}">Xem tất cả</a>
+                </div>
+                {% for order in itinerary_orders|slice:":3" %}
+                    <div class="trip-order-item">
+                        <div>
+                            <div class="fw-bold text-primary">{{ order.order_code }}</div>
+                            <div>{{ order.title }}</div>
+                            <div class="small text-muted">{{ order.destination }} · {{ order.items.count }} booking · {{ order.start_date|date:"d/m/Y" }}</div>
+                        </div>
+                        <div class="text-end">
+                            <strong>{{ order.total_amount|floatformat:0 }} VND</strong>
+                            <a class="btn btn-sm btn-outline-primary d-block mt-1" href="{% url 'hotels:itinerary_order_detail' order.order_code %}">Chi tiết</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small mb-0">Bạn chưa có lịch trình đã đặt.</p>
+                {% endfor %}
+            </div>
+
             <div class="panel mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="h5 mb-0">Kế hoạch của tôi</h2>
@@ -235,6 +258,17 @@
 .trip-plan-item {
     border-bottom: 1px solid #edf0ef;
     padding: 10px 0;
+}
+.trip-order-item {
+    align-items: center;
+    border-bottom: 1px solid #edf0ef;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+}
+.trip-order-item:last-child {
+    border-bottom: 0;
 }
 .trip-plan-item:last-child {
     border-bottom: 0;

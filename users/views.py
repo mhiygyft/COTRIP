@@ -8,7 +8,7 @@ from django.urls import reverse
 from activities.models import ActivityBooking
 from bookings.models import Booking
 from flights.models import FlightSearch, SavedFlight
-from hotels.models import HotelReservation, Itinerary
+from hotels.models import HotelReservation, Itinerary, ItineraryOrder
 from packages.models import PackageBooking
 
 from .forms import UserProfileForm
@@ -82,6 +82,7 @@ def dashboard(request):
     )
     package_bookings = PackageBooking.objects.filter(user=request.user).select_related("package")
     activity_bookings = ActivityBooking.objects.filter(user=request.user).select_related("activity")
+    itinerary_orders = ItineraryOrder.objects.filter(user=request.user).prefetch_related("items")
 
     recent_items = []
     for booking in flight_bookings:
@@ -179,12 +180,14 @@ def dashboard(request):
         "hotel_reservations": hotel_reservations,
         "package_bookings": package_bookings,
         "activity_bookings": activity_bookings,
+        "itinerary_orders": itinerary_orders,
         "recent_items": recent_items,
         "booking_total": (
             flight_bookings.count()
             + hotel_reservations.count()
             + package_bookings.count()
             + activity_bookings.count()
+            + itinerary_orders.count()
         ),
         "total_spent": total_spent,
         "saved_flights": SavedFlight.objects.filter(user=request.user).select_related("flight")[:5],

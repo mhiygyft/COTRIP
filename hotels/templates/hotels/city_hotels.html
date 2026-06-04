@@ -1,5 +1,7 @@
 ﻿{% extends 'base.html' %}
 
+{% load hotels_tags %}
+
 {% block title %}Khách sạn tại {{ city.name }}, {{ city.country.name }} - COTRIPVn{% endblock %}
 
 {% block content %}
@@ -34,7 +36,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <p class="mb-0">{{ city.description }}</p>
+                <p class="mb-0">{{ city.description|without_public_source_note }}</p>
             </div>
         </div>
     </div>
@@ -136,7 +138,7 @@
                                 <i class="bi bi-geo-alt"></i> {{ hotel.address|truncatewords:5 }}
                             </p>
                             
-                            <p class="card-text text-muted small">{{ hotel.description|truncatewords:12 }}</p>
+                            <p class="card-text text-muted small">{{ hotel.description|without_public_source_note|truncatewords:12 }}</p>
                             
                             <!-- Amenities -->
                             <div class="amenities mb-3">

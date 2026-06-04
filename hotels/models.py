@@ -6,6 +6,8 @@ from django.utils.text import slugify
 from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 from decimal import Decimal
+import random
+import string
 
 User = get_user_model()
 
@@ -522,6 +524,82 @@ class ItineraryStop(models.Model):
 
     def __str__(self):
         return f"Ngày {self.day_number} {self.get_session_display()} - {self.place_name}"
+
+
+class ItineraryOrder(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Cho xac nhan'),
+        ('confirmed', 'Da xac nhan'),
+        ('completed', 'Hoan tat'),
+        ('cancelled', 'Da huy'),
+    ]
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Cho thanh toan'),
+        ('completed', 'Da thanh toan'),
+        ('cancelled', 'Da huy'),
+        ('refunded', 'Da hoan tien'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='itinerary_orders')
+    itinerary = models.ForeignKey(Itinerary, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    order_code = models.CharField(max_length=20, unique=True, editable=False)
+    title = models.CharField(max_length=200)
+    destination = models.CharField(max_length=120)
+    start_date = models.DateField()
+    travelers = models.PositiveIntegerField(default=1)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    currency = models.CharField(max_length=3, default='VND')
+    payment_method = models.CharField(max_length=30, blank=True)
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['order_code']),
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['payment_status', 'created_at']),
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.order_code:
+            self.order_code = self.generate_order_code()
+        super().save(*args, **kwargs)
+
+    def generate_order_code(self):
+        while True:
+            code = 'ITN-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            if not ItineraryOrder.objects.filter(order_code=code).exists():
+                return code
+
+    def __str__(self):
+        return f"{self.order_code} - {self.title}"
+
+
+class ItineraryOrderItem(models.Model):
+    order = models.ForeignKey(ItineraryOrder, on_delete=models.CASCADE, related_name='items')
+    day_number = models.PositiveIntegerField(default=1)
+    booking_type = models.CharField(max_length=30)
+    object_id = models.PositiveIntegerField()
+    title = models.CharField(max_length=200)
+    service_date = models.DateField(blank=True, null=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    currency = models.CharField(max_length=3, default='VND')
+    payment_transaction_id = models.CharField(max_length=64, blank=True)
+    status = models.CharField(max_length=20, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['day_number', 'id']
+        indexes = [
+            models.Index(fields=['booking_type', 'object_id']),
+        ]
+
+    def __str__(self):
+        return f"{self.order.order_code} - {self.title}"
 
 
 class Review(models.Model):

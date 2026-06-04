@@ -1,5 +1,7 @@
 ﻿{% extends "base.html" %}
 
+{% load hotels_tags %}
+
 {% block title %}Chi tiet trai nghiem - COTRIPVn{% endblock %}
 
 {% block content %}
@@ -10,7 +12,7 @@
         {% endif %}
         <h1 class="h3">{{ activity.title }}</h1>
         <p class="text-muted">{{ activity.city }}, {{ activity.country }}</p>
-        <p>{{ activity.description }}</p>
+        <p>{{ activity.description|without_public_source_note }}</p>
         {% if activity.images.all %}
             <div class="row g-2 mb-4">
                 {% for image in activity.images.all %}

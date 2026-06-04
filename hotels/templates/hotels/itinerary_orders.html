@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Lịch trình đã đặt - COTRIPVn{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4">
+    <div class="container">
+        <h1 class="h3 mb-1">Lịch trình đã đặt</h1>
+        <p class="mb-0 text-white-50">Các lịch trình đã thanh toán tổng và đang chờ admin xác nhận.</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Danh sách đơn lịch trình</h2>
+        <a class="btn btn-outline-primary" href="{% url 'hotels:itinerary_planner' %}">Tạo lịch trình mới</a>
+    </div>
+
+    {% for order in orders %}
+        <div class="border rounded-3 p-3 mb-3">
+            <div class="d-flex justify-content-between gap-3 flex-wrap">
+                <div>
+                    <div class="fw-bold text-primary">{{ order.order_code }}</div>
+                    <h3 class="h5 mb-1">{{ order.title }}</h3>
+                    <div class="text-muted small">
+                        {{ order.destination }} · bắt đầu {{ order.start_date|date:"d/m/Y" }} · {{ order.travelers }} người · {{ order.items.count }} mục
+                    </div>
+                </div>
+                <div class="text-end">
+                    <strong class="text-success d-block">{{ order.total_amount|floatformat:0 }} VND</strong>
+                    <span class="badge text-bg-warning">{{ order.get_status_display }}</span>
+                    <span class="badge text-bg-success">{{ order.get_payment_status_display }}</span>
+                    <a class="btn btn-sm btn-primary d-block mt-2" href="{% url 'hotels:itinerary_order_detail' order.order_code %}">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">Bạn chưa có lịch trình đã đặt.</div>
+    {% endfor %}
+</div>
+{% endblock %}

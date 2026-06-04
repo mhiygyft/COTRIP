@@ -1,5 +1,7 @@
 ﻿{% extends 'base.html' %}
 
+{% load hotels_tags %}
+
 {% block title %}COTRIPVn - Đặt khách sạn, chuyến bay và tour Việt Nam{% endblock %}
 
 {% block content %}
@@ -133,7 +135,7 @@
                         <p class="text-muted mb-2">
                             <i class="bi bi-geo-alt"></i> {{ hotel.city.name }}, {{ hotel.city.country.name }}
                         </p>
-                        <p class="card-text text-muted small">{{ hotel.description|truncatewords:15 }}</p>
+                        <p class="card-text text-muted small">{{ hotel.description|without_public_source_note|truncatewords:15 }}</p>
                         
                         <!-- Amenities -->
                         <div class="amenities mb-3">

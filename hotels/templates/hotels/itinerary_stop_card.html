@@ -1,3 +1,4 @@
+{% load hotels_tags %}
 <div class="itinerary-stop-card card border-0 shadow-sm overflow-hidden">
     {% if stop.image_url %}
     <img src="{{ stop.image_url }}" class="itinerary-stop-image" alt="{{ stop.place_name }}">
@@ -9,7 +10,7 @@
                 <span class="badge text-bg-primary">{{ stop.start_time|time:"H:i" }}</span>
             {% endif %}
         </div>
-        <p class="card-text small text-muted">{{ stop.description }}</p>
+        <p class="card-text small text-muted">{{ stop.description|without_public_source_note }}</p>
         <div class="itinerary-stop-meta small mb-3">
             <span><i class="bi bi-clock me-1"></i>{{ stop.duration_hours }} giờ</span>
             <span><i class="bi bi-cash-coin me-1"></i>{{ stop.estimated_cost|floatformat:0 }} {{ stop.currency }}</span>
@@ -31,7 +32,7 @@
                     data-day-number="{{ stop.day_number }}"
                     data-session="{{ stop.get_session_display }}"
                     data-place-name="{{ stop.place_name }}"
-                    data-description="{{ stop.description|truncatewords:24 }}"
+                    data-description="{{ stop.description|without_public_source_note|truncatewords:24 }}"
                     data-start-time="{% if stop.start_time %}{{ stop.start_time|time:'H:i' }}{% endif %}"
                     data-duration-hours="{{ stop.duration_hours }}"
                     data-estimated-cost="{{ stop.estimated_cost }}"

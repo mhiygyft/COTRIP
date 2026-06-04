@@ -6,7 +6,7 @@ from django.utils import timezone
 from .models import (
     Country, City, HotelChain, Amenity, Hotel, HotelImage, 
     RoomType, RoomImage, RoomAvailability, HotelReservation, HotelFacility,
-    Itinerary, ItineraryStop
+    Itinerary, ItineraryStop, ItineraryOrder, ItineraryOrderItem
 )
 
 
@@ -49,6 +49,8 @@ MODEL_LABELS = {
     HotelFacility: ('co so vat chat', 'Co so vat chat'),
     Itinerary: ('lich trinh goi y', 'Lich trinh goi y'),
     ItineraryStop: ('diem dung lich trinh', 'Diem dung lich trinh'),
+    ItineraryOrder: ('don lich trinh', 'Don lich trinh'),
+    ItineraryOrderItem: ('muc don lich trinh', 'Muc don lich trinh'),
 }
 for model, (singular, plural) in MODEL_LABELS.items():
     model._meta.verbose_name = singular
@@ -133,6 +135,13 @@ class ItineraryStopInline(admin.TabularInline):
         'day_number', 'session', 'start_time', 'place_name', 'duration_hours',
         'estimated_cost', 'currency', 'cost_note', 'image_url', 'google_maps_url', 'order'
     ]
+
+
+class ItineraryOrderItemInline(admin.TabularInline):
+    model = ItineraryOrderItem
+    extra = 0
+    fields = ['day_number', 'booking_type', 'object_id', 'title', 'service_date', 'amount', 'status', 'payment_transaction_id']
+    readonly_fields = ['payment_transaction_id']
 
 
 @admin.register(Hotel)
@@ -351,6 +360,24 @@ class ItineraryStopAdmin(admin.ModelAdmin):
     search_fields = ['place_name', 'description', 'itinerary__title']
     list_editable = ['day_number', 'session', 'order']
     autocomplete_fields = ['itinerary']
+
+
+@admin.register(ItineraryOrder)
+class ItineraryOrderAdmin(admin.ModelAdmin):
+    list_display = ['order_code', 'user', 'title', 'destination', 'start_date', 'travelers', 'total_amount', 'payment_status', 'status', 'created_at']
+    list_filter = ['payment_status', 'status', 'destination', 'created_at']
+    search_fields = ['order_code', 'title', 'destination', 'user__email']
+    readonly_fields = ['order_code', 'created_at', 'updated_at']
+    autocomplete_fields = ['user', 'itinerary']
+    inlines = [ItineraryOrderItemInline]
+
+
+@admin.register(ItineraryOrderItem)
+class ItineraryOrderItemAdmin(admin.ModelAdmin):
+    list_display = ['order', 'day_number', 'booking_type', 'object_id', 'title', 'service_date', 'amount', 'status']
+    list_filter = ['booking_type', 'status', 'service_date']
+    search_fields = ['order__order_code', 'title', 'booking_type']
+    autocomplete_fields = ['order']
 
 
 # Custom admin site configuration

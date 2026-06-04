@@ -14,6 +14,8 @@ urlpatterns = [
 
     path('destinations/', views.DestinationListView.as_view(), name='destinations'),
     path('itinerary-planner/', views.ItineraryPlannerView.as_view(), name='itinerary_planner'),
+    path('itinerary-orders/', views.itinerary_orders, name='itinerary_orders'),
+    path('itinerary-orders/<str:order_code>/', views.itinerary_order_detail, name='itinerary_order_detail'),
     path('itinerary/<int:itinerary_id>/book/', views.itinerary_booking_plan, name='itinerary_booking_plan'),
     path('destinations/<str:country_code>/', views.CountryHotelsView.as_view(), name='country_hotels'),
     path('destinations/<str:country_code>/<int:city_id>/', views.CityHotelsView.as_view(), name='city_hotels'),

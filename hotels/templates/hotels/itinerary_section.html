@@ -1,3 +1,4 @@
+{% load hotels_tags %}
 {% if itineraries %}
 <section class="itinerary-section bg-light py-5">
     <div class="container">
@@ -32,7 +33,7 @@
                         <div>
                             <h3 class="h4 mb-1">{{ itinerary.title }}</h3>
                             {% if itinerary.description %}
-                            <p class="text-muted mb-0">{{ itinerary.description }}</p>
+                            <p class="text-muted mb-0">{{ itinerary.description|without_public_source_note }}</p>
                             {% endif %}
                         </div>
                         <div class="d-flex flex-column align-items-start align-items-lg-end gap-2">

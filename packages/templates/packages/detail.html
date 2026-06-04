@@ -1,5 +1,7 @@
 ﻿{% extends "base.html" %}
 
+{% load hotels_tags %}
+
 {% block title %}Chi tiet tour - COTRIPVn{% endblock %}
 
 {% block content %}
@@ -10,7 +12,7 @@
         {% endif %}
         <h1 class="h3">{{ package.title }}</h1>
         <p class="text-muted">{{ package.destination_city }}, {{ package.destination_country }}</p>
-        <p>{{ package.description }}</p>
+        <p>{{ package.description|without_public_source_note }}</p>
         {% if package.images.all %}
             <div class="row g-2 mb-4">
                 {% for image in package.images.all %}

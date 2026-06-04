@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ order.order_code }} - COTRIPVn{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb text-white-50 mb-0">
+                <li class="breadcrumb-item"><a class="text-white-50 text-decoration-none" href="{% url 'customer_dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a class="text-white-50 text-decoration-none" href="{% url 'hotels:itinerary_orders' %}">Lịch trình đã đặt</a></li>
+                <li class="breadcrumb-item active text-white">{{ order.order_code }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mb-1">{{ order.title }}</h1>
+        <p class="mb-0 text-white-50">{{ order.destination }} · {{ order.travelers }} người · {{ order.start_date|date:"d/m/Y" }}</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Booking trong lịch trình</h2>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'hotels:itinerary_orders' %}">Tất cả lịch trình</a>
+            </div>
+            {% for item in order.items.all %}
+                <div class="border rounded-3 p-3 mb-3">
+                    <div class="d-flex justify-content-between gap-3 flex-wrap">
+                        <div>
+                            <span class="badge text-bg-light mb-2">Ngày {{ item.day_number }} · {{ item.booking_type }}</span>
+                            <h3 class="h6 mb-1">{{ item.title }}</h3>
+                            <div class="text-muted small">
+                                {% if item.service_date %}Ngày dùng dịch vụ: {{ item.service_date|date:"d/m/Y" }} · {% endif %}
+                                Booking ID: {{ item.object_id }}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <strong class="text-success d-block">{{ item.amount|floatformat:0 }} VND</strong>
+                            <span class="badge text-bg-warning">{{ item.status }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-warning">Đơn lịch trình này chưa có booking con.</div>
+            {% endfor %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="border rounded-3 p-3 position-sticky" style="top: 90px;">
+                <h2 class="h5">Tóm tắt đơn</h2>
+                <div class="d-flex justify-content-between py-2 border-bottom"><span>Mã đơn</span><strong>{{ order.order_code }}</strong></div>
+                <div class="d-flex justify-content-between py-2 border-bottom"><span>Thanh toán</span><strong>{{ order.get_payment_status_display }}</strong></div>
+                <div class="d-flex justify-content-between py-2 border-bottom"><span>Trạng thái</span><strong>{{ order.get_status_display }}</strong></div>
+                <div class="d-flex justify-content-between py-2 border-bottom"><span>Phương thức</span><strong>{{ order.payment_method|default:"-" }}</strong></div>
+                <div class="d-flex justify-content-between py-2"><span>Tổng tiền</span><strong class="text-success">{{ order.total_amount|floatformat:0 }} VND</strong></div>
+                <p class="text-muted small mb-0 mt-3">Các booking trong đơn đã được thanh toán và đang chờ admin xác nhận.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

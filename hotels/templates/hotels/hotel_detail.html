@@ -1,5 +1,7 @@
 ﻿{% extends 'base.html' %}
 
+{% load hotels_tags %}
+
 {% block title %}{{ hotel.name }} - {{ hotel.city.name }}, {{ hotel.city.country.name }} | COTRIPVn{% endblock %}
 
 {% block content %}
@@ -120,7 +122,7 @@
             <!-- Hotel Description -->
             <section class="mb-5">
                 <h2 class="mb-3">Giới thiệu {{ hotel.name }}</h2>
-                <p class="lead">{{ hotel.description }}</p>
+                <p class="lead">{{ hotel.description|without_public_source_note }}</p>
             </section>
             
             <!-- Hotel Amenities -->
