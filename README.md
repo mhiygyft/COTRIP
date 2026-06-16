@@ -1,6 +1,6 @@
-# Novaryo Travel Booking Platform
+# CoTRIPVn Travel Booking Platform
 
-Novaryo là nền tảng đặt dịch vụ du lịch được xây dựng bằng Django. Repo có các module chính cho khách sạn, chuyến bay, gói du lịch, hoạt động, booking, review và loyalty.
+CoTRIPVn là nền tảng đặt dịch vụ du lịch được xây dựng bằng Django. Repo có các module chính cho khách sạn, chuyến bay, gói du lịch, hoạt động, booking, review và loyalty.
 
 ## Yêu cầu môi trường
 
@@ -104,9 +104,9 @@ Nếu muốn chạy gần giống môi trường Docker/production hơn, dùng P
 Tạo database và user theo cấu hình bạn muốn, ví dụ:
 
 ```sql
-CREATE DATABASE novaryo;
+CREATE DATABASE CoTRIPVn;
 CREATE USER postgres WITH PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE novaryo TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE CoTRIPVn TO postgres;
 ```
 
 ### 2. Cấu hình `.env`
@@ -116,7 +116,7 @@ SECRET_KEY=dev-secret-key-change-me
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 USE_SQLITE=False
-DB_NAME=novaryo
+DB_NAME=CoTRIPVn
 DB_USER=postgres
 DB_PASSWORD=password
 DB_HOST=localhost
@@ -215,13 +215,13 @@ python manage.py shell
 Chạy Celery worker nếu Redis đang chạy:
 
 ```bash
-celery -A novaryo worker -l info
+celery -A CoTRIPVn worker -l info
 ```
 
 Chạy Celery beat:
 
 ```bash
-celery -A novaryo beat -l info
+celery -A CoTRIPVn beat -l info
 ```
 
 ## Cấu trúc thư mục chính
@@ -233,7 +233,7 @@ celery -A novaryo beat -l info
 ├── flights/           # Module chuyến bay
 ├── hotels/            # Module khách sạn
 ├── loyalty/           # Module điểm thưởng/thành viên
-├── novaryo/           # Settings, URLs, WSGI/ASGI
+├── CoTRIPVn/           # Settings, URLs, WSGI/ASGI
 ├── packages/          # Module gói du lịch
 ├── reviews/           # Module đánh giá
 ├── docker-compose.yml
@@ -269,7 +269,7 @@ USE_SQLITE=True
 Nếu dùng PostgreSQL, kiểm tra lại các biến:
 
 ```env
-DB_NAME=novaryo
+DB_NAME=CoTRIPVn
 DB_USER=postgres
 DB_PASSWORD=password
 DB_HOST=localhost
@@ -278,7 +278,7 @@ DB_PORT=5432
 
 ### Lỗi thiếu module `users` hoặc `payments`
 
-File `novaryo/settings.py` và `novaryo/urls.py` hiện có khai báo app `users` và `payments`. Nếu khi chạy gặp lỗi dạng:
+File `CoTRIPVn/settings.py` và `CoTRIPVn/urls.py` hiện có khai báo app `users` và `payments`. Nếu khi chạy gặp lỗi dạng:
 
 ```text
 ModuleNotFoundError: No module named 'users'
