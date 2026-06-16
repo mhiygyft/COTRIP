@@ -33,11 +33,11 @@ Copy-Item .env.example .env
 Mở file `.env` và chỉnh các giá trị tối thiểu:
 
 ```env
-SECRET_KEY=dev-secret-key-change-me
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-USE_SQLITE=True
-REDIS_URL=redis://localhost:6379/0
+SECRET_KEY=
+DEBUG=
+ALLOWED_HOSTS=
+USE_SQLITE=
+REDIS_URL=
 ```
 
 ### 2. Tạo virtual environment
@@ -112,16 +112,16 @@ GRANT ALL PRIVILEGES ON DATABASE CoTRIPVn TO postgres;
 ### 2. Cấu hình `.env`
 
 ```env
-SECRET_KEY=dev-secret-key-change-me
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-USE_SQLITE=False
-DB_NAME=CoTRIPVn
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=localhost
-DB_PORT=5432
-REDIS_URL=redis://localhost:6379/0
+SECRET_KEY=
+DEBUG=
+ALLOWED_HOSTS=
+USE_SQLITE=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
+REDIS_URL=
 ```
 
 ### 3. Cài dependency, migrate và chạy server
@@ -255,7 +255,7 @@ decouple.UndefinedValueError: SECRET_KEY not found
 Cách xử lý: tạo file `.env` từ `.env.example` và đảm bảo có dòng:
 
 ```env
-SECRET_KEY=dev-secret-key-change-me
+SECRET_KEY=
 ```
 
 ### Lỗi không kết nối được PostgreSQL
@@ -263,17 +263,17 @@ SECRET_KEY=dev-secret-key-change-me
 Nếu chỉ muốn chạy nhanh ở local, bật SQLite:
 
 ```env
-USE_SQLITE=True
+USE_SQLITE=
 ```
 
 Nếu dùng PostgreSQL, kiểm tra lại các biến:
 
 ```env
-DB_NAME=CoTRIPVn
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=localhost
-DB_PORT=5432
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
 ```
 
 ### Lỗi thiếu module `users` hoặc `payments`
@@ -297,6 +297,4 @@ redis://localhost:6379/0
 
 Nếu không dùng Celery trong lúc phát triển giao diện/API cơ bản, bạn có thể chỉ chạy Django server trước.
 
-## Ghi chú license
 
-Repo gốc ghi rõ dự án thuộc bản quyền của tác giả. Trước khi dùng cho mục đích thương mại, phân phối lại hoặc chỉnh sửa công khai, cần kiểm tra và tuân thủ điều khoản license đi kèm repo.
