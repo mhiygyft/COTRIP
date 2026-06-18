@@ -1,6 +1,6 @@
-# Novaryo Travel Booking Platform
+# CoTRIPVn Travel Booking Platform
 
-Novaryo là nền tảng đặt dịch vụ du lịch được xây dựng bằng Django. Repo có các module chính cho khách sạn, chuyến bay, gói du lịch, hoạt động, booking, review và loyalty.
+CoTRIPVn là nền tảng đặt dịch vụ du lịch được xây dựng bằng Django. Repo có các module chính cho khách sạn, chuyến bay, gói du lịch, hoạt động, booking, review và loyalty.
 
 ## Yêu cầu môi trường
 
@@ -33,11 +33,11 @@ Copy-Item .env.example .env
 Mở file `.env` và chỉnh các giá trị tối thiểu:
 
 ```env
-SECRET_KEY=dev-secret-key-change-me
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-USE_SQLITE=True
-REDIS_URL=redis://localhost:6379/0
+SECRET_KEY=
+DEBUG=
+ALLOWED_HOSTS=
+USE_SQLITE=
+REDIS_URL=
 ```
 
 ### 2. Tạo virtual environment
@@ -104,24 +104,24 @@ Nếu muốn chạy gần giống môi trường Docker/production hơn, dùng P
 Tạo database và user theo cấu hình bạn muốn, ví dụ:
 
 ```sql
-CREATE DATABASE novaryo;
+CREATE DATABASE CoTRIPVn;
 CREATE USER postgres WITH PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE novaryo TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE CoTRIPVn TO postgres;
 ```
 
 ### 2. Cấu hình `.env`
 
 ```env
-SECRET_KEY=dev-secret-key-change-me
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-USE_SQLITE=False
-DB_NAME=novaryo
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=localhost
-DB_PORT=5432
-REDIS_URL=redis://localhost:6379/0
+SECRET_KEY=
+DEBUG=
+ALLOWED_HOSTS=
+USE_SQLITE=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
+REDIS_URL=
 ```
 
 ### 3. Cài dependency, migrate và chạy server
@@ -215,13 +215,13 @@ python manage.py shell
 Chạy Celery worker nếu Redis đang chạy:
 
 ```bash
-celery -A novaryo worker -l info
+celery -A CoTRIPVn worker -l info
 ```
 
 Chạy Celery beat:
 
 ```bash
-celery -A novaryo beat -l info
+celery -A CoTRIPVn beat -l info
 ```
 
 ## Cấu trúc thư mục chính
@@ -233,7 +233,7 @@ celery -A novaryo beat -l info
 ├── flights/           # Module chuyến bay
 ├── hotels/            # Module khách sạn
 ├── loyalty/           # Module điểm thưởng/thành viên
-├── novaryo/           # Settings, URLs, WSGI/ASGI
+├── CoTRIPVn/           # Settings, URLs, WSGI/ASGI
 ├── packages/          # Module gói du lịch
 ├── reviews/           # Module đánh giá
 ├── docker-compose.yml
@@ -255,7 +255,7 @@ decouple.UndefinedValueError: SECRET_KEY not found
 Cách xử lý: tạo file `.env` từ `.env.example` và đảm bảo có dòng:
 
 ```env
-SECRET_KEY=dev-secret-key-change-me
+SECRET_KEY=
 ```
 
 ### Lỗi không kết nối được PostgreSQL
@@ -263,22 +263,22 @@ SECRET_KEY=dev-secret-key-change-me
 Nếu chỉ muốn chạy nhanh ở local, bật SQLite:
 
 ```env
-USE_SQLITE=True
+USE_SQLITE=
 ```
 
 Nếu dùng PostgreSQL, kiểm tra lại các biến:
 
 ```env
-DB_NAME=novaryo
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=localhost
-DB_PORT=5432
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
 ```
 
 ### Lỗi thiếu module `users` hoặc `payments`
 
-File `novaryo/settings.py` và `novaryo/urls.py` hiện có khai báo app `users` và `payments`. Nếu khi chạy gặp lỗi dạng:
+File `CoTRIPVn/settings.py` và `CoTRIPVn/urls.py` hiện có khai báo app `users` và `payments`. Nếu khi chạy gặp lỗi dạng:
 
 ```text
 ModuleNotFoundError: No module named 'users'
@@ -297,6 +297,4 @@ redis://localhost:6379/0
 
 Nếu không dùng Celery trong lúc phát triển giao diện/API cơ bản, bạn có thể chỉ chạy Django server trước.
 
-## Ghi chú license
 
-Repo gốc ghi rõ dự án thuộc bản quyền của tác giả. Trước khi dùng cho mục đích thương mại, phân phối lại hoặc chỉnh sửa công khai, cần kiểm tra và tuân thủ điều khoản license đi kèm repo.
