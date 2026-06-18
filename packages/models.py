@@ -53,6 +53,9 @@ class TravelPackage(models.Model):
     
     # Media
     image_url = models.URLField(blank=True)
+    video_url = models.URLField(blank=True, help_text="YouTube, TikTok or Facebook video URL")
+    affiliate_url = models.URLField(blank=True, help_text="Optional partner/affiliate booking URL")
+    affiliate_label = models.CharField(max_length=120, blank=True, default="Xem ưu đãi liên kết")
     
     # Status
     is_active = models.BooleanField(default=True)

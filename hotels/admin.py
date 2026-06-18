@@ -27,8 +27,8 @@ class MultipleImageField(forms.ImageField):
 class HotelAdminForm(forms.ModelForm):
     additional_images = MultipleImageField(
         required=False,
-        label='Them nhieu anh',
-        help_text='Chon mot hoac nhieu anh de them vao thu vien anh khach san.',
+        label='Thêm nhiều ảnh',
+        help_text='Chọn một hoặc nhiều ảnh để thêm vào thư viện ảnh khách sạn.',
     )
 
     class Meta:
@@ -36,21 +36,21 @@ class HotelAdminForm(forms.ModelForm):
         fields = '__all__'
 
 MODEL_LABELS = {
-    Country: ('quoc gia', 'Quoc gia'),
-    City: ('thanh pho', 'Thanh pho'),
-    HotelChain: ('chuoi khach san', 'Chuoi khach san'),
-    Amenity: ('tien nghi', 'Tien nghi'),
-    Hotel: ('khach san', 'Khach san'),
-    HotelImage: ('anh khach san', 'Anh khach san'),
-    RoomType: ('loai phong', 'Loai phong'),
-    RoomImage: ('anh phong', 'Anh phong'),
-    RoomAvailability: ('lich phong', 'Lich phong'),
-    HotelReservation: ('booking khach san', 'Booking khach san'),
-    HotelFacility: ('co so vat chat', 'Co so vat chat'),
-    Itinerary: ('lich trinh goi y', 'Lich trinh goi y'),
-    ItineraryStop: ('diem dung lich trinh', 'Diem dung lich trinh'),
-    ItineraryOrder: ('don lich trinh', 'Don lich trinh'),
-    ItineraryOrderItem: ('muc don lich trinh', 'Muc don lich trinh'),
+    Country: ('quốc gia', 'Quốc gia'),
+    City: ('thành phố', 'Thành phố'),
+    HotelChain: ('chuỗi khách sạn', 'Chuỗi khách sạn'),
+    Amenity: ('tiện nghi', 'Tiện nghi'),
+    Hotel: ('khách sạn', 'Khách sạn'),
+    HotelImage: ('ảnh khách sạn', 'Ảnh khách sạn'),
+    RoomType: ('loại phòng', 'Loại phòng'),
+    RoomImage: ('ảnh phòng', 'Ảnh phòng'),
+    RoomAvailability: ('lịch phòng', 'Lịch phòng'),
+    HotelReservation: ('booking khách sạn', 'Booking khách sạn'),
+    HotelFacility: ('cơ sở vật chất', 'Cơ sở vật chất'),
+    Itinerary: ('lịch trình gợi ý', 'Lịch trình gợi ý'),
+    ItineraryStop: ('điểm dừng lịch trình', 'Điểm dừng lịch trình'),
+    ItineraryOrder: ('đơn lịch trình', 'Đơn lịch trình'),
+    ItineraryOrderItem: ('mục đơn lịch trình', 'Mục đơn lịch trình'),
 }
 for model, (singular, plural) in MODEL_LABELS.items():
     model._meta.verbose_name = singular
@@ -176,7 +176,7 @@ class HotelAdmin(admin.ModelAdmin):
             'fields': ('price_from', 'currency', 'amenities')
         }),
         ('Images', {
-            'fields': ('image_url', 'additional_images')
+            'fields': ('image_url', 'additional_images', 'video_url', 'affiliate_url', 'affiliate_label')
         }),
         ('Policies', {
             'fields': ('check_in_time', 'check_out_time', 'cancellation_policy', 'child_policy', 'pet_policy'),
@@ -234,7 +234,7 @@ class HotelAdmin(admin.ModelAdmin):
 
     def rooms_available_display(self, obj):
         return obj.rooms_available_total or 0
-    rooms_available_display.short_description = 'Phong con'
+    rooms_available_display.short_description = 'Phòng còn'
     rooms_available_display.admin_order_field = 'rooms_available_total'
 
     def reservations_count(self, obj):
@@ -350,7 +350,7 @@ class ItineraryAdmin(admin.ModelAdmin):
 
     def total_cost_display(self, obj):
         return f"{obj.total_estimated_cost:,.0f} VND"
-    total_cost_display.short_description = 'Chi phi du kien'
+    total_cost_display.short_description = 'Chi phí dự kiến'
 
 
 @admin.register(ItineraryStop)
@@ -383,4 +383,4 @@ class ItineraryOrderItemAdmin(admin.ModelAdmin):
 # Custom admin site configuration
 admin.site.site_header = 'COTRIPVn Administration'
 admin.site.site_title = 'COTRIPVn Admin'
-admin.site.index_title = 'Quan tri he thong du lich Viet Nam'
+admin.site.index_title = 'Quản trị hệ thống du lịch Việt Nam'

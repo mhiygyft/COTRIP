@@ -12,9 +12,9 @@
             <div class="col-12">
                 <h1 class="h3 mb-0">Kết quả tìm khách sạn tại Việt Nam</h1>
                 {% if location %}
-                    <p class="mb-0">{{ page_obj.paginator.count }} khach san tai "{{ location }}"</p>
+                    <p class="mb-0">{{ page_obj.paginator.count }} khách sạn tại "{{ location }}"</p>
                 {% else %}
-                    <p class="mb-0">{{ page_obj.paginator.count }} khach san phu hop</p>
+                    <p class="mb-0">{{ page_obj.paginator.count }} khách sạn phù hợp</p>
                 {% endif %}
             </div>
         </div>
@@ -130,7 +130,7 @@
         <div class="col-lg-9">
             <!-- Sort Options -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <p class="text-muted mb-0">{{ page_obj.paginator.count }} khach san</p>
+                <p class="text-muted mb-0">{{ page_obj.paginator.count }} khách sạn</p>
                 <span class="badge text-bg-light">Bộ lọc sẽ hoạt động khi bạn bấm Áp dụng</span>
             </div>
             
@@ -187,7 +187,7 @@
                             
                             <!-- Price -->
                             <div class="text-end">
-                                <p class="text-muted small mb-1">Tu</p>
+                                <p class="text-muted small mb-1">Từ</p>
                                 <div class="price mb-2">
                                     <span class="fw-bold fs-4 text-primary">{{ hotel.price_from }} {{ hotel.currency }}</span>
                                     <small class="text-muted">/đêm</small>
@@ -220,7 +220,7 @@
                     {% if hotels.has_previous %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ hotels.previous_page_number }}{% if current_querystring %}&{{ current_querystring }}{% endif %}">
-                                Previous
+                                Trước
                             </a>
                         </li>
                     {% endif %}
@@ -242,7 +242,7 @@
                     {% if hotels.has_next %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ hotels.next_page_number }}{% if current_querystring %}&{{ current_querystring }}{% endif %}">
-                                Next
+                                Sau
                             </a>
                         </li>
                     {% endif %}

@@ -22,8 +22,8 @@ class MultipleImageField(forms.ImageField):
 class ActivityAdminForm(forms.ModelForm):
     additional_images = MultipleImageField(
         required=False,
-        label='Them nhieu anh',
-        help_text='Chon mot hoac nhieu anh de them vao thu vien anh trai nghiem.',
+        label='Thêm nhiều ảnh',
+        help_text='Chọn một hoặc nhiều ảnh để thêm vào thư viện ảnh trải nghiệm.',
     )
 
     class Meta:
@@ -37,10 +37,10 @@ class ActivityImageInline(admin.TabularInline):
     fields = ['image', 'external_url', 'caption', 'alt_text', 'is_primary', 'display_order']
 
 MODEL_LABELS = {
-    ActivityCategory: ("loai trai nghiem", "Loai trai nghiem"),
-    Activity: ("trai nghiem", "Trai nghiem"),
-    ActivityImage: ("anh trai nghiem", "Anh trai nghiem"),
-    ActivityBooking: ("booking trai nghiem", "Booking trai nghiem"),
+    ActivityCategory: ("loại trải nghiệm", "Loại trải nghiệm"),
+    Activity: ("trải nghiệm", "Trải nghiệm"),
+    ActivityImage: ("ảnh trải nghiệm", "Ảnh trải nghiệm"),
+    ActivityBooking: ("booking trải nghiệm", "Booking trải nghiệm"),
 }
 for model, (singular, plural) in MODEL_LABELS.items():
     model._meta.verbose_name = singular
@@ -65,22 +65,22 @@ class ActivityAdmin(admin.ModelAdmin):
     inlines = [ActivityImageInline]
     actions = ['mark_featured', 'mark_active']
     fieldsets = (
-        ('Thong tin co ban', {
+        ('Thông tin cơ bản', {
             'fields': ('title', 'slug', 'category', 'description', 'short_description')
         }),
-        ('Dia diem', {
+        ('Địa điểm', {
             'fields': ('city', 'country', 'address')
         }),
-        ('Gia va chi tiet', {
+        ('Giá và chi tiết', {
             'fields': ('price_adult', 'price_child', 'duration_hours', 'difficulty', 'max_participants', 'min_age')
         }),
-        ('Hinh anh', {
-            'fields': ('image_url', 'additional_images')
+        ('Hình ảnh và video', {
+            'fields': ('image_url', 'additional_images', 'video_url', 'affiliate_url', 'affiliate_label')
         }),
-        ('Bao gom', {
+        ('Bao gồm', {
             'fields': ('includes_equipment', 'includes_transport', 'includes_meals', 'includes_guide')
         }),
-        ('Trang thai', {
+        ('Trạng thái', {
             'fields': ('is_active', 'featured')
         }),
     )
@@ -102,7 +102,7 @@ class ActivityAdmin(admin.ModelAdmin):
 
     def paid_count_display(self, obj):
         return obj.paid_total
-    paid_count_display.short_description = 'Da thanh toan'
+    paid_count_display.short_description = 'Đã thanh toán'
     paid_count_display.admin_order_field = 'paid_total'
 
     def save_model(self, request, obj, form, change):

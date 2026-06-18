@@ -139,6 +139,9 @@ class Hotel(models.Model):
     # Features
     amenities = models.ManyToManyField(Amenity, blank=True)
     image_url = models.URLField(blank=True, help_text="Primary hotel image URL")
+    video_url = models.URLField(blank=True, help_text="YouTube, TikTok or Facebook video URL")
+    affiliate_url = models.URLField(blank=True, help_text="Optional partner/affiliate booking URL")
+    affiliate_label = models.CharField(max_length=120, blank=True, default="Xem ưu đãi liên kết")
     
     # Policies
     check_in_time = models.TimeField(default='15:00')
@@ -528,16 +531,16 @@ class ItineraryStop(models.Model):
 
 class ItineraryOrder(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Cho xac nhan'),
-        ('confirmed', 'Da xac nhan'),
-        ('completed', 'Hoan tat'),
-        ('cancelled', 'Da huy'),
+        ('pending', 'Chờ xác nhận'),
+        ('confirmed', 'Đã xác nhận'),
+        ('completed', 'Hoàn tất'),
+        ('cancelled', 'Đã hủy'),
     ]
     PAYMENT_STATUS_CHOICES = [
-        ('pending', 'Cho thanh toan'),
-        ('completed', 'Da thanh toan'),
-        ('cancelled', 'Da huy'),
-        ('refunded', 'Da hoan tien'),
+        ('pending', 'Chờ thanh toán'),
+        ('completed', 'Đã thanh toán'),
+        ('cancelled', 'Đã hủy'),
+        ('refunded', 'Đã hoàn tiền'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='itinerary_orders')

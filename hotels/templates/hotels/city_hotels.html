@@ -24,7 +24,7 @@
                 
                 <h1 class="display-5 fw-bold">Khách sạn tại {{ city.name }}</h1>
                 <p class="lead mb-0">{{ city.country.name }}</p>
-                <p class="mb-0">{{ hotels|length }} hotels available</p>
+                <p class="mb-0">{{ hotels|length }} khách sạn khả dụng</p>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-search"></i> Search
+                    <i class="bi bi-search"></i> Tìm kiếm
                 </button>
             </div>
         </form>
@@ -84,7 +84,7 @@
         <div class="col-12">
             <!-- Sort and View Options -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3>All Hotels ({{ hotels|length }})</h3>
+                <h3>Tất cả khách sạn ({{ hotels|length }})</h3>
                 <div class="d-flex gap-2">
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
@@ -169,7 +169,7 @@
                                     <div class="fw-bold text-primary fs-5">{{ hotel.price_from|floatformat:0 }} VND<small>/đêm</small></div>
                                 </div>
                                 <a href="{% url 'hotels:hotel_detail' hotel.slug %}" class="btn btn-primary btn-sm">
-                                    View Details
+                                Xem chi tiết
                                 </a>
                             </div>
                         </div>
@@ -181,7 +181,7 @@
                     <h4>No hotels found in {{ city.name }}</h4>
                     <p class="text-muted">Thử tìm ở các thành phố gần đó hoặc quay lại sau.</p>
                     <a href="{% url 'home' %}" class="btn btn-primary">
-                        <i class="bi bi-arrow-left"></i> Back to Search
+                    <i class="bi bi-arrow-left"></i> Quay lại tìm kiếm
                     </a>
                 </div>
                 {% endfor %}
@@ -194,7 +194,7 @@
                     {% if hotels.has_previous %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ hotels.previous_page_number }}">
-                                Previous
+                                Trước
                             </a>
                         </li>
                     {% endif %}
@@ -214,7 +214,7 @@
                     {% if hotels.has_next %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ hotels.next_page_number }}">
-                                Next
+                                Sau
                             </a>
                         </li>
                     {% endif %}
@@ -231,7 +231,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h3 class="text-center mb-4">Other Popular Destinations in {{ city.country.name }}</h3>
+                <h3 class="text-center mb-4">Điểm đến nổi bật khác tại {{ city.country.name }}</h3>
                 
                 <div class="row">
                     {% for other_city in other_popular_cities %}
@@ -242,7 +242,7 @@
                                 <p class="text-muted small mb-2">{{ other_city.hotel_count }} hotels</p>
                                 <a href="{% url 'hotels:city_hotels' other_city.country.code other_city.id %}" 
                                    class="btn btn-outline-primary btn-sm">
-                                    Explore
+                                    Khám phá
                                 </a>
                             </div>
                         </div>

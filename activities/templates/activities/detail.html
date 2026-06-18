@@ -2,7 +2,7 @@
 
 {% load hotels_tags %}
 
-{% block title %}Chi tiet trai nghiem - COTRIPVn{% endblock %}
+{% block title %}Chi tiết trải nghiệm - COTRIPVn{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -23,7 +23,7 @@
             </div>
         {% endif %}
         <p><strong>{{ activity.price_adult|floatformat:0 }} VND</strong> mỗi người lớn</p>
-        <p class="text-success">{{ activity.max_participants }} suat moi ngay</p>
+        <p class="text-success">{{ activity.max_participants }} suất mỗi ngày</p>
         <form method="post" action="{% url 'activities:book' activity.id %}" class="row g-3 border rounded p-3 mt-3">
             {% csrf_token %}
             <div class="col-md-4">

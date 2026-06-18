@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from .models import User
 
-User._meta.verbose_name = "nguoi dung"
-User._meta.verbose_name_plural = "Nguoi dung"
+User._meta.verbose_name = "người dùng"
+User._meta.verbose_name_plural = "Người dùng"
 
 
 @admin.register(User)

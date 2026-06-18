@@ -22,8 +22,8 @@ class MultipleImageField(forms.ImageField):
 class TravelPackageAdminForm(forms.ModelForm):
     additional_images = MultipleImageField(
         required=False,
-        label='Them nhieu anh',
-        help_text='Chon mot hoac nhieu anh de them vao thu vien anh tour.',
+        label='Thêm nhiều ảnh',
+        help_text='Chọn một hoặc nhiều ảnh để thêm vào thư viện ảnh tour.',
     )
 
     class Meta:
@@ -37,9 +37,9 @@ class PackageImageInline(admin.TabularInline):
     fields = ['image', 'external_url', 'caption', 'alt_text', 'is_primary', 'display_order']
 
 MODEL_LABELS = {
-    TravelPackage: ("tour tron goi", "Tour tron goi"),
-    PackageImage: ("anh tour", "Anh tour"),
-    PackageComponent: ("lich trinh tour", "Lich trinh tour"),
+    TravelPackage: ("tour trọn gói", "Tour trọn gói"),
+    PackageImage: ("ảnh tour", "Ảnh tour"),
+    PackageComponent: ("lịch trình tour", "Lịch trình tour"),
     PackageBooking: ("booking tour", "Booking tour"),
 }
 for model, (singular, plural) in MODEL_LABELS.items():
@@ -65,22 +65,22 @@ class TravelPackageAdmin(admin.ModelAdmin):
     inlines = [PackageImageInline, PackageComponentInline]
     actions = ['mark_featured', 'mark_active']
     fieldsets = (
-        ('Thong tin co ban', {
+        ('Thông tin cơ bản', {
             'fields': ('title', 'slug', 'package_type', 'description', 'short_description')
         }),
-        ('Diem den va thoi luong', {
+        ('Điểm đến và thời lượng', {
             'fields': ('destination_city', 'destination_country', 'duration_days', 'duration_nights')
         }),
-        ('Gia va suc chua', {
+        ('Giá và sức chứa', {
             'fields': ('base_price_per_person', 'child_price', 'single_supplement', 'min_participants', 'max_participants')
         }),
-        ('Hinh anh', {
-            'fields': ('image_url', 'additional_images')
+        ('Hình ảnh và video', {
+            'fields': ('image_url', 'additional_images', 'video_url', 'affiliate_url', 'affiliate_label')
         }),
-        ('Bao gom', {
+        ('Bao gồm', {
             'fields': ('includes_flight', 'includes_hotel', 'includes_meals', 'includes_activities', 'includes_transport', 'includes_insurance')
         }),
-        ('Trang thai', {
+        ('Trạng thái', {
             'fields': ('is_active', 'featured')
         }),
     )
@@ -102,7 +102,7 @@ class TravelPackageAdmin(admin.ModelAdmin):
 
     def paid_count_display(self, obj):
         return obj.paid_total
-    paid_count_display.short_description = 'Da thanh toan'
+    paid_count_display.short_description = 'Đã thanh toán'
     paid_count_display.admin_order_field = 'paid_total'
 
     def save_model(self, request, obj, form, change):

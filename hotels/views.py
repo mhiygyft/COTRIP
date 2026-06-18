@@ -87,7 +87,7 @@ def default_activity_suggestions(city_name):
             ('transport', 'Thue xe may Soc Son 1 ngay', 'Phu hop nhom nho muon tu di cac diem quanh ho va doi thong.', 180000),
             ('accommodation', 'Lakeside camping stay Dong Do', 'Luu tru ven ho, hop nhom ban thich BBQ, chill dem va di ngan ngay.', 620000),
             ('accommodation', 'Pine hill homestay Soc Son', 'Homestay doi thong gan ho Dong Do, yen tinh va co goc check-in.', 680000),
-            ('food', 'BBQ ven ho Dong Do', 'Bua toi phu hop nhom ban sau khi SUP/cam trai.', 250000),
+            ('food', 'BBQ ven hồ Đồng Đò', 'Bữa tối phù hợp nhóm bạn sau khi SUP/cắm trại.', 250000),
             ('food', 'Cafe chill Soc Son', 'Dung nghi buoi chieu, chup anh va can bang lich trinh.', 90000),
             ('food', 'Bua sang homestay', 'An sang nhe truoc khi di dao ho hoac quay lai Ha Noi.', 70000),
         ],
@@ -852,7 +852,7 @@ def create_itinerary_booking_for_item(user, itinerary, item, service_date, trave
                 'total_price': activity.price_adult * travelers,
                 'status': 'pending',
                 'payment_status': 'pending',
-                'special_requests': f'Tu lich trinh: {itinerary.title} - ngay {stop.day_number}',
+                'special_requests': f'Từ lịch trình: {itinerary.title} - ngày {stop.day_number}',
             },
         )
         return {

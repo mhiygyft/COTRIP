@@ -232,6 +232,102 @@ ROOM_IMAGES = [
     "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=80",
 ]
 
+ACTIVITY_FALLBACK_IMAGES = {
+    "am thuc": [
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "di san": [
+        "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518002054494-3a6f94352e9d?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "khu vui choi": [
+        "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "check-in": [
+        "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518002054494-3a6f94352e9d?auto=format&fit=crop&w=1200&q=80",
+    ],
+    "thien nhien": [
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1200&q=80",
+    ],
+}
+
+ACTIVITY_REAL_PHOTO_QUERIES = [
+    ("cooking", "vietnam,cooking,class"),
+    ("lop nau", "vietnam,cooking,class"),
+    ("food", "vietnam,street-food"),
+    ("am thuc", "vietnam,street-food"),
+    ("snack", "vietnam,street-food"),
+    ("coffee", "vietnam,cafe"),
+    ("cafe", "vietnam,cafe"),
+    ("market", "vietnam,market"),
+    ("cho noi", "vietnam,floating-market"),
+    ("floating market", "vietnam,floating-market"),
+    ("waterbus", "vietnam,river"),
+    ("dragon boat", "vietnam,river,boat"),
+    ("boat", "vietnam,boat,tour"),
+    ("du thuyen", "vietnam,bay,boat"),
+    ("basket boat", "vietnam,basket-boat"),
+    ("thuyen thung", "vietnam,basket-boat"),
+    ("cruise", "vietnam,bay,boat"),
+    ("snorkel", "vietnam,snorkeling"),
+    ("san ho", "vietnam,snorkeling"),
+    ("beach", "vietnam,beach"),
+    ("bien", "vietnam,beach"),
+    ("starfish", "vietnam,beach,starfish"),
+    ("island", "vietnam,island"),
+    ("dao", "vietnam,island"),
+    ("trek", "vietnam,trekking,mountain"),
+    ("fansipan", "vietnam,cable-car,mountain"),
+    ("cable car", "vietnam,cable-car,mountain"),
+    ("ha giang", "vietnam,mountain,road"),
+    ("quan ba", "vietnam,mountain,road"),
+    ("sapa", "vietnam,rice-terraces"),
+    ("sa pa", "vietnam,rice-terraces"),
+    ("tea", "vietnam,tea-hills"),
+    ("cau dat", "vietnam,tea-hills"),
+    ("cloud", "vietnam,mountain,clouds"),
+    ("sand dunes", "vietnam,sand-dunes"),
+    ("mui ne", "vietnam,sand-dunes"),
+    ("cave", "vietnam,cave"),
+    ("phong nha", "vietnam,cave"),
+    ("tunnel", "vietnam,tunnel"),
+    ("cu chi", "vietnam,tunnel"),
+    ("museum", "vietnam,museum"),
+    ("prison", "vietnam,museum"),
+    ("temple", "vietnam,temple"),
+    ("sanctuary", "vietnam,temple"),
+    ("imperial", "vietnam,heritage"),
+    ("heritage", "vietnam,heritage"),
+    ("di san", "vietnam,heritage"),
+    ("old quarter", "vietnam,old-quarter"),
+    ("pho co", "vietnam,old-quarter"),
+    ("train street", "vietnam,train-street"),
+    ("incense", "vietnam,incense-village"),
+    ("vegetable", "vietnam,farm,village"),
+    ("farm", "vietnam,farm"),
+    ("nong trai", "vietnam,farm"),
+    ("cycling", "vietnam,cycling,village"),
+    ("bike", "vietnam,cycling,village"),
+    ("picnic", "vietnam,lake,picnic"),
+    ("lake", "vietnam,lake"),
+    ("sunset", "vietnam,sunset"),
+    ("viewpoint", "vietnam,viewpoint"),
+    ("photo", "vietnam,travel,viewpoint"),
+    ("check-in", "vietnam,travel,viewpoint"),
+    ("vinwonders", "theme-park"),
+    ("sun world", "theme-park"),
+    ("ba na", "vietnam,cable-car,bridge"),
+]
+
 
 class Command(BaseCommand):
     help = "Attach destination-accurate external image URLs for hotels, rooms, packages and activities."
@@ -262,12 +358,77 @@ class Command(BaseCommand):
                 return images
         return self.image_set_for_city(city_name)
 
+    def activity_fallback_images(self, activity):
+        category_name = activity.category.name.lower() if activity.category_id else ""
+        for keyword, images in ACTIVITY_FALLBACK_IMAGES.items():
+            if keyword in category_name:
+                return images
+        return ACTIVITY_FALLBACK_IMAGES["thien nhien"]
+
+    def activity_real_photo_query(self, activity):
+        text_key = f"{activity.title} {activity.category.name if activity.category_id else ''} {activity.city}".lower()
+        for keyword, query in ACTIVITY_REAL_PHOTO_QUERIES:
+            if keyword in text_key:
+                return query
+        category_name = activity.category.name.lower() if activity.category_id else ""
+        if "am thuc" in category_name:
+            return "vietnam,street-food"
+        if "di san" in category_name:
+            return "vietnam,heritage"
+        if "khu vui choi" in category_name:
+            return "theme-park"
+        if "check-in" in category_name:
+            return "vietnam,travel,viewpoint"
+        return f"vietnam,{activity.city.lower().replace(' ', '-')},travel"
+
+    def activity_real_photo_urls(self, activity):
+        query = quote(self.activity_real_photo_query(activity), safe=",")
+        return [
+            f"https://loremflickr.com/1200/800/{query}?lock={activity.id * 10 + image_index}"
+            for image_index in range(1, 4)
+        ]
+
+    def dedupe_images(self, images):
+        seen = set()
+        unique_images = []
+        for image in images:
+            if image and image not in seen:
+                seen.add(image)
+                unique_images.append(image)
+        return unique_images
+
+    def ordered_activity_images(self, activity, blocked_primary_urls, used_primary_urls):
+        images = self.dedupe_images(
+            self.activity_real_photo_urls(activity)
+            + self.image_set_for_text(activity.title, activity.city)
+            + self.activity_fallback_images(activity)
+            + self.image_set_for_city(activity.city)
+        )
+        if not images:
+            return []
+
+        offset = activity.id % len(images)
+        rotated = images[offset:] + images[:offset]
+        primary = next(
+            (
+                image
+                for image in rotated
+                if image not in blocked_primary_urls and image not in used_primary_urls
+            ),
+            None,
+        )
+        if primary is None:
+            primary = next((image for image in rotated if image not in blocked_primary_urls), rotated[0])
+
+        return [primary] + [image for image in rotated if image != primary]
+
     def seed_hotels(self):
         updates = 0
         for hotel in Hotel.objects.select_related("city").order_by("id"):
             images = self.image_set_for_hotel(hotel)
             hotel.image_url = images[0]
             hotel.save(update_fields=["image_url", "updated_at"])
+            hotel.images.filter(external_url__gt="", image="").delete()
             for image_index, external_url in enumerate(images[:3]):
                 image, _ = HotelImage.objects.update_or_create(
                     hotel=hotel,
@@ -288,6 +449,7 @@ class Command(BaseCommand):
     def seed_rooms(self):
         updates = 0
         for room_index, room in enumerate(RoomType.objects.select_related("hotel").order_by("id")):
+            room.images.filter(external_url__gt="", image="").delete()
             for image_index in range(2):
                 external_url = ROOM_IMAGES[(room_index + image_index) % len(ROOM_IMAGES)]
                 image, _ = RoomImage.objects.update_or_create(
@@ -310,6 +472,7 @@ class Command(BaseCommand):
             images = self.image_set_for_text(package.title, package.destination_city)
             package.image_url = images[0]
             package.save(update_fields=["image_url", "updated_at"])
+            package.images.filter(external_url__gt="", image="").delete()
             for image_index, external_url in enumerate(images[:3]):
                 image, _ = PackageImage.objects.update_or_create(
                     package=package,
@@ -328,14 +491,27 @@ class Command(BaseCommand):
 
     def seed_activities(self):
         updates = 0
-        for activity in Activity.objects.order_by("id"):
-            images = self.image_set_for_text(activity.title, activity.city)
+        package_primary_urls = set(
+            TravelPackage.objects.exclude(image_url="")
+            .values_list("image_url", flat=True)
+        )
+        used_primary_urls = set()
+        for activity in Activity.objects.select_related("category").order_by("id"):
+            images = self.ordered_activity_images(activity, package_primary_urls, used_primary_urls)
+            if not images:
+                continue
+            used_primary_urls.add(images[0])
             activity.image_url = images[0]
             activity.save(update_fields=["image_url", "updated_at"])
+
+            # Clear generated/local sample rows and previous external seed rows.
+            # Other manually uploaded files outside activities/generated/ are kept.
+            activity.images.filter(image__startswith="activities/generated/").delete()
+            activity.images.filter(external_url__gt="", image="").delete()
             for image_index, external_url in enumerate(images[:3]):
                 image, _ = ActivityImage.objects.update_or_create(
                     activity=activity,
-                    display_order=image_index + 1,
+                    display_order=image_index,
                     defaults={
                         "external_url": external_url,
                         "caption": f"{activity.title} destination image",

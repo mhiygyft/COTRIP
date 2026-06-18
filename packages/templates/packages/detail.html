@@ -2,7 +2,7 @@
 
 {% load hotels_tags %}
 
-{% block title %}Chi tiet tour - COTRIPVn{% endblock %}
+{% block title %}Chi tiết tour - COTRIPVn{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -23,7 +23,7 @@
             </div>
         {% endif %}
         <p><strong>{{ package.base_price_per_person|floatformat:0 }} VND</strong> mỗi người</p>
-        <p class="text-success">Con {{ package.max_participants }} suat moi dot khoi hanh</p>
+        <p class="text-success">Còn {{ package.max_participants }} suất mỗi đợt khởi hành</p>
         <form method="post" action="{% url 'packages:book' package.id %}" class="row g-3 border rounded p-3 mt-3">
             {% csrf_token %}
             <div class="col-md-4">
@@ -39,7 +39,7 @@
                 <input class="form-control" id="children" name="children" type="number" min="0" value="0">
             </div>
             <div class="col-md-2">
-                <label class="form-label" for="infants">Em be</label>
+                <label class="form-label" for="infants">Em bé</label>
                 <input class="form-control" id="infants" name="infants" type="number" min="0" value="0">
             </div>
             <div class="col-md-2 d-flex align-items-end">
